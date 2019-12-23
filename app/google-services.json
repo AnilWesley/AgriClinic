@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "620434577854",
+    "firebase_url": "https://agriclinic.firebaseio.com",
+    "project_id": "agriclinic",
+    "storage_bucket": "agriclinic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620434577854:android:97c7909e5504185d17c1ef",
+        "android_client_info": {
+          "package_name": "com.novaagritech.agriclinic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "620434577854-595nv6nrlhu0eekb3vp32cersb6agp32.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.novaagritech.agriclinic",
+            "certificate_hash": "6a5ca0f34051ceaeb6473065187eecf609dc1f78"
+          }
+        },
+        {
+          "client_id": "620434577854-lsh8h0hpa9kijncf7pob6kcffc2thr17.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmMCVwvVUPIUDX5qROTwlB0OiEcsFLUOQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "620434577854-lsh8h0hpa9kijncf7pob6kcffc2thr17.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

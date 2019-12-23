@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="@dimen/padding_10"
+        android:background="@drawable/bg"
+        android:orientation="vertical"
+        tools:context=".LoginActivity">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:ignore="UselessParent">
+            <LinearLayout
+                android:ems="10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="@dimen/padding_10"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center|top"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@mipmap/logo"
+                    android:scaleType="fitCenter"
+                    android:background="@color/apploizc_transparent_color"
+                    android:contentDescription="@string/app_name"/>
+
+
+        <com.novaagritech.agriclinic.constants.CustomTextViewBold
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/login_form"
+            android:padding="@dimen/padding_10"
+            android:layout_margin="10dp"
+            android:textColor="#FF43A047"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/editTextNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/enter_mobile_number"
+                        android:layout_margin="10dp"
+                        android:padding="10dp"
+                        android:maxLength="10"
+                        android:ems="10"
+                        android:textColor="@color/colorPrimary"
+                        android:inputType="number"
+                        tools:ignore="Autofill" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    app:passwordToggleEnabled="true"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/editTextCnfPasswrd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/enter_password"
+                        android:layout_margin="10dp"
+                        android:padding="10dp"
+                        android:ems="10"
+                        android:textColor="@color/colorPrimary"
+                        android:inputType="textPassword"
+                        tools:ignore="Autofill" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:id="@+id/forgot_password"
+            android:text="@string/forgot_password"
+            android:layout_margin="5dp"
+            android:textColor="#FF43A047"/>
+
+        <Button
+            android:id="@+id/buttonSignUp"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:onClick="veriySignIn"
+            android:padding="5dp"
+            android:layout_gravity="center"
+            android:background="@drawable/login_button"
+            android:text="@string/login"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/text_signUp"
+            android:onClick="textSignUp"
+            android:text="@string/create_account"
+            android:layout_margin="5dp"
+            android:textSize="15sp"
+            android:textColor="#FF43A047"/>
+            </LinearLayout>
+
+        </FrameLayout>
+    </LinearLayout>
+
+</layout>

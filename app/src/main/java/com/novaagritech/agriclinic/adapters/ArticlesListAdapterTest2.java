@@ -1,0 +1,420 @@
+package com.novaagritech.agriclinic.adapters;
+
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.text.Html;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.ToggleButton;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.ShortDynamicLink;
+import com.google.gson.JsonObject;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.novaagritech.agriclinic.R;
+import com.novaagritech.agriclinic.activities.SingleArticleActivity;
+import com.novaagritech.agriclinic.comments.ChatActivity;
+import com.novaagritech.agriclinic.constants.ConstantValues;
+import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
+import com.novaagritech.agriclinic.modals.ArticlesList;
+import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.retrofit.ApiInterface;
+import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
+import com.novaagritech.agriclinic.utilities.Urls;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ArticlesListAdapterTest2 extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+
+
+    private Context context;
+
+    ArticlesListAdapterTest2 adapter;
+
+    private DisplayImageOptions options;
+
+    private String TAG="CONTEXT";
+
+    private String user_id;
+
+
+    private List<InfoData> infoDataList;
+
+
+    private MyAppPrefsManager myAppPrefsManager;
+
+    private int likes_count;
+
+
+
+
+    public ArticlesListAdapterTest2(Context ctx, List<InfoData> infoDataList) {
+        this.infoDataList = infoDataList;
+        context = ctx;
+        this.adapter = this; //This is an important line, you need this line to keep track the adapter variable
+        myAppPrefsManager=new MyAppPrefsManager(context);
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.image_not_available)
+                .showImageForEmptyUri(R.drawable.image_not_available)
+                .showImageOnFail(R.drawable.image_not_available)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .displayer(new RoundedBitmapDisplayer(20))
+                .build();
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder = null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        viewHolder = getViewHolder(parent, inflater);
+
+        return viewHolder;
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+        if (holder instanceof MyViewHolder) {
+            InfoData articleModal = (InfoData) infoDataList.get(position);
+
+            user_id = myAppPrefsManager.getUserId();
+
+
+            ((MyViewHolder) holder).tvName.setText(articleModal.getTitle());
+            ((MyViewHolder) holder).articlelikes.setText(articleModal.getLikes_count() + " " + "likes");
+            ((MyViewHolder) holder).articleviews.setText(articleModal.getViews_count() + " " + "views");
+            ((MyViewHolder) holder).articleCommentCount.setText("View All " + articleModal.getComment_count() + " Comments");
+            ((MyViewHolder) holder).tvDate.setText(ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, articleModal.getCreated_on()));
+            //((MyViewHolder) holder).tvDate.setText(articleModal.getCreated_on());
+
+            ImageLoader.getInstance()
+                    .displayImage(Urls.IMAGE_URL + articleModal.getImage_path(), ((MyViewHolder) holder).imageView, options);
+
+
+            ((MyViewHolder) holder).imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent setIntent = new Intent(context, SingleArticleActivity.class);
+                    setIntent.putExtra("article_id", infoDataList.get(position).getId());
+                    setIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    context.startActivity(setIntent);
+                }
+            });
+
+
+            // Check if the User has Liked the Product
+            if (articleModal.getIs_liked() == 1) {
+                ((MyViewHolder) holder).product_like_btn.setChecked(true);
+
+            } else {
+                ((MyViewHolder) holder).product_like_btn.setChecked(false);
+            }
+
+            // Check if the User has Liked the Product
+            if (articleModal.getComment_count() == 0) {
+
+                ((MyViewHolder) holder).articleCommentCount.setText("Add Comments");
+
+
+            }
+            // Handle Click event of product_like_btn Button
+            ((MyViewHolder) holder).product_like_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // Check if the User is Authenticated
+                    if (ConstantValues.IS_USER_LOGGED_IN) {
+
+                        // Check if the User has Checked the Like Button
+                        if (((MyViewHolder) holder).product_like_btn.isChecked()) {
+                            articleModal.setIs_liked(1);
+                            ((MyViewHolder) holder).product_like_btn.setChecked(true);
+                            // Request the Server to Like the Product for the User
+
+                            // prepare call in Retrofit 2.0
+                            JsonObject jsonObject = new JsonObject();
+
+                            jsonObject.addProperty("user_id", user_id);
+                            jsonObject.addProperty("article_id", articleModal.getId());
+                            jsonObject.addProperty("is_liked", 1);
+
+                            Log.d(TAG, "" + jsonObject);
+                            ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
+                            Call<ArticlesList> call = service.processArticlesLikes(jsonObject);
+                            call.enqueue(new Callback<ArticlesList>() {
+                                @Override
+                                public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+
+                                    // Check if the Response is successful
+                                    if (response.isSuccessful()) {
+                                        // Check the Success status
+                                        if (response.body().getMessage().equalsIgnoreCase("Data Updated successfully!")) {
+
+                                            // Product has been Disliked. Show the message to User
+                                            likes_count = response.body().getLikes_count();
+                                            Log.d(TAG, "Count : " + likes_count);
+                                            //((MyViewHolder) holder).articlelikes.setText((likes_count)+" "+"likes");
+                                            ((MyViewHolder) holder).articlelikes.setText(((infoDataList.get(position).getLikes_count()) + 1) + " " + "likes");
+                                            infoDataList.get(position).setLikes_count(((infoDataList.get(position).getLikes_count()) + 1));
+                                        }
+
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+
+                                    Log.d("ResponseF", "" + t);
+                                }
+                            });
+
+                        } else {
+                            articleModal.setIs_liked(0);
+                            ((MyViewHolder) holder).product_like_btn.setChecked(false);
+
+                            // Request the Server to Unlike the Product for the User
+                            // prepare call in Retrofit 2.0
+                            JsonObject jsonObject = new JsonObject();
+
+
+                            jsonObject.addProperty("user_id", user_id);
+                            jsonObject.addProperty("article_id", articleModal.getId());
+                            jsonObject.addProperty("is_liked", 0);
+
+                            Log.d(TAG, "" + jsonObject);
+                            ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
+                            Call<ArticlesList> call = service.processArticlesUnLikes(jsonObject);
+                            call.enqueue(new Callback<ArticlesList>() {
+                                @Override
+                                public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+
+                                    // Check if the Response is successful
+                                    if (response.isSuccessful()) {
+                                        // Check the Success status
+                                        if (response.body().getMessage().equalsIgnoreCase("Data Updated successfully!")) {
+
+                                            // Product has been Disliked. Show the message to User
+                                            likes_count = response.body().getLikes_count();
+                                            Log.d(TAG, "Count : " + likes_count);
+                                            // ((MyViewHolder) holder).articlelikes.setText((likes_count)+" "+"likes");
+                                            ((MyViewHolder) holder).articlelikes.setText(((infoDataList.get(position).getLikes_count()) - 1) + " " + "likes");
+                                            infoDataList.get(position).setLikes_count(((infoDataList.get(position).getLikes_count()) - 1));
+
+                                        }
+
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+
+                                    Log.d("ResponseF", "" + t);
+                                }
+                            });
+
+
+                        }
+
+
+                    }
+                }
+            });
+
+            ((MyViewHolder) holder).product_share_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+
+                    if (ConstantValues.IS_USER_LOGGED_IN) {
+                        try {
+
+
+                           /* DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                                    .setLink(Uri.parse("http://agriclinic.org/"))
+                                    .setDomainUriPrefix("novaagritech1.page.link")
+                                    // Open links with this app on Android
+                                    .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                                    // Open links with com.example.ios on iOS
+                                    .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
+                                    .buildDynamicLink();
+
+                            Uri dynamicLinkUri = dynamicLink.getUri();
+                            Log.d("dynamicLinkUri",""+articleModal.getTitle());*/
+
+
+                            String sharelinktext  = "https://novaagritech1.page.link/?"+
+                                    "link=http://agriclinic.org/viewcontent.php?id="+infoDataList.get(position).getId() +
+                                    "&apn="+ context.getPackageName();
+
+
+                            // shorten the link
+                            Task<ShortDynamicLink> shortLinkTask;
+                            shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                                    .setLink(Uri.parse(sharelinktext))// manually
+                                    .setDomainUriPrefix("https://novaagritech1.page.link")
+                                    .setAndroidParameters(new DynamicLink.AndroidParameters.Builder()
+                                            .setMinimumVersion(0)
+                                            .build())
+                                    .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
+                                            .setTitle(infoDataList.get(position).getTitle())
+                                            .setDescription(context.getResources().getString(R.string.access_farmrise_articles1))
+                                            .build())
+                                    .buildShortDynamicLink(ShortDynamicLink.Suffix.SHORT)
+                                    .addOnCompleteListener((Activity) context, (OnCompleteListener<ShortDynamicLink>) task -> {
+                                        if (task.isSuccessful()) {
+                                            // Short link created
+                                            Uri shortLink = task.getResult().getShortLink();
+                                            Uri flowchartLink = task.getResult().getPreviewLink();
+                                            Log.e("main ", "short link "+ shortLink);
+                                            Log.e("main ", "short link "+ flowchartLink);
+
+
+                                            Intent intent = new Intent();
+                                            intent.setAction(Intent.ACTION_SEND);
+
+                                            intent.putExtra(Intent.EXTRA_TEXT, shortLink.toString());
+                                            intent.setType("text/plain");
+                                            context.startActivity(intent);
+
+
+                                        } else {
+                                            // Error
+                                            // ...
+                                            Log.e("main", " error "+task.getException() );
+
+                                        }
+                                    });
+
+                            Log.e("main ", "short link "+ shortLinkTask);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                }
+            });
+            ((MyViewHolder) holder).articleCommentCount.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // Check if the User is Authenticated
+                    if (ConstantValues.IS_USER_LOGGED_IN) {
+
+                        //ConstantValues.shareDeepLink1(context, String.format(context.getResources().getString(R.string.access_farmrise_articles), articleModal.getTitle()));
+
+                        try {
+                            Intent intent = new Intent(context, ChatActivity.class);
+                            intent.putExtra("article_id", articleModal.getId());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            context.startActivity(intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                }
+            });
+            ((MyViewHolder) holder).product_comment_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // Check if the User is Authenticated
+                    if (ConstantValues.IS_USER_LOGGED_IN) {
+
+                        //ConstantValues.shareDeepLink1(context, String.format(context.getResources().getString(R.string.access_farmrise_articles), articleModal.getTitle()));
+
+                        try {
+                            Intent intent = new Intent(context, ChatActivity.class);
+                            intent.putExtra("article_id", articleModal.getId());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            context.startActivity(intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                }
+            });
+        }
+    }
+
+    @NonNull
+    private RecyclerView.ViewHolder getViewHolder(ViewGroup parent, LayoutInflater inflater) {
+        RecyclerView.ViewHolder viewHolder;
+        View v1 = inflater.inflate(R.layout.articlelayout, parent, false);
+        viewHolder = new MyViewHolder(v1);
+        return viewHolder;
+    }
+
+
+
+    @Override
+    public int getItemCount() {
+        return infoDataList.size();
+    }
+
+    private class MyViewHolder extends RecyclerView.ViewHolder {
+
+         private TextView tvName;
+         private TextView tvDate;
+         private TextView articlelikes;
+         private TextView articleviews;
+         private TextView articleCommentCount;
+         private ImageButton product_share_btn;
+
+         private ImageButton product_comment_btn;
+
+         private ImageView imageView;
+         private ToggleButton product_like_btn;
+
+      private   MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvName = (TextView) itemView.findViewById(R.id.articleTitle);
+            tvDate = (TextView) itemView.findViewById(R.id.articleDate);
+            articlelikes = (TextView) itemView.findViewById(R.id.articlelikes);
+            articleviews = (TextView) itemView.findViewById(R.id.articleviews);
+            articleCommentCount = (TextView) itemView.findViewById(R.id.articleCommentCount);
+            imageView=(ImageView) itemView.findViewById(R.id.articleImage);
+            product_share_btn=(ImageButton) itemView.findViewById(R.id.product_share_btn);
+
+            product_like_btn = (ToggleButton) itemView.findViewById(R.id.product_like_btn1);
+            product_comment_btn = (ImageButton) itemView.findViewById(R.id.product_comment_btn);
+        }
+    }
+
+
+
+}

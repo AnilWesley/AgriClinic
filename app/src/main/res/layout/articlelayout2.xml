@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="280dp"
+        app:cardUseCompatPadding="true"
+        android:id="@+id/cardViewCrops"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="3dp"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/articleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:id="@+id/articleImage"
+            android:contentDescription="@string/app_name"
+            app:srcCompat="@drawable/ic_account_circle_black_24dp"
+            android:layout_margin="2dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="5dp"
+            android:background="@color/quantum_grey"/>
+
+        <TextView
+            android:id="@+id/articleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Crop"
+            android:ellipsize="end"
+            android:maxEms="15"
+            android:minLines="2"
+            android:maxLines="2"
+            android:textSize="15sp"
+            android:layout_margin="5dp"
+            android:textColor="@color/quantum_black_secondary_text"/>
+
+    </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

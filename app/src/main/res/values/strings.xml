@@ -1,0 +1,130 @@
+<resources>
+    <string name="app_name">AgriClinic</string>
+    <string name="articles">Articles</string>
+    <string name="market">Market</string>
+    <string name="schemes">Schemes</string>
+    <string name="news">News</string>
+    <string name="videos">Videos</string>
+    <string name="channels">Channels</string>
+    <string name="events">Events</string>
+    <string name="profile">Profile</string>
+    <string name="weather">Weather</string>
+    <string name="home">Home</string>
+    <string name="viewMore">View More</string>
+    <string name="crops">Crops</string>
+
+    <string name="trending_articles">Trending Articles</string>
+    <string name="latest_articles">Latest Articles</string>
+    <string name="recommended_articles">Recommended Articles</string>
+
+
+    <string name="verify_continue">Verify &amp; Continue></string>
+    <string name="send_otp">Send OTP</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="enter_mobile_number">Enter Mobile Number</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="title_activity_maps" translatable="false">Map</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="create_new_password">Create New Password</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="forgot_password">Forgot Password ?</string>
+    <string name="forgot_password1">Forgot Password</string>
+    <string name="create_account">Create Account</string>
+
+    <string name="already_have_an_account_sign_in">Already have an account ? Sign in..!!</string>
+    <string name="title_activity_home" translatable="false">HomeActivity</string>
+    <string name="title_home" translatable="false">Home</string>
+    <string name="title_dashboard" translatable="false">Dashboard</string>
+    <string name="title_notifications" translatable="false">Notifications</string>
+    <string name="access_farmrise_articles">Hi, I found this article on Agri Clinic app. Hope it is helpful for you %s</string>
+    <!--<string name="access_farmrise_articles1">Hi, I found this article on Agri Clinic app. Hope it is helpful for you</string>-->
+    <string name="access_farmrise_articles1">హాయ్, నేను అగ్రి క్లినిక్ అనువర్తనంలో ఈ కథనాన్ని కనుగొన్నాను. ఇది మీకు సహాయకరంగా ఉంటుందని ఆశిస్తున్నాము</string>
+
+
+    <string name="player_error" translatable="false">Error initializing YouTube player: %s</string>
+
+    <string name="thumbnail_image_view_desc" translatable="false">Youtube Video thumbnail image view</string>
+    <string name="close_player_activity">Close Player activity</string>
+
+    <string name="title_of_video" translatable="false">Title of Video</string>
+    <string name="time_of_video" translatable="false">Time of Video</string>
+
+
+    <string name="nova_agritech" translatable="false">UCicsA32B7SO_RUJqzDKbKNA</string>
+
+    <string name="_26_xb0">26°</string>
+    <string name="todo" translatable="false">TODO</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+
+
+
+
+
+    <string name="share">Share</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="no_records">No Records</string>
+    <string name="login">Login</string>
+    <string name="login_form">Login Form</string>
+    <string name="i_agree_terms_and_conditions_and_privacy_policy">I Agree Terms and Conditions and Privacy Policy</string>
+    <string name="i_would_like_to_receive_sms_calls_and_promotional_alerts_from_nova_agri_group">I would like to receive sms,calls and promotional alerts from Nova Agri Group</string>
+    <string name="title_activity_home3" translatable="false">HomeActivity3</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="nav_header_title" translatable="false">Android Studio</string>
+    <string name="nav_header_subtitle" translatable="false">android.studio@android.com</string>
+    <string name="nav_header_desc" translatable="false">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string name="communicate">Communicate</string>
+    <string name="about">About</string>
+    <string name="removed_from_favourites">Removed from Favourites</string>
+    <string name="added_to_favourites">Added to Favourites</string>
+    <string name="app_version">App Version</string>
+    <string name="about_us">About Us</string>
+    <string name="about_us1" translatable="false">
+        Nova Agritech Limited, established in 2007, as a research based company with manufacturing facilities located in Hyderabad. The company has won several awards for technical innovation and outstanding performance in the Agri Inputs industry and has many firsts in the field of Bio Stimulants, Micronutrients and Organic Inputs.
+        Through vibrant R&amp;D efforts, our innovations has marked the rise of Nova Agritech Limited (NATL) from a small unit in 2007 to one of the most successful and reputed companies in the Agro input Industry now. A strong and passionate team in our organization with expertise in industry has capitalized the company to take forward the vision of management.
+        This has led to the production of vital substitute products and cost-effective agrochemicals on a large scale and consequently to a strong, competitive national and international presence. And all this has been made possible by the vision and unswerving dedication and commitment of our Team.
+    </string>
+
+    <string name="about_us2" translatable="false">
+        Nova Agri tech’s vision is to be a global leader in provision of comprehensive agriculture technology solutions while balancing the goals between food security and environment sustainability. The company aims to be recognized as one of the innovators in the segment and be an employer of choice by year 2020.
+    </string>
+
+    <string name="about_us3" translatable="false">
+        Nova Agritech’s mission is to provide a wide range of cutting edge agriput solutions through continued and organized research and focus towards quality and excellence, ultimately leading to an ecologically sustainable, nutritionally balanced and financially profitable farming community.
+    </string>
+    <string name="our_vision" translatable="false">Our Vision</string>
+    <string name="our_mission" translatable="false">Our Mission</string>
+
+    <string name="enter_message">Enter Message</string>
+    <string name="send">Send</string>
+    <string name="comments">Comments</string>
+    <string name="post" translatable="false">post</string>
+    <string name="enter_comment">Enter Comment</string>
+    <string name="register_form">Register Form</string>
+    <string name="show_password">Show Password</string>
+    <string name="resend_otp">Resend OTP</string>
+    <string name="your_mobile">Your Mobile</string>
+    <string name="description">Description</string>
+    <string name="your_name">Your Name</string>
+    <string name="write_us_review">Write us Review</string>
+    <string name="submit">submit</string>
+    <string name="no_comments">No Comments</string>
+    <string name="text_author">About Author</string>
+    <string name="help_support">Help &amp; Support</string>
+
+
+
+</resources>
