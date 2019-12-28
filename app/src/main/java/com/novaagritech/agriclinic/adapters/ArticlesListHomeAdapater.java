@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.modals.InfoData;
 
@@ -72,7 +75,31 @@ public class ArticlesListHomeAdapater extends RecyclerView.Adapter<ArticlesListH
         InfoData infoData=dataModelList.get(position);
         holder.textView.setText(infoData.getTitle());
         ImageLoader.getInstance()
-                .displayImage(infoData.getImage_url(), holder.imageView, options);
+                .displayImage(infoData.getImage_url(), holder.imageView, options,
+                        new SimpleImageLoadingListener(){
+                            @Override
+                            public void onLoadingStarted(String imageUri, View view) {
+                                holder.progressBar.setVisibility(View.VISIBLE);
+                            }
+                            @Override
+                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                                holder.progressBar.setVisibility(View.GONE);
+
+                            }
+
+                            @Override
+                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                holder.progressBar.setVisibility(View.GONE);
+
+                            }
+
+                            @Override
+                            public void onLoadingCancelled(String imageUri, View view) {
+                                holder.progressBar.setVisibility(View.GONE);
+
+                            }
+                        });
+
 
     }
 
@@ -87,12 +114,15 @@ public class ArticlesListHomeAdapater extends RecyclerView.Adapter<ArticlesListH
 
         TextView textView;
         ImageView imageView;
+        ProgressBar progressBar;
+
 
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             textView=(TextView)itemView.findViewById(R.id.articleTitle);
             imageView=(ImageView) itemView.findViewById(R.id.articleImage);
+            progressBar=(ProgressBar) itemView.findViewById(R.id.progressBar);
         }
     }
 

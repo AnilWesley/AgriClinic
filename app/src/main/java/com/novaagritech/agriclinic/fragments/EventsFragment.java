@@ -21,15 +21,19 @@ import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.activities.SingleEventActivity;
 import com.novaagritech.agriclinic.activities.SingleNewsActivity;
+import com.novaagritech.agriclinic.adapters.EventsAdapter;
 import com.novaagritech.agriclinic.adapters.NewsAdapter;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.FragmentEventsBinding;
 import com.novaagritech.agriclinic.databinding.FragmentNewsBinding;
+import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
 import com.novaagritech.agriclinic.modals.InfoData;
 import com.novaagritech.agriclinic.modals.SchemesData;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -44,7 +48,7 @@ public class EventsFragment extends Fragment {
     private RecyclerView articlesNews;
     private RecyclerView articlesSchemes;
 
-    private NewsAdapter mAdapter;
+    private EventsAdapter mAdapter;
 
     private List<InfoData> infoDataNews;
     private List<InfoData> infoDataSchemes;
@@ -111,6 +115,18 @@ public class EventsFragment extends Fragment {
                     SchemesData articlesData = response.body();
                     infoDataEvents = response.body().getResponse();
 
+                    if (infoDataEvents.isEmpty()) {
+                        binding.articlesEvents.setVisibility(View.GONE);
+                        binding.emptyView.setVisibility(View.VISIBLE);
+
+
+                    } else {
+                        binding.emptyView.setVisibility(View.GONE);
+                        binding.articlesEvents.setVisibility(View.VISIBLE);
+
+                    }
+                    Collections.sort(infoDataEvents, (lhs, rhs) ->
+                            lhs.getStart_date().compareTo(rhs.getStart_date()));
 
                     if (articlesData.isStatus()){
                         if (infoDataEvents != null&&infoDataEvents.size()>0  ) {
@@ -128,10 +144,17 @@ public class EventsFragment extends Fragment {
                                 binding.articlesEvents.setLayoutManager(mLayoutManager);
 
                                 // create an Object for Adapter
-                                mAdapter = new NewsAdapter(getActivity(), infoDataEvents, binding.articlesEvents);
+                                mAdapter = new EventsAdapter(getActivity(), infoDataEvents, binding.articlesEvents);
 
                                 // set the adapter object to the Recyclerview
                                 binding.articlesEvents.setAdapter(mAdapter);
+
+                                mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+                                    @Override
+                                    public void onLoadMore() {
+
+                                    }
+                                });
 
 
                                 pDialog.dismiss();

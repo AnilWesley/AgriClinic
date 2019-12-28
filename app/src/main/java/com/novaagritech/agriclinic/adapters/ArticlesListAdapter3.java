@@ -1,37 +1,28 @@
 package com.novaagritech.agriclinic.adapters;
 
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.modals.BannerData;
-import com.novaagritech.agriclinic.modals.InfoData;
 import com.novaagritech.agriclinic.utilities.Urls;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 public class ArticlesListAdapter3 extends RecyclerView.Adapter<ArticlesListAdapter3.ViewHolder>{
@@ -97,7 +88,31 @@ public class ArticlesListAdapter3 extends RecyclerView.Adapter<ArticlesListAdapt
         Log.d("IMAGES",""+Urls.IMAGE_URL1+infoData.getImage());
 
         ImageLoader.getInstance()
-                .displayImage(Urls.IMAGE_URL1 +infoData.getImage(), holder.imageView, options);
+                .displayImage(Urls.IMAGE_URL1 +infoData.getImage(), holder.imageView, options,
+                        new SimpleImageLoadingListener(){
+                        @Override
+                        public void onLoadingStarted(String imageUri, View view) {
+                        holder.progressBar.setVisibility(View.VISIBLE);
+                    }
+                        @Override
+                        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                        holder.progressBar.setVisibility(View.GONE);
+
+                    }
+
+                        @Override
+                        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        holder.progressBar.setVisibility(View.GONE);
+
+                    }
+
+                        @Override
+                        public void onLoadingCancelled(String imageUri, View view) {
+                        holder.progressBar.setVisibility(View.GONE);
+
+                    }
+                    });
+
 
 
 
@@ -115,12 +130,14 @@ public class ArticlesListAdapter3 extends RecyclerView.Adapter<ArticlesListAdapt
 
 
         ImageView imageView;
+        ProgressBar progressBar;
 
 
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView=(ImageView) itemView.findViewById(R.id.articleImageAdd);
+            progressBar=(ProgressBar) itemView.findViewById(R.id.progressBar);
         }
     }
 

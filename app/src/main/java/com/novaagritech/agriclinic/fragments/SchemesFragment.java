@@ -120,6 +120,16 @@ public class SchemesFragment extends Fragment {
                     infoDataSchemes = response.body().getResponse();
 
 
+                    if (infoDataSchemes.isEmpty()) {
+                        binding.articlesSchemes.setVisibility(View.GONE);
+                        binding.emptyView.setVisibility(View.VISIBLE);
+
+
+                    } else {
+                        binding.emptyView.setVisibility(View.GONE);
+                        binding.articlesSchemes.setVisibility(View.VISIBLE);
+
+                    }
                     if (articlesData.isStatus()){
                         if (infoDataSchemes != null&&infoDataSchemes.size()>0  ) {
                             for (int i = 0; i <infoDataSchemes.size(); i++) {

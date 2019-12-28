@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClientInstance {
 
     private static Retrofit retrofit;
-    private static final String BASE_URL = "http://novaagri.in/agriclinic/app/ws/";
+    private static final String BASE_URL = "https://www.agriclinic.org/admin/app/ws/";
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {

@@ -30,7 +30,7 @@
     <string name="forgot_password">పాస్‌వర్డ్ మర్చిపోయారా ?</string>
     <string name="forgot_password1">పాస్‌వర్డ్ మర్చిపోయారా</string>
     <string name="hello_blank_fragment">హలో ఖాళీ శకలం</string>
-    <string name="help_support">సహాయం &amp; మద్దతు</string>
+    <string name="help_support">సహాయం &amp;  మద్దతు</string>
     <string name="home">హోమ్</string>
     <string name="i_agree_terms_and_conditions_and_privacy_policy">నేను నిబంధనలు మరియు షరతులు మరియు గోప్యతా విధానాన్ని అంగీకరిస్తున్నాను</string>
     <string name="i_would_like_to_receive_sms_calls_and_promotional_alerts_from_nova_agri_group">నేను నోవా అగ్రి గ్రూప్ నుండి ఎస్ఎంఎస్, కాల్స్ మరియు ప్రచార హెచ్చరికలను స్వీకరించాలనుకుంటున్నాను</string>
@@ -61,7 +61,7 @@
     <string name="submit">సబ్మిట్</string>
     <string name="text_author">రచయిత గురించి</string>
     <string name="trending_articles">ట్రెండింగ్ వ్యాసాలు</string>
-    <string name="verify_continue">కొనసాగించు &amp;  ధృవీకరించండి</string>
+    <string name="verify_continue">కొనసాగించు &amp;ధృవీకరించండి</string>
     <string name="videos">వీడియోలు</string>
     <string name="viewMore">మరింత చూడండి</string>
     <string name="weather">వాతావరణ</string>

@@ -17,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
@@ -95,11 +97,15 @@ public class NewsAdapter extends RecyclerView.Adapter {
         return newsModalList.get(position) != null ? VIEW_ITEM : VIEW_PROG;
     }
 
+
+
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                       int viewType) {
         RecyclerView.ViewHolder vh;
+
         if (viewType == VIEW_ITEM) {
             View v = LayoutInflater.from(parent.getContext()).inflate(
                     R.layout.newslayout1, parent, false);
@@ -125,7 +131,29 @@ public class NewsAdapter extends RecyclerView.Adapter {
             //((MyViewHolder) holder).tvDate.setText(articleModal.getCreated_on());
 
             ImageLoader.getInstance()
-                    .displayImage( newsModal.getImage_url(), ((MyViewHolder) holder).imageView, options);
+                    .displayImage( newsModal.getImage_url(), ((MyViewHolder) holder).imageView, options, new SimpleImageLoadingListener(){
+                        @Override
+                        public void onLoadingStarted(String imageUri, View view) {
+                            ((MyViewHolder) holder).progressBar.setVisibility(View.VISIBLE);
+                        }
+                        @Override
+                        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                            ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                        }
+
+                        @Override
+                        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                            ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                        }
+
+                        @Override
+                        public void onLoadingCancelled(String imageUri, View view) {
+                            ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                        }
+                    });
 
 
             ((MyViewHolder) holder).tvName.setOnClickListener(new OnClickListener() {
@@ -173,6 +201,8 @@ public class NewsAdapter extends RecyclerView.Adapter {
         public TextView tvDate;
         ImageView imageView;
 
+        ProgressBar progressBar;
+
 
 
 
@@ -181,7 +211,8 @@ public class NewsAdapter extends RecyclerView.Adapter {
             tvName = (TextView) v.findViewById(R.id.newsTitle);
             tvDate = (TextView) v.findViewById(R.id.newsDate);
 
-            imageView=(ImageView) itemView.findViewById(R.id.newsImage);
+            imageView=(ImageView) v.findViewById(R.id.newsImage);
+            progressBar=(ProgressBar) v.findViewById(R.id.progressBar);
 
 
         }

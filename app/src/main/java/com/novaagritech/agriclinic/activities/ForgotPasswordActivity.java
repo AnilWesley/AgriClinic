@@ -103,6 +103,8 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SmsRetriever.SMS_RETRIEVED_ACTION);
         getApplicationContext().registerReceiver(mSmsBroadcastReceiver, intentFilter);
+
+        //getHintPhoneNumber();
     }
 
     public void sendOtp(View view) {

@@ -33,7 +33,7 @@
                     android:textStyle="bold"
                     android:drawablePadding="5dp"
                     android:layout_margin="5dp"
-                    android:textColor="@color/quantum_grey"
+                    android:textColor="@color/colorNewsRead"
                     android:layout_height="wrap_content"/>
 
                 <View
@@ -80,7 +80,7 @@
                     android:gravity="center"
                     android:textAllCaps="true"
                     android:text="@string/our_vision"
-                    android:textColor="@color/quantum_grey"
+                    android:textColor="@color/red"
                     android:textSize="14sp"
                     android:textStyle="bold" />
                 <View
@@ -124,7 +124,7 @@
                         android:textAllCaps="true"
                         android:drawablePadding="5dp"
                         android:layout_margin="5dp"
-                        android:textColor="@color/quantum_grey"
+                        android:textColor="@color/blue"
                         android:layout_height="wrap_content"/>
                     <View
                         android:layout_width="match_parent"

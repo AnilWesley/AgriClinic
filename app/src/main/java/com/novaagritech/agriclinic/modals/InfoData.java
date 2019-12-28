@@ -39,6 +39,14 @@ public class InfoData implements Serializable {
     @Expose
     private String description;
 
+    @SerializedName("description2")
+    @Expose
+    private String description2;
+
+    @SerializedName("description3")
+    @Expose
+    private String description3;
+
     @SerializedName("tags")
     @Expose
     private String tags;
@@ -100,6 +108,22 @@ public class InfoData implements Serializable {
     @Expose
     private int comment_count;
 
+
+    public String getDescription2() {
+        return description2;
+    }
+
+    public void setDescription2(String description2) {
+        this.description2 = description2;
+    }
+
+    public String getDescription3() {
+        return description3;
+    }
+
+    public void setDescription3(String description3) {
+        this.description3 = description3;
+    }
 
     public String getShare_url() {
         return share_url;

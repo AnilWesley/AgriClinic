@@ -16,9 +16,9 @@
     <string name="trending_articles">Trending Articles</string>
     <string name="latest_articles">Latest Articles</string>
     <string name="recommended_articles">Recommended Articles</string>
+    <string name="fcm_token" translatable="false">FCM Token: %s</string>
 
-
-    <string name="verify_continue">Verify &amp; Continue></string>
+    <string name="verify_continue">Verify &amp; Continue</string>
     <string name="send_otp">Send OTP</string>
     <string name="enter_otp">Enter OTP</string>
     <string name="enter_mobile_number">Enter Mobile Number</string>

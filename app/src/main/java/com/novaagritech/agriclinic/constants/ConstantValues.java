@@ -156,6 +156,25 @@ import static com.novaagritech.agriclinic.receiver.NetworkStateChangeReceiver.IS
     }
 
 
+    public static String getFormattedDate1(String str, String j) {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat spf=new SimpleDateFormat("yyyy-MM-dd");
+
+        Date newDate= null;
+        try {
+            newDate = spf.parse(j);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (isStringValid(str)) {
+            spf = new SimpleDateFormat(str, Locale.ENGLISH);
+        } else {
+            spf = new SimpleDateFormat(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, Locale.ENGLISH);
+        }
+        return spf.format(newDate);
+    }
+
     public static String getAppVersion(Context context) {
         String app_ver = "";
         try {
@@ -172,7 +191,8 @@ import static com.novaagritech.agriclinic.receiver.NetworkStateChangeReceiver.IS
 
         try {
             String shareMessage= "\nLet me recommend you this application\n\n";
-            shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID +"\n\n";
+            //shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID +"\n\n";
+            shareMessage = shareMessage + "https://bit.ly/39fSael" +"\n\n";
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My App");

@@ -81,7 +81,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_more);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        action_image = (ImageView) findViewById(R.id.action_image);
+        action_image = (ImageView) findViewById(R.id.actionImage);
         action_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

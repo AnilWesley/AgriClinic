@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -29,7 +30,9 @@ import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.google.gson.JsonObject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.activities.SingleArticleActivity;
 import com.novaagritech.agriclinic.comments.ChatActivity;
@@ -117,7 +120,30 @@ public class ArticlesListAdapterTest2 extends RecyclerView.Adapter<RecyclerView.
             //((MyViewHolder) holder).tvDate.setText(articleModal.getCreated_on());
 
             ImageLoader.getInstance()
-                    .displayImage(Urls.IMAGE_URL + articleModal.getImage_path(), ((MyViewHolder) holder).imageView, options);
+                    .displayImage(Urls.IMAGE_URL + articleModal.getImage_path(), ((MyViewHolder) holder).imageView, options,
+                            new SimpleImageLoadingListener(){
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
+                    ((MyViewHolder) holder).progressBar.setVisibility(View.VISIBLE);
+                }
+                @Override
+                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                }
+
+                @Override
+                public void onLoadingCancelled(String imageUri, View view) {
+                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                }
+            });
 
 
             ((MyViewHolder) holder).imageView.setOnClickListener(new View.OnClickListener() {
@@ -399,6 +425,7 @@ public class ArticlesListAdapterTest2 extends RecyclerView.Adapter<RecyclerView.
 
          private ImageView imageView;
          private ToggleButton product_like_btn;
+         ProgressBar progressBar;
 
       private   MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -412,6 +439,7 @@ public class ArticlesListAdapterTest2 extends RecyclerView.Adapter<RecyclerView.
 
             product_like_btn = (ToggleButton) itemView.findViewById(R.id.product_like_btn1);
             product_comment_btn = (ImageButton) itemView.findViewById(R.id.product_comment_btn);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
         }
     }
 

@@ -2,15 +2,11 @@ package com.novaagritech.agriclinic.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.MediaController;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -20,20 +16,12 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.adapters.ArticlesListAdapter3;
 import com.novaagritech.agriclinic.adapters.ArticlesListAdapterTest2;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
-import com.novaagritech.agriclinic.app.AppController;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-
 import com.novaagritech.agriclinic.databinding.FragmentHome1Binding;
 import com.novaagritech.agriclinic.modals.ArticlesList;
 import com.novaagritech.agriclinic.modals.BannerData;
@@ -42,14 +30,8 @@ import com.novaagritech.agriclinic.modals.Stories1;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -100,6 +82,8 @@ public class HomeFragment1 extends Fragment {
 
     //private List<Stories1> list;
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,6 +132,7 @@ public class HomeFragment1 extends Fragment {
         loadFirstPage();
 
         loadBanners();
+
 
 
 
@@ -277,6 +262,10 @@ public class HomeFragment1 extends Fragment {
 
                                     binding.articlesBanners.setAdapter(articlesListAdapter);
                                     articlesListAdapter.notifyDataSetChanged();
+
+
+
+
 
                                 }
 

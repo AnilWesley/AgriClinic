@@ -19,11 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
-import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
@@ -96,7 +94,28 @@ public class SplashScreenActivity extends AppCompatActivity {
                     }
                 });
 
+
+
+
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        //To do//
+                        return;
+                    }
+
+                    // Get the Instance ID token//
+                    String token = task.getResult().getToken();
+                    String msg = getString(R.string.fcm_token, token);
+                    Log.d(TAG, msg);
+
+                });
+
+
     }
+
+
 
 
 
@@ -117,8 +136,8 @@ public class SplashScreenActivity extends AppCompatActivity {
             permissionsNeeded.add("CAMERA");
         if (addPermission(permissionsList, Manifest.permission.CALL_PHONE))
             permissionsNeeded.add("CALL_PHONE");
-        if (addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE))
-            permissionsNeeded.add("READ_PHONE_STATE");
+       /* if (addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE))
+            permissionsNeeded.add("READ_PHONE_STATE");*/
 
         if (addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION))
             permissionsNeeded.add("ACCESS_FINE_LOCATION");
@@ -222,7 +241,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
             perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
             perms.put(Manifest.permission.CALL_PHONE, PackageManager.PERMISSION_GRANTED);
-            perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);
+           /* perms.put(Manifest.permission.READ_PHONE_STATE, PackageManager.PERMISSION_GRANTED);*/
             perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
             perms.put(Manifest.permission.ACCESS_COARSE_LOCATION, PackageManager.PERMISSION_GRANTED);
             //Toast.makeText(SplashScreenActivity.this, " Permissions are jddddd", Toast.LENGTH_SHORT).show();
@@ -234,7 +253,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                     && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                     && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                     && perms.get(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED
-                    && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+                   /* && perms.get(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED*/
                    &&  perms.get(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                    && perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 // All Permissions Granted

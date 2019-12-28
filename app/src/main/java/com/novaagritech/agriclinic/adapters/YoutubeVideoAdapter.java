@@ -18,7 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.activities.VideoMoreActivity;
 import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
@@ -122,7 +124,29 @@ public class YoutubeVideoAdapter extends RecyclerView.Adapter {
             //((MyViewHolder) holder).tvDate.setText(articleModal.getCreated_on());
 
             ImageLoader.getInstance()
-                    .displayImage(articleModal.getUrl(), ((MyViewHolder) holder).videoThumbnailImageView, options);
+                    .displayImage(articleModal.getUrl(), ((MyViewHolder) holder).videoThumbnailImageView, options, new SimpleImageLoadingListener(){
+                                @Override
+                                public void onLoadingStarted(String imageUri, View view) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.VISIBLE);
+                                }
+                                @Override
+                                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                                }
+
+                                @Override
+                                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                                }
+
+                                @Override
+                                public void onLoadingCancelled(String imageUri, View view) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                                }
+                            });
 
 
 
@@ -154,6 +178,8 @@ public class YoutubeVideoAdapter extends RecyclerView.Adapter {
         public TextView videoTitle,videoTime;
         public LinearLayout parentLayout;
 
+        ProgressBar progressBar;
+
 
 
 
@@ -163,6 +189,7 @@ public class YoutubeVideoAdapter extends RecyclerView.Adapter {
             videoTitle = itemView.findViewById(R.id.video_title_label);
             videoTime=itemView.findViewById(R.id.video_time);
             parentLayout =itemView.findViewById(R.id.parentLayout);
+            progressBar =itemView.findViewById(R.id.progressBar);
 
 
         }

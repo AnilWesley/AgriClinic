@@ -27,7 +27,9 @@ import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.google.gson.JsonObject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.CustomButton;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
@@ -154,7 +156,7 @@ public class SingleArticleActivity extends AppCompatActivity  {
 
                                 LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                                        55);
+                                        85);
                                 layoutParams.setMargins(5, 5, 5, 5);
 
 
@@ -202,10 +204,32 @@ public class SingleArticleActivity extends AppCompatActivity  {
 
                                 }*/
 
-                                binding.textDesc.loadDataWithBaseURL(null,articlesDetails.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
+                                binding.textDesc.loadDataWithBaseURL(null,articlesDetails.get(0).getDescription()+articlesDetails.get(0).getDescription2()+articlesDetails.get(0).getDescription3(), "text/html; charset=utf-8", "UTF-8",null);
 
                                 ImageLoader.getInstance()
-                                        .displayImage(Urls.IMAGE_URL+articlesDetails.get(0).getImage_path(), binding.textImage, options);
+                                        .displayImage(Urls.IMAGE_URL+articlesDetails.get(0).getImage_path(), binding.textImage, options,new SimpleImageLoadingListener(){
+                                            @Override
+                                            public void onLoadingStarted(String imageUri, View view) {
+                                                binding.progressBar.setVisibility(View.VISIBLE);
+                                            }
+                                            @Override
+                                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+
+                                            @Override
+                                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+
+                                            @Override
+                                            public void onLoadingCancelled(String imageUri, View view) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+                                        });
 
 
                                 pDialog.dismiss();

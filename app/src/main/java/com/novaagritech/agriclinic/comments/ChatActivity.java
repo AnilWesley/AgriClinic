@@ -83,7 +83,7 @@ public class ChatActivity extends AppCompatActivity {
 
         getComment();
 
-        action_image = (ImageView) findViewById(R.id.action_image);
+        action_image = (ImageView) findViewById(R.id.actionImage);
         action_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

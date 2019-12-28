@@ -4,10 +4,12 @@ import android.content.Context;
 
 public class Urls {
 
-    private static String MAIN_URL="http://novaagri.in/agriclinic/app/ws/";
 
-    public static String IMAGE_URL="http://novaagri.in/agriclinic/storage/articles/";
-    public static String IMAGE_URL1="http://novaagri.in/agriclinic/";
+
+    private static String MAIN_URL = "https://www.agriclinic.org/admin/app/ws/";
+
+    public static String IMAGE_URL = "https://www.agriclinic.org/admin/storage/articles/";
+    public static String IMAGE_URL1 = "https://www.agriclinic.org/admin/";
 
     public static String REGISTER_USER=MAIN_URL+"register_user";
 

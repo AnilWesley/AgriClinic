@@ -3,18 +3,25 @@ package com.novaagritech.agriclinic.app;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.novaagritech.agriclinic.firebase.ForceUpdateChecker;
 
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AppController extends Application {
@@ -48,6 +55,27 @@ public class AppController extends Application {
 
 
 
+		final FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
+		// set in-app defaults
+		Map<String, Object> remoteConfigDefaults = new HashMap();
+		remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_REQUIRED, false);
+		remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, "1.0.4");
+		remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_URL,
+				"https://play.google.com/store/apps/details?id=com.novaagritech.agriclinic&hl=en");
+
+		firebaseRemoteConfig.setDefaults(remoteConfigDefaults);
+		firebaseRemoteConfig.fetch(60) // fetch every minutes
+				.addOnCompleteListener(new OnCompleteListener<Void>() {
+					@Override
+					public void onComplete(@NonNull Task<Void> task) {
+						if (task.isSuccessful()) {
+							Log.d(TAG, "remote config is fetched.");
+							firebaseRemoteConfig.activateFetched();
+						}
+					}
+				});
+
 	}
 
 
@@ -68,6 +96,11 @@ public class AppController extends Application {
 
 		// Initialize ImageLoader with configuration.
 		com.nostra13.universalimageloader.core.ImageLoader.getInstance().init(config.build());
+
+
+
+
+
 	}
 	public static synchronized AppController getInstance() {
 		return mInstance;

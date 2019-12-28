@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,16 +20,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.activities.SingleEventActivity;
 import com.novaagritech.agriclinic.activities.SingleNewsActivity;
 import com.novaagritech.agriclinic.adapters.NewsAdapter;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.FragmentNewsBinding;
-import com.novaagritech.agriclinic.databinding.FragmentSchemesBinding;
+import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
 import com.novaagritech.agriclinic.modals.InfoData;
 import com.novaagritech.agriclinic.modals.SchemesData;
+import com.novaagritech.agriclinic.modals.YoutubeVideoModel;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -113,6 +118,16 @@ public class NewsFragment extends Fragment {
                     SchemesData articlesData = response.body();
                     infoDataNews = response.body().getResponse();
 
+                    if (infoDataNews.isEmpty()) {
+                        binding.articlesNews.setVisibility(View.GONE);
+                        binding.emptyView.setVisibility(View.VISIBLE);
+
+
+                    } else {
+                        binding.emptyView.setVisibility(View.GONE);
+                        binding.articlesNews.setVisibility(View.VISIBLE);
+
+                    }
 
                     if (articlesData.isStatus()) {
                         if (response.code() == 200) {
@@ -131,13 +146,52 @@ public class NewsFragment extends Fragment {
                                     binding.articlesNews.setLayoutManager(mLayoutManager);
 
                                     // create an Object for Adapter
-                                    mAdapter = new NewsAdapter(getActivity(), infoDataNews, binding.articlesNews);
+                                    mAdapter = new NewsAdapter(getActivity(), infoDataNews,binding.articlesNews);
 
                                     // set the adapter object to the Recyclerview
                                     binding.articlesNews.setAdapter(mAdapter);
 
+                                    //pDialog.dismiss();
 
-                                    pDialog.dismiss();
+                                  /*  mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+                                        @Override
+                                        public void onLoadMore() {
+                                            //add null , so the mAdapter will check view_type and show progress bar at bottom
+                                            infoDataNews.add(null);
+                                            mAdapter.notifyItemInserted(infoDataNews.size() - 1);
+
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //   remove progress item
+                                                    infoDataNews.remove(infoDataNews.size() - 1);
+                                                    mAdapter.notifyItemRemoved(infoDataNews.size());
+                                                    //add items one by one
+
+                                                    int start = infoDataNews.size();
+
+                                                    int end = start + 7;
+
+                                                    for (int i = start + 1; i <= end; i++) {
+
+
+
+                                                    }
+
+
+                                                    mAdapter.notifyDataSetChanged();
+                                                    mAdapter.setLoaded();
+
+
+
+                                                }
+
+
+                                            }, 1000);
+
+                                        }
+                                    });*/
+
 
                                     //set click event
                                     //set click event
@@ -163,12 +217,15 @@ public class NewsFragment extends Fragment {
 
 
 
+
                             }
+
 
                         } else {
                             pDialog.dismiss();
                             Toast.makeText(getActivity(), "" + articlesData.getMessage(), Toast.LENGTH_SHORT).show();
                         }
+
 
 
                     }

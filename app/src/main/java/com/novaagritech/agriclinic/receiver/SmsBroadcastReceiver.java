@@ -37,7 +37,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
           String message = (String) extras.get(SmsRetriever.EXTRA_SMS_MESSAGE);
           Log.d(TAG, "onReceive: failure " + message);
           if (otpReceiveInterface != null) {
-            String otpMessage = message.replace("<#> Your otp code is: ", "");
+            String otpMessage = message.replace("<#> Welcome to AgriClinic, Your OTP is: ", "");
             String otp = otpMessage.split("\n")[0];
             otpReceiveInterface.onOtpReceived(otp);
           }

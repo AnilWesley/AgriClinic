@@ -3,9 +3,9 @@ package com.novaagritech.agriclinic.activities;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -27,6 +27,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
+import com.novaagritech.agriclinic.firebase.ForceUpdateChecker;
 import com.novaagritech.agriclinic.fragments.AboutFragment;
 import com.novaagritech.agriclinic.fragments.EventsFragment;
 import com.novaagritech.agriclinic.fragments.HelpFragment;
@@ -36,7 +37,7 @@ import com.novaagritech.agriclinic.fragments.SchemesFragment;
 import com.novaagritech.agriclinic.fragments.SearchMArticlesFragment;
 import com.novaagritech.agriclinic.fragments.VideosFragment;
 
-public class HomeActivity1 extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class HomeActivity1 extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener , ForceUpdateChecker.OnUpdateNeededListener  {
 
     Toolbar toolbar;
 
@@ -85,9 +86,9 @@ public class HomeActivity1 extends AppCompatActivity implements NavigationView.O
         name.setText(""+myAppPrefsManager.getUserName());
         number.setText(""+myAppPrefsManager.getUserMobile());
 
-        TextView appversion = (TextView ) findViewById(R.id.appversion);
+        TextView appversion = (TextView )v. findViewById(R.id.appversion);
 
-        appversion.setText("Version : "+ ConstantValues.getAppVersion(HomeActivity1.this));
+        appversion.setText("V : "+ ConstantValues.getAppVersion(HomeActivity1.this));
 
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottom_view);
@@ -104,6 +105,28 @@ public class HomeActivity1 extends AppCompatActivity implements NavigationView.O
         fm.beginTransaction().add(R.id.main_container,homeFragment1, "1").commit();
 
 
+        ForceUpdateChecker.with(this).onUpdateNeeded(this).check();
+
+
+    }
+
+    @Override
+    public void onUpdateNeeded(final String updateUrl) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("New version available")
+                .setMessage("Please, update app to new version to continue.")
+                .setPositiveButton("Update",
+                        (dialog12, which) ->
+                                redirectStore(updateUrl)).setNegativeButton("No, thanks",
+                        (dialog1, which) ->
+                                dialog1.dismiss()).create();
+        dialog.show();
+    }
+
+    private void redirectStore(String updateUrl) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
 

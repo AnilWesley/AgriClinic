@@ -23,7 +23,9 @@ import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.google.gson.JsonObject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
@@ -76,9 +78,9 @@ public class SingleNewsActivity extends AppCompatActivity {
         scheme_id = i.getStringExtra("scheme_id");
         String title = i.getStringExtra("title");
 
-        binding.toolbarTitle.setText(title);
+        //binding.toolbarTitle.setText(title);
 
-        binding.imageViewBack.setOnClickListener(new View.OnClickListener() {
+        binding.actionImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
@@ -141,7 +143,29 @@ public class SingleNewsActivity extends AppCompatActivity {
                                 binding.textDesc.loadDataWithBaseURL(null,infoDataList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
                                 ImageLoader.getInstance()
-                                        .displayImage(infoDataList.get(0).getImage(), binding.textImage, options);
+                                        .displayImage(infoDataList.get(0).getImage(), binding.textImage, options,new SimpleImageLoadingListener(){
+                                            @Override
+                                            public void onLoadingStarted(String imageUri, View view) {
+                                                binding.progressBar.setVisibility(View.VISIBLE);
+                                            }
+                                            @Override
+                                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+
+                                            @Override
+                                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+
+                                            @Override
+                                            public void onLoadingCancelled(String imageUri, View view) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+                                        });
 
 
 
@@ -217,7 +241,29 @@ public class SingleNewsActivity extends AppCompatActivity {
                                 binding.textDesc.loadDataWithBaseURL(null,infoDataList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
                                 ImageLoader.getInstance()
-                                        .displayImage(infoDataList.get(0).getImage(), binding.textImage, options);
+                                        .displayImage(infoDataList.get(0).getImage(), binding.textImage, options,new SimpleImageLoadingListener(){
+                                            @Override
+                                            public void onLoadingStarted(String imageUri, View view) {
+                                                binding.progressBar.setVisibility(View.VISIBLE);
+                                            }
+                                            @Override
+                                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+
+                                            @Override
+                                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+
+                                            @Override
+                                            public void onLoadingCancelled(String imageUri, View view) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
+                                            }
+                                        });
 
 
 

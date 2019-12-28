@@ -10,7 +10,7 @@
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
-            android:background="@color/colorPrimary"
+            android:background="@color/white"
             android:layout_height="wrap_content"
             android:layout_width="match_parent">
 
@@ -27,25 +27,27 @@
                     android:orientation="horizontal"
                     android:weightSum="2"
                     android:layout_height="wrap_content">
-
                     <ImageView
-                        android:id="@+id/imageViewBack"
+                        android:id="@+id/actionImage"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:src="@drawable/ic_chevron_left"
-                        android:layout_weight="0.3"
+                        android:layout_weight="0.1"
                         android:layout_gravity="center"
-                        android:contentDescription="@string/articles" />
-                    <com.novaagritech.agriclinic.constants.CustomTextViewBold
-                        android:textColor="@android:color/white"
-                        android:gravity="start"
-                        android:id="@+id/toolbarTitle"
-                        android:layout_gravity="center"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1.7"/>
+                        android:contentDescription="@string/todo" />
+
+                    <ImageView
+                        android:id="@+id/imageViewBack"
+                        android:layout_width="150dp"
+                        android:layout_weight="1.9"
+                        android:scaleType="fitStart"
+                        android:padding="5dp"
+                        android:layout_height="?attr/actionBarSize"
+                        android:contentDescription="@string/app_name"
+                        android:src="@drawable/mainlogo" />
+
                 </LinearLayout>
+
 
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
@@ -59,16 +61,18 @@
                 android:layout_width="match_parent"
                 app:cardElevation="5dp"
                 app:cardCornerRadius="5dp"
-                android:layout_margin="16dp"
+                android:layout_margin="5dp"
                 android:layout_height="wrap_content">
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
-
+                    android:orientation="vertical">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <ImageView
 
@@ -80,6 +84,14 @@
                         android:contentDescription="@string/app_name"
                         app:srcCompat="@drawable/image_not_available" />
 
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/absListViewStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:visibility="visible"/>
+                </RelativeLayout>
                     <TextView
                         android:id="@+id/textDate"
                         android:layout_width="match_parent"

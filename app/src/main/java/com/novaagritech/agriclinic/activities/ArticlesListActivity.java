@@ -96,7 +96,7 @@ public class ArticlesListActivity extends AppCompatActivity {
 
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("limit", "10");
+        jsonObject.addProperty("limit", "");
         jsonObject.addProperty("language_id", "2");
         jsonObject.addProperty("crop_id", "5");
         jsonObject.addProperty("page", currentPage);

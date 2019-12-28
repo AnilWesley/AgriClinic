@@ -4,46 +4,37 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
-import com.novaagritech.agriclinic.BuildConfig;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.activities.CropsNamesActivity;
 import com.novaagritech.agriclinic.activities.SingleArticleActivity;
 import com.novaagritech.agriclinic.comments.ChatActivity;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.CropsData;
 import com.novaagritech.agriclinic.modals.InfoData;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.Urls;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -139,7 +130,31 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
             //((MyViewHolder) holder).tvDate.setText(articleModal.getCreated_on());
 
             ImageLoader.getInstance()
-                    .displayImage(Urls.IMAGE_URL+ articleModal.getImage_path(), ((MyViewHolder) holder).imageView, options);
+                    .displayImage(Urls.IMAGE_URL+ articleModal.getImage_path(), ((MyViewHolder) holder).imageView, options,
+                            new SimpleImageLoadingListener(){
+                                @Override
+                                public void onLoadingStarted(String imageUri, View view) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.VISIBLE);
+                                }
+                                @Override
+                                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                                }
+
+                                @Override
+                                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                                }
+
+                                @Override
+                                public void onLoadingCancelled(String imageUri, View view) {
+                                    ((MyViewHolder) holder).progressBar.setVisibility(View.GONE);
+
+                                }
+                            });
+
 
 
             ((MyViewHolder) holder).imageView.setOnClickListener(new View.OnClickListener() {
@@ -448,6 +463,7 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
         private ImageView imageView;
         private ToggleButton product_like_btn;
 
+        ProgressBar progressBar;
 
 
         private MyViewHolder(View itemView) {
@@ -460,6 +476,7 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
             articleCommentCount = (TextView) itemView.findViewById(R.id.articleCommentCount);
             imageView=(ImageView) itemView.findViewById(R.id.articleImage);
             product_share_btn=(ImageButton) itemView.findViewById(R.id.product_share_btn);
+            progressBar=(ProgressBar) itemView.findViewById(R.id.progressBar);
 
             product_like_btn = (ToggleButton) itemView.findViewById(R.id.product_like_btn1);
             product_comment_btn = (ImageButton) itemView.findViewById(R.id.product_comment_btn);
