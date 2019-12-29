@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -16,11 +17,17 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.adapters.ArticlesListAdapter3;
 import com.novaagritech.agriclinic.adapters.ArticlesListAdapterTest2;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
+import com.novaagritech.agriclinic.app.AppController;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.FragmentHome1Binding;
 import com.novaagritech.agriclinic.modals.ArticlesList;
@@ -31,7 +38,12 @@ import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -80,7 +92,7 @@ public class HomeFragment1 extends Fragment {
     private FragmentHome1Binding binding;
 
 
-    //private List<Stories1> list;
+    private List<Stories1> list;
 
 
 
@@ -316,7 +328,7 @@ public class HomeFragment1 extends Fragment {
     }
 
 
-   /* private void getStories1(){
+    private void getStories1(){
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("language_id", "2");
@@ -331,10 +343,10 @@ public class HomeFragment1 extends Fragment {
         // Tag used to cancel the request
         String tag_json_obj = "pqlist";
 
-        String url ="http://novaagri.in/agriclinic/app/ws/stories";
+        String url ="https://www.agriclinic.org/admin/app/ws/stories";
 
 
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest( Request.Method.POST,
                 url, null,
                 new com.android.volley.Response.Listener<JSONObject>() {
 
@@ -448,14 +460,14 @@ public class HomeFragment1 extends Fragment {
             }
 
         };
-        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy (
                 0,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
 
-    }*/
+    }
 
 
     @Override

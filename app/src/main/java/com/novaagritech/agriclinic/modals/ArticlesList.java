@@ -17,9 +17,15 @@ public class ArticlesList implements Serializable {
     @Expose
     private List<InfoData> response = new ArrayList<InfoData>();
 
+
+    @SerializedName("blist")
+    @Expose
+    private List<InfoData_test> blist = new ArrayList<InfoData_test>();
+
     @SerializedName("message")
     @Expose
     private String message;
+
 
 
     @SerializedName("article_pages")
@@ -34,6 +40,14 @@ public class ArticlesList implements Serializable {
     @Expose
     private Integer likes_count;
 
+
+    public List<InfoData_test> getBlist() {
+        return blist;
+    }
+
+    public void setBlist(List<InfoData_test> blist) {
+        this.blist = blist;
+    }
 
     public Integer getLikes_count() {
         return likes_count;

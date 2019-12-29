@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         app:shimmer_duration="1500"
         android:layout_marginTop="15dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:orientation="vertical">
 
         <!-- Adding 7 rows of placeholders -->
@@ -48,62 +48,6 @@
 
 
 
-
-
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/articlesStories"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:nestedScrollingEnabled="false"
-            android:padding="3dp" />
-
-
-
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="5dp"
-            android:background="@color/quantum_grey"/>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="10dp"
-            android:orientation="vertical">
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/articlesRecycle1"
-                android:layout_width="match_parent"
-                android:layout_margin="5dp"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-
-
-        </RelativeLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/articlesBanners"
-            android:layout_width="match_parent"
-            android:layout_margin="5dp"
-            android:padding="3dp"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="5dp"
-            android:padding="3dp"
-            android:visibility="visible"
-            android:background="@color/quantum_grey400"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/articlesRecycle"

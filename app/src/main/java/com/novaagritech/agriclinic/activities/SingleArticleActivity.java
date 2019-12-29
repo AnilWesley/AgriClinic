@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
@@ -48,10 +49,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SingleArticleActivity extends AppCompatActivity  {
+public class SingleArticleActivity extends AppCompatActivity {
 
 
-    String TAG="Articles";
+    String TAG = "Articles";
     private ProgressDialog pDialog;
 
     private List<InfoData> articlesDetails;
@@ -59,141 +60,178 @@ public class SingleArticleActivity extends AppCompatActivity  {
     private DisplayImageOptions options;
 
     ActivitySingleArticleBinding binding;
-    private  String article_id ,user_id;
+    private String article_id, user_id;
 
-    String str ="http://agriclinic.org/";
+    String str = "http://agriclinic.org/";
     MyAppPrefsManager myAppPrefsManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding= DataBindingUtil. setContentView(SingleArticleActivity.this,R.layout.activity_single_article);
+        super.onCreate ( savedInstanceState );
+        binding = DataBindingUtil.setContentView ( SingleArticleActivity.this, R.layout.activity_single_article );
 
-        pDialog=new ProgressDialog(this);
-        myAppPrefsManager=new MyAppPrefsManager(SingleArticleActivity.this);
-        user_id=myAppPrefsManager.getUserId();
+        pDialog = new ProgressDialog ( this );
+        myAppPrefsManager = new MyAppPrefsManager ( SingleArticleActivity.this );
+        user_id = myAppPrefsManager.getUserId ( );
 
-        setSupportActionBar(binding.toolbar);
+        setSupportActionBar ( binding.toolbar );
 
-        binding.toolbar.inflateMenu(R.menu.share);
-        options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.image_not_available)
-                .showImageForEmptyUri(R.drawable.image_not_available)
-                .showImageOnFail(R.drawable.image_not_available)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .considerExifParams(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .displayer(new RoundedBitmapDisplayer(1))
-                .build();
-        Intent i = getIntent();
-        article_id = i.getStringExtra("article_id");
+        binding.toolbar.inflateMenu ( R.menu.share );
+        options = new DisplayImageOptions.Builder ( )
+                .showImageOnLoading ( R.drawable.image_not_available )
+                .showImageForEmptyUri ( R.drawable.image_not_available )
+                .showImageOnFail ( R.drawable.image_not_available )
+                .cacheInMemory ( true )
+                .cacheOnDisk ( true )
+                .considerExifParams ( true )
+                .bitmapConfig ( Bitmap.Config.RGB_565 )
+                .displayer ( new RoundedBitmapDisplayer ( 1 ) )
+                .build ( );
+        Intent i = getIntent ( );
+
+        article_id = i.getStringExtra ( "article_id" );
 
 
-        binding.actionImage.setOnClickListener(new View.OnClickListener() {
+        binding.actionImage.setOnClickListener ( new View.OnClickListener ( ) {
             @Override
             public void onClick(View v) {
 
-                onBackPressed();
+                onBackPressed ( );
             }
-        });
-        getArticle();
+        } );
+
+        if (i.hasExtra ( "article_id" ))
+            getArticle ( article_id);
+        else {
 
 
+            FirebaseDynamicLinks.getInstance ( )
+                    .getDynamicLink ( getIntent ( ) )
+                    .addOnSuccessListener ( this, pendingDynamicLinkData -> {
+                        // Get deep link from result (may be null if no link is found)
+                        Uri deepLink = null;
+                        if (pendingDynamicLinkData != null) {
+                            deepLink = pendingDynamicLinkData.getLink ( );
 
+                            String referlink = deepLink.toString ( ).replace ( "https://agriclinic.org/viewcontent.php?id=", "" );
+                            Log.e ( TAG, " substring " + referlink ); //id=174
+
+                            getArticle (referlink);
+
+                        /*Intent intent=new Intent(SplashScreenActivity.this,SingleArticleActivity.class);
+                        intent.putExtra("article_id","179");
+                        startActivity(intent);*/
+
+                        }
+
+
+                        // Handle the deep link. For example, open the linked
+                        // content, or apply promotional credit to the user's
+                        // account.
+                        // ...
+
+                        // ...
+                    } )
+                    .addOnFailureListener ( this, new OnFailureListener ( ) {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e ( TAG, "getDynamicLink:onFailure", e );
+                        }
+                    } );
+        }
 
     }
 
-    public void getArticle(){
+    public void getArticle(String article_id) {
 
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-        pDialog.setCancelable(false);
+        pDialog.setMessage ( "Loading..." );
+        pDialog.show ( );
+        pDialog.setCancelable ( false );
 
         // prepare call in Retrofit 2.0
-        JsonObject jsonObject = new JsonObject();
+        JsonObject jsonObject = new JsonObject ( );
 
-        jsonObject.addProperty("language_id", "2");
-        jsonObject.addProperty("article_id", article_id);
-        jsonObject.addProperty("user_id", user_id);
+        jsonObject.addProperty ( "language_id", "2" );
+        jsonObject.addProperty ( "article_id", article_id );
+        jsonObject.addProperty ( "user_id", user_id );
 
 
-        Log.d(TAG,""+jsonObject);
-        ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<ArticlesList> call = service.processArticlesDetails(jsonObject);
-        call.enqueue(new Callback<ArticlesList>() {
+        Log.d ( TAG, "" + jsonObject );
+        ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
+        Call<ArticlesList> call = service.processArticlesDetails ( jsonObject );
+        call.enqueue ( new Callback<ArticlesList> ( ) {
             @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
 
 
                 // Check if the Response is successful
-                if (response.isSuccessful()){
-                    Log.d(TAG,""+response.toString());
-                    assert response.body() != null;
-                    ArticlesList articlesData = response.body();
-                    articlesDetails = response.body().getResponse();
+                if (response.isSuccessful ( )) {
+                    Log.d ( TAG, "" + response.toString ( ) );
+                    assert response.body ( ) != null;
+                    ArticlesList articlesData = response.body ( );
+                    articlesDetails = response.body ( ).getResponse ( );
 
-                    if (articlesData.isStatus()) {
-                        if (articlesDetails != null && articlesDetails.size() > 0) {
-                            for (int j = 0; j < articlesDetails.size(); j++) {
-                                Log.d(TAG, "" + articlesDetails.size());
+                    if (articlesData.isStatus ( )) {
+                        if (articlesDetails != null && articlesDetails.size ( ) > 0) {
+                            for (int j = 0; j < articlesDetails.size ( ); j++) {
+                                Log.d ( TAG, "" + articlesDetails.size ( ) );
 
 
-                                binding.textAuthor.setText(articlesDetails.get(0).getAuthor_info());
+                                binding.textAuthor.setText ( articlesDetails.get ( 0 ).getAuthor_info ( ) );
                                 //binding.textTags.setText(articleModalList.get(0).getTags());
-                                String line=articlesDetails.get(0).getTags();
+                                String line = articlesDetails.get ( 0 ).getTags ( );
 
                                 //using String split function
-                                String[] words = line.split(",");
-                                Log.d(TAG,""+Arrays.toString(words));
+                                String[] words = line.split ( "," );
+                                Log.d ( TAG, "" + Arrays.toString ( words ) );
 
-                                Log.d(TAG,""+words.length);
+                                Log.d ( TAG, "" + words.length );
 
                                 final CustomButton[] myTextViews = new CustomButton[words.length]; // create an empty array;
 
 
-                                LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams (
                                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                                        85);
-                                layoutParams.setMargins(5, 5, 5, 5);
+                                        85 );
+                                layoutParams.setMargins ( 5, 5, 5, 5 );
 
 
                                 for (int i = 0; i < words.length; i++) {
                                     // create a new textview
-                                    final CustomButton rowTextView = new CustomButton(SingleArticleActivity.this);
+                                    final CustomButton rowTextView = new CustomButton ( SingleArticleActivity.this );
 
                                     // set some properties of rowTextView or something
-                                    rowTextView.setText(words[i]+" ");
-                                    rowTextView.setTextColor(Color.parseColor("#FFFFFF"));
-                                    rowTextView.setBackgroundResource(R.drawable.button_rounded);
-                                    rowTextView.setPadding(5,5,5,5);
+                                    rowTextView.setText ( words[i] + " " );
+                                    rowTextView.setTextColor ( Color.parseColor ( "#FFFFFF" ) );
+                                    rowTextView.setBackgroundResource ( R.drawable.button_rounded );
+                                    rowTextView.setPadding ( 5, 5, 5, 5 );
 
-                                    rowTextView.setLayoutParams(layoutParams);
+                                    rowTextView.setLayoutParams ( layoutParams );
                                     // add the textview to the linearlayout
-                                    binding.myLinearLayout.addView(rowTextView);
+                                    binding.myLinearLayout.addView ( rowTextView );
 
                                     // save a reference to the textview for later
                                     myTextViews[i] = rowTextView;
 
                                     int finalI = i;
-                                    rowTextView.setOnClickListener(new View.OnClickListener() {
+                                    rowTextView.setOnClickListener ( new View.OnClickListener ( ) {
                                         @Override
                                         public void onClick(View v) {
                                             //Toast.makeText(SingleArticleActivity.this, ""+ words[finalI], Toast.LENGTH_SHORT).show();
 
-                                            Intent setIntent = new Intent(SingleArticleActivity.this, ArticlesListActivity.class);
-                                            setIntent.putExtra("article_tag", ""+words[finalI]);
-                                            Log.d(TAG,""+words[finalI]);
-                                            setIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                            startActivity(setIntent);
+                                            Intent setIntent = new Intent ( SingleArticleActivity.this, ArticlesListActivity.class );
+                                            setIntent.putExtra ( "article_tag", "" + words[finalI] );
+                                            Log.d ( TAG, "" + words[finalI] );
+                                            setIntent.setFlags ( Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
+                                            startActivity ( setIntent );
                                         }
-                                    });
+                                    } );
                                 }
 
 
-                                binding.textDate.setText("Published on : " + ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT,articlesDetails.get(0).getCreated_on()));
+                                binding.textDate.setText ( "Published on : " + ConstantValues.getFormattedDate ( MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, articlesDetails.get ( 0 ).getCreated_on ( ) ) );
 
                               /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
@@ -204,35 +242,36 @@ public class SingleArticleActivity extends AppCompatActivity  {
 
                                 }*/
 
-                                binding.textDesc.loadDataWithBaseURL(null,articlesDetails.get(0).getDescription()+articlesDetails.get(0).getDescription2()+articlesDetails.get(0).getDescription3(), "text/html; charset=utf-8", "UTF-8",null);
+                                binding.textDesc.loadDataWithBaseURL ( null, articlesDetails.get ( 0 ).getDescription ( ) + articlesDetails.get ( 0 ).getDescription2 ( ) + articlesDetails.get ( 0 ).getDescription3 ( ), "text/html; charset=utf-8", "UTF-8", null );
 
-                                ImageLoader.getInstance()
-                                        .displayImage(Urls.IMAGE_URL+articlesDetails.get(0).getImage_path(), binding.textImage, options,new SimpleImageLoadingListener(){
+                                ImageLoader.getInstance ( )
+                                        .displayImage ( Urls.IMAGE_URL + articlesDetails.get ( 0 ).getImage_path ( ), binding.textImage, options, new SimpleImageLoadingListener ( ) {
                                             @Override
                                             public void onLoadingStarted(String imageUri, View view) {
-                                                binding.progressBar.setVisibility(View.VISIBLE);
+                                                binding.progressBar.setVisibility ( View.VISIBLE );
                                             }
+
                                             @Override
                                             public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                                                binding.progressBar.setVisibility(View.GONE);
+                                                binding.progressBar.setVisibility ( View.GONE );
 
                                             }
 
                                             @Override
                                             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                                                binding.progressBar.setVisibility(View.GONE);
+                                                binding.progressBar.setVisibility ( View.GONE );
 
                                             }
 
                                             @Override
                                             public void onLoadingCancelled(String imageUri, View view) {
-                                                binding.progressBar.setVisibility(View.GONE);
+                                                binding.progressBar.setVisibility ( View.GONE );
 
                                             }
-                                        });
+                                        } );
 
 
-                                pDialog.dismiss();
+                                pDialog.dismiss ( );
                             }
                             //get values
 
@@ -246,20 +285,18 @@ public class SingleArticleActivity extends AppCompatActivity  {
 
             @Override
             public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
-                pDialog.dismiss();
-                Log.d("ResponseF",""+t);
+                pDialog.dismiss ( );
+                Log.d ( "ResponseF", "" + t );
             }
-        });
+        } );
 
     }
 
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.share, menu);
+        MenuInflater inflater = getMenuInflater ( );
+        inflater.inflate ( R.menu.share, menu );
 
 
         // return true so that the menu pop up is opened
@@ -268,7 +305,7 @@ public class SingleArticleActivity extends AppCompatActivity  {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.share) {
+        if (item.getItemId ( ) == R.id.share) {
             // do your code
 
 
@@ -292,52 +329,51 @@ public class SingleArticleActivity extends AppCompatActivity  {
                             Log.d("dynamicLinkUri",""+articleModal.getTitle());*/
 
 
-                    String sharelinktext  = "https://novaagritech1.page.link/?"+
-                            "link=http://agriclinic.org/viewcontent.php?id="+articlesDetails.get(0).getId() +
-                            "&apn="+ getPackageName();
+                    String sharelinktext = "https://novaagritech1.page.link/?" +
+                            "link=https://agriclinic.org/viewcontent.php?id=" + articlesDetails.get ( 0 ).getId ( ) +
+                            "&apn=" + getPackageName ( );
 
 
                     // shorten the link
-                    Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                            .setLink(Uri.parse(sharelinktext))// manually
-                            .setDomainUriPrefix("https://novaagritech1.page.link")
-                            .setAndroidParameters(new DynamicLink.AndroidParameters.Builder()
-                                             .setMinimumVersion(0)
-                                             .build())
-                            .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
-                                            .setTitle(articlesDetails.get(0).getTitle())
-                                            .setDescription(getResources().getString(R.string.access_farmrise_articles1))
-                                            .build())
-                            .buildShortDynamicLink(ShortDynamicLink.Suffix.SHORT)
-                            .addOnCompleteListener(this , (OnCompleteListener<ShortDynamicLink>) task -> {
-                                if (task.isSuccessful()) {
+                    Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance ( ).createDynamicLink ( )
+                            .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + articlesDetails.get ( 0 ).getId ( ) ) )// manually
+                            .setDomainUriPrefix ( "https://novaagritech1.page.link" )
+                            .setAndroidParameters ( new DynamicLink.AndroidParameters.Builder ( )
+                                    .build ( ) )
+                            .setSocialMetaTagParameters ( new DynamicLink.SocialMetaTagParameters.Builder ( )
+                                    .setTitle ( articlesDetails.get ( 0 ).getTitle ( ) )
+                                    .setDescription ( getResources ( ).getString ( R.string.access_farmrise_articles1 ) )
+                                    .build ( ) )
+                            .buildShortDynamicLink ( ShortDynamicLink.Suffix.SHORT )
+                            .addOnCompleteListener ( this, (OnCompleteListener<ShortDynamicLink>) task -> {
+                                if (task.isSuccessful ( )) {
                                     // Short link created
-                                    Uri shortLink = task.getResult().getShortLink();
-                                    Uri flowchartLink = task.getResult().getPreviewLink();
-                                    Log.e("main ", "short link "+ shortLink);
-                                    Log.e("main ", "short link "+ flowchartLink);
+                                    Uri shortLink = task.getResult ( ).getShortLink ( );
+                                    Uri flowchartLink = task.getResult ( ).getPreviewLink ( );
+                                    Log.e ( "main ", "short link " + shortLink );
+                                    Log.e ( "main ", "short link " + flowchartLink );
 
 
-                                    Intent intent = new Intent();
-                                    intent.setAction(Intent.ACTION_SEND);
+                                    Intent intent = new Intent ( );
+                                    intent.setAction ( Intent.ACTION_SEND );
 
-                                    intent.putExtra(Intent.EXTRA_TEXT, shortLink.toString());
-                                    intent.setType("text/plain");
-                                    startActivity(intent);
+                                    intent.putExtra ( Intent.EXTRA_TEXT, shortLink.toString ( ) );
+                                    intent.setType ( "text/plain" );
+                                    startActivity ( intent );
 
 
                                 } else {
                                     // Error
                                     // ...
-                                    Log.e("main", " error "+task.getException() );
+                                    Log.e ( "main", " error " + task.getException ( ) );
 
                                 }
-                            });
+                            } );
 
-                    Log.e("main ", "short link "+ shortLinkTask);
+                    Log.e ( "main ", "short link " + shortLinkTask );
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    e.printStackTrace ( );
 
                 }
 
@@ -347,7 +383,7 @@ public class SingleArticleActivity extends AppCompatActivity  {
             return true;
 
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected ( item );
     }
 
 

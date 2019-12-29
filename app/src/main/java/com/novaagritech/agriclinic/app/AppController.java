@@ -18,6 +18,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.novaagritech.agriclinic.BuildConfig;
 import com.novaagritech.agriclinic.firebase.ForceUpdateChecker;
 
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class AppController extends Application {
 		// set in-app defaults
 		Map<String, Object> remoteConfigDefaults = new HashMap();
 		remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_REQUIRED, false);
-		remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, "1.0.4");
+		remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, BuildConfig.VERSION_NAME );
 		remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_URL,
 				"https://play.google.com/store/apps/details?id=com.novaagritech.agriclinic&hl=en");
 

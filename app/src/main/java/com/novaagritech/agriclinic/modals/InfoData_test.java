@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class InfoData implements Serializable {
+public class InfoData_test implements Serializable {
 
     @SerializedName("id")
     @Expose
@@ -309,35 +309,10 @@ public class InfoData implements Serializable {
         this.author_info = author_info;
     }
 
-
     @Override
     public String toString() {
-        return "InfoData{" +
-                "id='" + id + '\'' +
-                ", category_id='" + category_id + '\'' +
-                ", sub_category_id='" + sub_category_id + '\'' +
-                ", crop_id='" + crop_id + '\'' +
-                ", language_id='" + language_id + '\'' +
-                ", image_path='" + image_path + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", description2='" + description2 + '\'' +
-                ", description3='" + description3 + '\'' +
-                ", tags='" + tags + '\'' +
-                ", status='" + status + '\'' +
-                ", created_on='" + created_on + '\'' +
-                ", author_image='" + author_image + '\'' +
-                ", author_info='" + author_info + '\'' +
-                ", image='" + image + '\'' +
-                ", image_url='" + image_url + '\'' +
-                ", start_date='" + start_date + '\'' +
-                ", end_date='" + end_date + '\'' +
-                ", location='" + location + '\'' +
-                ", share_url='" + share_url + '\'' +
-                ", likes_count=" + likes_count +
-                ", is_liked=" + is_liked +
-                ", views_count=" + views_count +
-                ", comment_count=" + comment_count +
+        return "InfoData_test{" +
+                "image_url='" + image_url + '\'' +
                 '}';
     }
 }
