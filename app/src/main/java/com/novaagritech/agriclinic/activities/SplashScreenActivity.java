@@ -61,38 +61,38 @@ public class SplashScreenActivity extends AppCompatActivity {
             }
         }, 3000);
 
-
-        FirebaseDynamicLinks.getInstance()
-                .getDynamicLink(getIntent())
-                .addOnSuccessListener(this, pendingDynamicLinkData -> {
-                    // Get deep link from result (may be null if no link is found)
-                    Uri deepLink = null;
-                    if (pendingDynamicLinkData != null) {
-                        deepLink = pendingDynamicLinkData.getLink();
-
-                        String referlink = deepLink.toString();
-                        Log.e(TAG, " substring "+referlink); //id=174
-
-                        /*Intent intent=new Intent(SplashScreenActivity.this,SingleArticleActivity.class);
-                        intent.putExtra("article_id","179");
-                        startActivity(intent);*/
-
-                    }
-
-
-                    // Handle the deep link. For example, open the linked
-                    // content, or apply promotional credit to the user's
-                    // account.
-                    // ...
-
-                    // ...
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "getDynamicLink:onFailure", e);
-                    }
-                });
+//
+//        FirebaseDynamicLinks.getInstance()
+//                .getDynamicLink(getIntent())
+//                .addOnSuccessListener(this, pendingDynamicLinkData -> {
+//                    // Get deep link from result (may be null if no link is found)
+//                    Uri deepLink = null;
+//                    if (pendingDynamicLinkData != null) {
+//                        deepLink = pendingDynamicLinkData.getLink();
+//
+//                        String referlink = deepLink.toString();
+//                        Log.e(TAG, " substring "+referlink); //id=174
+//
+//                        /*Intent intent=new Intent(SplashScreenActivity.this,SingleArticleActivity.class);
+//                        intent.putExtra("article_id","179");
+//                        startActivity(intent);*/
+//
+//                    }
+//
+//
+//                    // Handle the deep link. For example, open the linked
+//                    // content, or apply promotional credit to the user's
+//                    // account.
+//                    // ...
+//
+//                    // ...
+//                })
+//                .addOnFailureListener(this, new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.e(TAG, "getDynamicLink:onFailure", e);
+//                    }
+//                });
 
 
 
