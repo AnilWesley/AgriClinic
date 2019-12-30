@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -14,13 +15,22 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.adapters.ArticleListAdapter1_test;
 import com.novaagritech.agriclinic.adapters.ArticlesListAdapter3;
+import com.novaagritech.agriclinic.adapters.ArticlesListAdapterTest2;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
+import com.novaagritech.agriclinic.app.AppController;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
+import com.novaagritech.agriclinic.databinding.FragmentHome1Binding;
 import com.novaagritech.agriclinic.databinding.FragmentHomeTestBinding;
 import com.novaagritech.agriclinic.modals.ArticlesList;
 import com.novaagritech.agriclinic.modals.BannerData;
@@ -31,7 +41,12 @@ import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
