@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_marginTop="40dp"
             app:shimmer_duration="1500"
             android:visibility="visible"
             android:orientation="vertical">
@@ -74,7 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top|center"
-                android:text="No Records"
+                android:text="@string/no_records"
                 android:visibility="gone" />
         </LinearLayout>
     </RelativeLayout>

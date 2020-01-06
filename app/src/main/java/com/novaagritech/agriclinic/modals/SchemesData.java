@@ -16,6 +16,11 @@ public class SchemesData implements Serializable {
     @Expose
     private List<InfoData> response = new ArrayList<InfoData>();
 
+    @SerializedName("result")
+    @Expose
+    private List<InfoData> result = new ArrayList<InfoData>();
+
+
     @SerializedName("message")
     @Expose
     private String message;
@@ -45,5 +50,14 @@ public class SchemesData implements Serializable {
 
     public void setResponse(List<InfoData> response) {
         this.response = response;
+    }
+
+
+    public List<InfoData> getResult() {
+        return result;
+    }
+
+    public void setResult(List<InfoData> result) {
+        this.result = result;
     }
 }

@@ -56,6 +56,14 @@ public interface ApiInterface {
         Call<BannerData> processBanners1(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
+        @POST("update_user_token")
+        Call<BannerData> processToken(@Body JsonObject body);
+
+        @Headers("Content-Type: application/json")
+        @POST("update_user_pincode")
+        Call<BannerData> processLocation(@Body JsonObject body);
+
+        @Headers("Content-Type: application/json")
         @POST("banner_adds")
         Call<ArticlesList> processBanners(@Body JsonObject body);
 
@@ -79,6 +87,9 @@ public interface ApiInterface {
         @POST("article_details")
         Call<ArticlesList> processArticlesDetails(@Body JsonObject body);
 
+        @Headers("Content-Type: application/json")
+        @POST("privacy_policy")
+        Call<ArticlesList> processPrivacyPolicy(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("user_stories")
@@ -99,6 +110,11 @@ public interface ApiInterface {
         @Headers("Content-Type: application/json")
         @POST("news_details")
         Call<SchemesData> processNewsDetails(@Body JsonObject body);
+
+
+        @Headers("Content-Type: application/json")
+        @POST("about_us")
+        Call<SchemesData> processAboutUS(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("govtScheme_details")

@@ -1,13 +1,11 @@
 package com.novaagritech.agriclinic.fragments;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -17,17 +15,11 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.adapters.ArticlesListAdapter3;
 import com.novaagritech.agriclinic.adapters.ArticlesListAdapterTest2;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
-import com.novaagritech.agriclinic.app.AppController;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.FragmentHome1Binding;
 import com.novaagritech.agriclinic.modals.ArticlesList;
@@ -38,12 +30,8 @@ import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -85,7 +73,7 @@ public class HomeFragment1 extends Fragment {
     private String user_id,selected;
     private StoryAdapter mAdapter;
 
-
+    String token;
     private LinearLayoutManager mLayoutManager,mLayoutManager1;
 
 
@@ -93,7 +81,8 @@ public class HomeFragment1 extends Fragment {
 
 
     private List<Stories1> list;
-
+    private List<String> crops;
+    private String name;
 
 
     @Override
@@ -110,6 +99,9 @@ public class HomeFragment1 extends Fragment {
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_home1, container, false);
         View view = binding.getRoot();
+        crops=new ArrayList<>();
+
+
 
 
 
@@ -120,14 +112,32 @@ public class HomeFragment1 extends Fragment {
 
 
         pDialog = new ProgressDialog(getActivity());
-        pDialog.setMessage("Loading...");
-        pDialog.show();
+       /* pDialog.setMessage("Loading...");
+        pDialog.show();*/
 
 
 
-        Intent i = getActivity().getIntent();
 
-        article_tag = i.getStringExtra("article_tag");
+      /* binding.button1.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               try {
+
+                   article_tag = binding.editTextInput.getText().toString().trim();
+                   callArticleListApi();
+                   loadFirstPage();
+
+
+               } catch (Exception e) {
+                   // TODO: handle exception
+               }
+           }
+       });*/
+
+
+       /* Intent i = getActivity().getIntent();
+
+        article_tag = i.getStringExtra("article_tag");*/
        // adapter = new ArticleListAdapter1(getActivity());
 
 
@@ -139,6 +149,11 @@ public class HomeFragment1 extends Fragment {
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
         selected= ""+ currentYear +"-"+ currentMonth;
 
+
+
+
+
+        //data();
         //getStories1();
 
         loadFirstPage();
@@ -153,11 +168,66 @@ public class HomeFragment1 extends Fragment {
 
 
 
+
         return  view;
 
 
     }
 
+
+   /* public void data(){
+
+
+
+
+        String url = "http://omnisoft.in/farmer/api/v1/crops.php";
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("URL",""+ url);
+                try {
+                    crops.clear();
+                    JSONObject jsonObject = new JSONObject(response);
+
+
+                    JSONArray jsonArray = jsonObject.getJSONArray("Content");
+
+                    Log.d("JSONOBJ1",""+jsonArray.length());
+
+
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+
+                       name =jsonArray.getJSONObject(i).getString("cropName");
+                       crops.add(name);
+
+
+                    }
+                    Log.d("JSONOBJ1",""+crops.size());
+                    ArrayAdapter<String> adapter =
+                            new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, crops);
+                    binding.editTextInput.setAdapter(adapter);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        int socketTimeout = 30000;
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        stringRequest.setRetryPolicy(policy);
+        requestQueue.add(stringRequest);
+
+
+    }*/
 
 
     private void loadFirstPage() {
@@ -307,6 +377,8 @@ public class HomeFragment1 extends Fragment {
 
 
 
+
+
     /**
      * Performs a Retrofit call to the top rated movies API.
      * Same API call for Pagination.
@@ -316,19 +388,21 @@ public class HomeFragment1 extends Fragment {
     private Call<ArticlesList> callArticleListApi() {
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("limit", "");
+        jsonObject.addProperty("limit", "20");
         jsonObject.addProperty("language_id", "2");
         jsonObject.addProperty("crop_id", "");
         jsonObject.addProperty("page", currentPage);
         jsonObject.addProperty("search_value", article_tag);
-        jsonObject.addProperty("search_byDate", selected);
+        jsonObject.addProperty("search_byDate", "");
         jsonObject.addProperty("user_id", user_id);
+
+        Log.d(TAG,"JSONOB"+jsonObject);
 
         return apiService.processArticlesList1(jsonObject);
     }
 
 
-    private void getStories1(){
+   /* private void getStories1(){
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("language_id", "2");
@@ -468,7 +542,7 @@ public class HomeFragment1 extends Fragment {
         AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
 
     }
-
+*/
 
     @Override
     public void onResume() {

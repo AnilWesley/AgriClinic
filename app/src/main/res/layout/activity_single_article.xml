@@ -31,7 +31,7 @@
                 android:id="@+id/actionImage"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_chevron_left"
+                app:srcCompat="@drawable/ic_chevron_left"
                 android:layout_weight="0.1"
                 android:layout_gravity="center"
                 android:contentDescription="@string/todo" />
@@ -50,6 +50,8 @@
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
+
+
 <androidx.core.widget.NestedScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -74,15 +76,30 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/textTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/ramabhadra"
+                android:gravity="center"
+                android:text="@string/app_name"
+                android:textColor="@color/red"
+                android:textSize="20sp"
+                android:visibility="visible" />
         <ImageView
 
-        android:id="@+id/textImage"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_margin="8dp"
-        android:scaleType="fitXY"
-        android:contentDescription="@string/app_name"
-        app:srcCompat="@drawable/image_not_available" />
+            android:id="@+id/textImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="8dp"
+            android:layout_below="@+id/textTitle"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/app_name"
+            app:srcCompat="@drawable/image_not_available" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -109,15 +126,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/textTags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:visibility="gone"
-            android:layout_margin="8dp"
-            android:text="@string/app_name"
-            android:gravity="center"/>
+
 
 
         <View

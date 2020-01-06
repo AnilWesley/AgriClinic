@@ -29,13 +29,12 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:textSize="14sp"
-                        android:text="Reach Us"
+                        android:text="@string/reach_us"
                         android:gravity="center"
                         android:textStyle="bold"
-                        android:textAllCaps="true"
                         android:drawablePadding="5dp"
                         android:layout_margin="5dp"
-                        android:textColor="@color/quantum_grey"
+                        android:textColor="@color/colorPrimary"
                         android:layout_height="wrap_content"/>
                     <View
                         android:layout_width="match_parent"

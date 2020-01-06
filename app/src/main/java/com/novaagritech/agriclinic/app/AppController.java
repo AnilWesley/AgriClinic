@@ -63,7 +63,7 @@ public class AppController extends Application {
 		remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_REQUIRED, false);
 		remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, BuildConfig.VERSION_NAME );
 		remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_URL,
-				"https://play.google.com/store/apps/details?id=com.novaagritech.agriclinic&hl=en");
+				"https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID);
 
 		firebaseRemoteConfig.setDefaults(remoteConfigDefaults);
 		firebaseRemoteConfig.fetch(60) // fetch every minutes
@@ -78,6 +78,7 @@ public class AppController extends Application {
 				});
 
 	}
+
 
 
 

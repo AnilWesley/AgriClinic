@@ -47,7 +47,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextNumber"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -57,14 +57,13 @@
                         android:maxLength="10"
                         android:ems="10"
                         android:textColor="@color/colorPrimary"
-                        android:inputType="number"
-                        tools:ignore="Autofill" />
+                        android:inputType="number" />
                 </com.google.android.material.textfield.TextInputLayout>
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     app:passwordToggleEnabled="true"
                     android:layout_height="wrap_content">
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextCnfPasswrd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -73,8 +72,7 @@
                         android:padding="10dp"
                         android:ems="10"
                         android:textColor="@color/colorPrimary"
-                        android:inputType="textPassword"
-                        tools:ignore="Autofill" />
+                        android:inputType="textPassword" />
                 </com.google.android.material.textfield.TextInputLayout>
 
 

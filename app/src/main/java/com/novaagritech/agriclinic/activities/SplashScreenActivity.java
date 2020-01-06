@@ -19,8 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
@@ -36,7 +34,8 @@ public class SplashScreenActivity extends AppCompatActivity {
     ProgressBar progressBar;
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     MyAppPrefsManager myAppPrefsManager;
-    private String TAG="SPLASHACTIVITY";
+    private String TAG="SPLASHACTIVITY1";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,38 +60,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             }
         }, 3000);
 
-//
-//        FirebaseDynamicLinks.getInstance()
-//                .getDynamicLink(getIntent())
-//                .addOnSuccessListener(this, pendingDynamicLinkData -> {
-//                    // Get deep link from result (may be null if no link is found)
-//                    Uri deepLink = null;
-//                    if (pendingDynamicLinkData != null) {
-//                        deepLink = pendingDynamicLinkData.getLink();
-//
-//                        String referlink = deepLink.toString();
-//                        Log.e(TAG, " substring "+referlink); //id=174
-//
-//                        /*Intent intent=new Intent(SplashScreenActivity.this,SingleArticleActivity.class);
-//                        intent.putExtra("article_id","179");
-//                        startActivity(intent);*/
-//
-//                    }
-//
-//
-//                    // Handle the deep link. For example, open the linked
-//                    // content, or apply promotional credit to the user's
-//                    // account.
-//                    // ...
-//
-//                    // ...
-//                })
-//                .addOnFailureListener(this, new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.e(TAG, "getDynamicLink:onFailure", e);
-//                    }
-//                });
+
 
 
 
@@ -102,6 +70,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
                         //To do//
+                        String msg = getString(R.string.fcm_token, "");
+                        Log.d(TAG, msg);
                         return;
                     }
 
@@ -292,10 +262,11 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
                     if (ConstantValues.IS_USER_LOGGED_IN = myAppPrefsManager.isUserLoggedIn()) {
-                        Intent intent = new Intent(getBaseContext(), HomeActivity1.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                        finish();
+
+                            Intent intent = new Intent(getBaseContext(), HomeActivity1.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            finish();
 
                     } else {
 

@@ -25,7 +25,6 @@ import com.novaagritech.agriclinic.databinding.FragmentHomeTestBinding;
 import com.novaagritech.agriclinic.modals.ArticlesList;
 import com.novaagritech.agriclinic.modals.BannerData;
 import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.InfoData_test;
 import com.novaagritech.agriclinic.modals.Stories1;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
@@ -60,7 +59,7 @@ public class HomeFragment_test extends Fragment {
 
     private List<InfoData> articlesDetails;
     private List<BannerData.BannerDetails> bannerDetails;
-    private List<InfoData_test> bannerDetails1;
+
 
     private String article_tag="";
     private Stories1 stories;
@@ -166,12 +165,12 @@ public class HomeFragment_test extends Fragment {
                         if (articlesData.isStatus()) {
 
                             articlesDetails = response.body().getResponse();
-                            bannerDetails1 = response.body().getBlist();
+                            bannerDetails = response.body().getBlist();
 
 
                             TOTAL_PAGES = response.body().getArticle_pages();
                             int size = articlesDetails.size();
-                            int size1 = bannerDetails1.size();
+                            int size1 = bannerDetails.size();
                             Log.d(TAG, "SIZEs" + size+"a"+size1);
                            /* linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                             binding.articlesRecycle.setLayoutManager(linearLayoutManager);
@@ -183,7 +182,7 @@ public class HomeFragment_test extends Fragment {
                             adapter.addAll(articlesDetails);
 
                             adapter.notifyDataSetChanged();*/
-                            articleListAdapterTest = new ArticleListAdapter1_test (getActivity(),articlesDetails,bannerDetails1);
+                            articleListAdapterTest = new ArticleListAdapter1_test (getActivity(),articlesDetails,bannerDetails);
                             linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                             binding.articlesRecycle.setLayoutManager(linearLayoutManager);
 
@@ -243,12 +242,12 @@ public class HomeFragment_test extends Fragment {
     private Call<ArticlesList> callArticleListApi() {
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("limit", "");
+        jsonObject.addProperty("limit", "4");
         jsonObject.addProperty("language_id", "2");
         jsonObject.addProperty("crop_id", "");
         jsonObject.addProperty("page", currentPage);
         jsonObject.addProperty("search_value", article_tag);
-        jsonObject.addProperty("search_byDate", selected);
+        jsonObject.addProperty("search_byDate", "");
         jsonObject.addProperty("user_id", user_id);
 
         return apiService.processArticlesList1(jsonObject);

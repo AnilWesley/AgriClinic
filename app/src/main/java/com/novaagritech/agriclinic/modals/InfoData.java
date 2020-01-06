@@ -1,5 +1,7 @@
 package com.novaagritech.agriclinic.modals;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -91,6 +93,16 @@ public class InfoData implements Serializable {
     @Expose
     private String share_url;
 
+
+    @SerializedName("source_logo")
+    @Expose
+    private String source_logo;
+
+
+    @SerializedName("source")
+    @Expose
+    private String source;
+
     @SerializedName("likes_count")
     @Expose
     private int likes_count;
@@ -108,6 +120,31 @@ public class InfoData implements Serializable {
     @Expose
     private int comment_count;
 
+
+    @SerializedName("terms_conditions")
+    @Expose
+    private String terms_conditions;
+
+    @SerializedName("privacy_policy")
+    @Expose
+    private String privacy_policy;
+
+
+    public String getTerms_conditions() {
+        return terms_conditions;
+    }
+
+    public void setTerms_conditions(String terms_conditions) {
+        this.terms_conditions = terms_conditions;
+    }
+
+    public String getPrivacy_policy() {
+        return privacy_policy;
+    }
+
+    public void setPrivacy_policy(String privacy_policy) {
+        this.privacy_policy = privacy_policy;
+    }
 
     public String getDescription2() {
         return description2;
@@ -309,7 +346,23 @@ public class InfoData implements Serializable {
         this.author_info = author_info;
     }
 
+    public String getSource_logo() {
+        return source_logo;
+    }
 
+    public void setSource_logo(String source_logo) {
+        this.source_logo = source_logo;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    @NonNull
     @Override
     public String toString() {
         return "InfoData{" +
@@ -334,6 +387,8 @@ public class InfoData implements Serializable {
                 ", end_date='" + end_date + '\'' +
                 ", location='" + location + '\'' +
                 ", share_url='" + share_url + '\'' +
+                ", source_logo='" + source_logo + '\'' +
+                ", source='" + source + '\'' +
                 ", likes_count=" + likes_count +
                 ", is_liked=" + is_liked +
                 ", views_count=" + views_count +

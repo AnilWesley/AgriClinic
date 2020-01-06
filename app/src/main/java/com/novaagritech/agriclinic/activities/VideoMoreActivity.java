@@ -122,7 +122,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
         } else {
             url = "https://www.googleapis.com/youtube/v3/search?part=snippet,id&order=date&type=video&fields=nextPageToken,pageInfo(totalResults),items(id(videoId),snippet(title,thumbnails,publishedAt))&key=" +Config.YOUTUBE_API_KEY + "&" + Config.PARAM_CHANNEL_ID_YOUTUBE + channelID+ "&" + Config.PARAM_PAGE_TOKEN_YOUTUBE + this.mNextPageToken + "&" + Config.PARAM_MAX_RESULT_YOUTUBE + 50;
         }
-
+        Log.e("URL",""+ url);
 
        // url = "https://www.googleapis.com/youtube/v3/search?part=snippet,id&order=date&type=video&fields=nextPageToken,pageInfo(totalResults),items(id(videoId),snippet(title,thumbnails,publishedAt))&key=" + Config.YOUTUBE_API_KEY + "&" + Config.PARAM_CHANNEL_ID_YOUTUBE + "UCicsA32B7SO_RUJqzDKbKNA" + "&" + Config.PARAM_PAGE_TOKEN_YOUTUBE + mNextPageToken + "&" + Config.PARAM_MAX_RESULT_YOUTUBE + 50;
 
@@ -131,7 +131,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("URL",""+ url);
+
                 try {
                     youtubeVideoModelArrayList.clear();
                     JSONObject jsonObject = new JSONObject(response);

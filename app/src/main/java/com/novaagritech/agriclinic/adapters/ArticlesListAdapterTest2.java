@@ -3,12 +3,10 @@ package com.novaagritech.agriclinic.adapters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -280,74 +278,57 @@ public class ArticlesListAdapterTest2 extends RecyclerView.Adapter<RecyclerView.
                 public void onClick(View view) {
 
 
+                    // Check if the User is Authenticated
                     if (ConstantValues.IS_USER_LOGGED_IN) {
                         try {
 
 
-                           /* DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                                    .setLink(Uri.parse("http://agriclinic.org/"))
-                                    .setDomainUriPrefix("novaagritech1.page.link")
-                                    // Open links with this app on Android
-                                    .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
-                                    // Open links with com.example.ios on iOS
-                                    .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
-                                    .buildDynamicLink();
-
-                            Uri dynamicLinkUri = dynamicLink.getUri();
-                            Log.d("dynamicLinkUri",""+articleModal.getTitle());*/
-
-
-                            String sharelinktext  = "https://novaagritech1.page.link/?"+
-                                    "link=http://agriclinic.org/viewcontent.php?id="+infoDataList.get(position).getId() +
-                                    "&apn="+ context.getPackageName();
-
-
                             // shorten the link
-                            Task<ShortDynamicLink> shortLinkTask;
-                            shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                                    .setLink(Uri.parse(sharelinktext))// manually
-                                    .setDomainUriPrefix("https://novaagritech1.page.link")
-                                    .setAndroidParameters(new DynamicLink.AndroidParameters.Builder()
-                                            .setMinimumVersion(0)
-                                            .build())
-                                    .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
-                                            .setTitle(infoDataList.get(position).getTitle())
-                                            .setDescription(context.getResources().getString(R.string.access_farmrise_articles1))
-                                            .build())
-                                    .buildShortDynamicLink(ShortDynamicLink.Suffix.SHORT)
-                                    .addOnCompleteListener((Activity) context, (OnCompleteListener<ShortDynamicLink>) task -> {
-                                        if (task.isSuccessful()) {
+                            Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance ( ).createDynamicLink ( )
+                                    .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + articleModal.getId ( )+ "articles" ) )// manually
+                                    .setDomainUriPrefix ( "https://agcl.in/a")
+                                    .setAndroidParameters ( new DynamicLink.AndroidParameters.Builder ( )
+                                            .build ( ) )
+                                    .setSocialMetaTagParameters ( new DynamicLink.SocialMetaTagParameters.Builder ( )
+                                            .setTitle ( articleModal.getTitle ( ) )
+                                            .setDescription ( context.getResources ( ).getString ( R.string.access_farmrise_articles1 ) )
+                                            .build ( ) )
+                                    .buildShortDynamicLink ( ShortDynamicLink.Suffix.SHORT )
+                                    .addOnCompleteListener ((Activity) context, (OnCompleteListener<ShortDynamicLink>) task -> {
+                                        if (task.isSuccessful ( )) {
                                             // Short link created
-                                            Uri shortLink = task.getResult().getShortLink();
-                                            Uri flowchartLink = task.getResult().getPreviewLink();
-                                            Log.e("main ", "short link "+ shortLink);
-                                            Log.e("main ", "short link "+ flowchartLink);
+                                            Uri shortLink = task.getResult ( ).getShortLink ( );
+                                            Uri flowchartLink = task.getResult ( ).getPreviewLink ( );
+                                            Log.e ( "main ", "substring1 " + shortLink );
+                                            Log.e ( "main ", "substring1 " + flowchartLink );
 
 
-                                            Intent intent = new Intent();
-                                            intent.setAction(Intent.ACTION_SEND);
+                                            Intent intent = new Intent ( );
+                                            intent.setAction ( Intent.ACTION_SEND );
 
-                                            intent.putExtra(Intent.EXTRA_TEXT, shortLink.toString());
-                                            intent.setType("text/plain");
-                                            context.startActivity(intent);
+                                            intent.putExtra ( Intent.EXTRA_TEXT, shortLink.toString ( ) );
+                                            intent.putExtra("title","articles");
+                                            intent.setType ( "text/plain" );
+                                            context.startActivity ( intent );
 
 
                                         } else {
                                             // Error
                                             // ...
-                                            Log.e("main", " error "+task.getException() );
+                                            Log.e ( "main", " error " + task.getException ( ) );
 
                                         }
-                                    });
+                                    } );
 
-                            Log.e("main ", "short link "+ shortLinkTask);
+                            Log.e ( "main ", "short link " + shortLinkTask );
 
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            e.printStackTrace ( );
 
                         }
 
                     }
+
                 }
             });
             ((MyViewHolder) holder).articleCommentCount.setOnClickListener(new View.OnClickListener() {

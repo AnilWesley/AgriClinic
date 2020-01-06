@@ -17,6 +17,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.google.gson.JsonObject;
@@ -87,9 +88,7 @@ public class SingleEventActivity extends AppCompatActivity {
             }
         });
 
-
-        getEvents();
-
+       getEvents();
 
 
 
@@ -142,15 +141,6 @@ public class SingleEventActivity extends AppCompatActivity {
                                 binding.textLocation.setText(infoDataList.get(0).getLocation());
                                 binding.textStartTime.setText("Start Date : "+infoDataList.get(0).getStart_date());
                                 binding.textEndTime.setText("End Date : "+infoDataList.get(0).getEnd_date());
-
-                              /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
-                                    text_desc.setText(Html.fromHtml(newsModalList.get(3).getDescription(), Html.FROM_HTML_MODE_COMPACT));
-
-                                } else {
-                                    text_desc.setText(Html.fromHtml(newsModalList.get(3).getDescription()));
-
-                                }*/
 
                                 binding.textDesc.loadDataWithBaseURL(null,infoDataList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
@@ -217,45 +207,58 @@ public class SingleEventActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.share) {
             // do your code
 
-
-            //ConstantValues.shareDeepLink(SingleEventActivity.this, String.format(getResources().getString(R.string.access_farmrise_articles), str));
-
-            String sharelinktext  = "https://novaagritech.page.link/?"+
-                    "link=http://agriclinic.org/viewcontent.php?id="+infoDataList.get(0).getId() +
-                    "&apn="+ getPackageName()+
-                    "&st="+getResources().getString(R.string.access_farmrise_articles1)+
-                    "&sd="+infoDataList.get(0).getTitle()+
-                    "&si="+infoDataList.get(0).getImage();
+            if (ConstantValues.IS_USER_LOGGED_IN) {
+                try {
 
 
-            // shorten the link
-            Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                    .setLongLink((Uri.parse(sharelinktext)))  // manually
-                    .buildShortDynamicLink()
-                    .addOnCompleteListener((OnCompleteListener<ShortDynamicLink>) task -> {
-                        if (task.isSuccessful()) {
-                            // Short link created
-                            Uri shortLink = task.getResult().getShortLink();
-                            Uri flowchartLink = task.getResult().getPreviewLink();
-                            Log.e("main ", "short link "+ shortLink);
+                    // shorten the link
+                    Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance ( ).createDynamicLink ( )
+                            .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + infoDataList.get ( 0 ).getId ( )+"events" ) )// manually
+                            .setDomainUriPrefix ( "https://agcl.in/a" )
+                            .setAndroidParameters ( new DynamicLink.AndroidParameters.Builder ( )
+                                    .build ( ) )
+                            .setSocialMetaTagParameters ( new DynamicLink.SocialMetaTagParameters.Builder ( )
+                                    .setTitle ( infoDataList.get ( 0 ).getTitle ( ) )
+                                    .setImageUrl(Uri.parse(infoDataList.get(0).getImage()))
+
+                                    .setDescription ( getResources ( ).getString ( R.string.access_farmrise_articles1 ) )
+                                    .build ( ) )
+                            .buildShortDynamicLink ( ShortDynamicLink.Suffix.SHORT )
+                            .addOnCompleteListener ( this, (OnCompleteListener<ShortDynamicLink>) task -> {
+                                if (task.isSuccessful ( )) {
+                                    // Short link created
+                                    Uri shortLink = task.getResult ( ).getShortLink ( );
+                                    Uri flowchartLink = task.getResult ( ).getPreviewLink ( );
+                                    Log.e ( "main ", "substring1 " + shortLink );
+                                    Log.e ( "main ", "substring1 " + flowchartLink );
 
 
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_SEND);
-                            intent.putExtra(Intent.EXTRA_TEXT,  shortLink.toString());
-                            intent.setType("text/plain");
-                            startActivity(intent);
+                                    Intent intent = new Intent ( );
+                                    intent.setAction ( Intent.ACTION_SEND );
+
+                                    intent.putExtra ( Intent.EXTRA_TEXT, shortLink.toString () );
+
+                                    intent.putExtra("title","events");
+                                    intent.setType ( "text/plain" );
+                                    startActivity ( intent );
 
 
-                        } else {
-                            // Error
-                            // ...
-                            Log.e("main", " error "+task.getException() );
+                                } else {
+                                    // Error
+                                    // ...
+                                    Log.e ( "main", " error " + task.getException ( ) );
 
-                        }
-                    });
+                                }
+                            } );
 
-            Log.e("main ", "short link "+ shortLinkTask);
+                    Log.e ( "main ", "short link " + shortLinkTask );
+
+                } catch (Exception e) {
+                    e.printStackTrace ( );
+
+                }
+
+            }
 
 
             return true;

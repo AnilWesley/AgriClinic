@@ -1,29 +1,19 @@
 package com.novaagritech.agriclinic.fragments;
 
 
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.activities.SingleNewsActivity;
-import com.novaagritech.agriclinic.adapters.NewsAdapter;
-import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.FragmentAboutBinding;
-import com.novaagritech.agriclinic.databinding.FragmentNewsBinding;
 import com.novaagritech.agriclinic.modals.InfoData;
 import com.novaagritech.agriclinic.modals.SchemesData;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
@@ -40,9 +30,10 @@ import retrofit2.Callback;
  */
 public class AboutFragment extends Fragment {
 
+    String TAG="ABOUTFRAGMENT";
 
-    private ProgressDialog pDialog;
 
+    private List<InfoData> infoDataList;
     public AboutFragment() {
         // Required empty public constructor
     }
@@ -58,7 +49,10 @@ public class AboutFragment extends Fragment {
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_about, container, false);
         View view = binding.getRoot();
-        pDialog=new ProgressDialog(getActivity());
+
+
+
+        getNews();
 
 
         return view;
@@ -68,6 +62,58 @@ public class AboutFragment extends Fragment {
 
 
 
+
+    private void getNews(){
+
+
+        // prepare call in Retrofit 2.0
+        JsonObject jsonObject = new JsonObject();
+
+        jsonObject.addProperty("language_id", "2");
+
+
+        Log.d(TAG,""+jsonObject);
+        ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
+        Call<SchemesData> call = service.processAboutUS(jsonObject);
+        call.enqueue(new Callback<SchemesData>() {
+            @Override
+            public void onResponse(@NonNull Call<SchemesData> call, @NonNull retrofit2.Response<SchemesData> response) {
+
+
+                // Check if the Response is successful
+                if (response.isSuccessful()){
+                    Log.d(TAG,""+response.toString());
+                    assert response.body() != null;
+                    SchemesData articlesData = response.body();
+                    infoDataList = response.body().getResult();
+
+                    if (articlesData.isStatus()) {
+                        if (infoDataList != null && infoDataList.size() > 0) {
+
+                                Log.d(TAG, "" + infoDataList.size());
+
+                                binding.textDesc.loadDataWithBaseURL(null,infoDataList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
+
+
+
+                            //get values
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<SchemesData> call, @NonNull Throwable t) {
+
+                Log.d("ResponseF",""+t);
+            }
+        });
+
+    }
 
 
 

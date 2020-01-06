@@ -1,86 +1,125 @@
 package com.novaagritech.agriclinic.activities;
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.location.Address;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Geocoder;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
+import android.provider.Settings;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
-import com.google.android.gms.auth.api.credentials.HintRequest;
 import com.google.android.gms.auth.api.phone.SmsRetriever;
 import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
+import com.novaagritech.agriclinic.BuildConfig;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.app.AppSignatureHelper;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.ActivityRegistrationBinding;
 import com.novaagritech.agriclinic.interfaces.OtpReceivedInterface;
+import com.novaagritech.agriclinic.location.Constants;
+import com.novaagritech.agriclinic.location.FetchAddressIntentService;
 import com.novaagritech.agriclinic.modals.UserData;
 import com.novaagritech.agriclinic.receiver.SmsBroadcastReceiver;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
-import com.novaagritech.agriclinic.utilities.LocationTrack;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 
-public class RegistrationActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        OtpReceivedInterface, GoogleApiClient.OnConnectionFailedListener {
+public class RegistrationActivity extends AppCompatActivity implements OtpReceivedInterface{
 
     ActivityRegistrationBinding binding;
     String TAG = "Registration_Activity1";
     ProgressDialog pDialog;
     String otp;
 
-    LocationTrack locationTrack;
-    Address address = null;
-    String addr = "";
-    String zipcode = "";
-    String city = "";
-    String state = "";
+    
+   
     String number;
     String otp_Num;
     String name,password;
-    double longitude;
-    double latitude;
+   
 
-    GoogleApiClient mGoogleApiClient;
+
     SmsBroadcastReceiver mSmsBroadcastReceiver;
-    private int RESOLVE_HINT = 2;
 
     MyAppPrefsManager myAppPrefsManager;
 
     String user_id;
 
     private List<UserData.UserDeatils> userDeatilsList;
+
+
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+
+    private static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
+    private static final String LOCATION_ADDRESS_KEY = "location-address";
+
+    /**
+     * Provides access to the Fused Location Provider API.
+     */
+    private FusedLocationProviderClient mFusedLocationClient;
+
+    /**
+     * Represents a geographical location.
+     */
+    private Location mLastLocation;
+
+    /**
+     * Tracks whether the user has requested an address. Becomes true when the user requests an
+     * address and false when the address (or an error message) is delivered.
+     */
+    private boolean mAddressRequested=false;
+
+    /**
+     * The formatted location address.
+     */
+    private String mAddressOutput="";
+    private String mAddressLatitude="";
+    private String mAddressLongitude="";
+    private String mAddressPostalCode="";
+
+    /**
+     * Receiver registered with this activity to get the response from FetchAddressIntentService.
+     */
+    private AddressResultReceiver mResultReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,12 +133,48 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
 
         AppSignatureHelper appSignatureHelper = new AppSignatureHelper(RegistrationActivity.this);
         appSignatureHelper.getAppSignatures();
-        //set google api client for hint request
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.CREDENTIALS_API)
-                .build();
+
+        SpannableString SpanString = new SpannableString(
+                "By Registering you agree to the Terms of Use and Privacy Policy");
+
+        ClickableSpan teremsAndCondition = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View textView) {
+
+
+                Intent mIntent = new Intent(RegistrationActivity.this, CommonWebView.class);
+                mIntent.putExtra("isTermsAndCondition", true);
+                mIntent.putExtra("value","1");
+                startActivity(mIntent);
+
+            }
+        };
+
+        // Character starting from 32 - 45 is Terms and condition.
+        // Character starting from 49 - 63 is privacy policy.
+
+        ClickableSpan privacy = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View textView) {
+
+                Intent mIntent = new Intent(RegistrationActivity.this, CommonWebView.class);
+                mIntent.putExtra("isPrivacyPolicy", true);
+                mIntent.putExtra("value","2");
+                startActivity(mIntent);
+
+            }
+        };
+
+        SpanString.setSpan(teremsAndCondition, 32, 45, 0);
+        SpanString.setSpan(privacy, 49, 63, 0);
+        SpanString.setSpan(new ForegroundColorSpan(Color.BLUE), 32, 45, 0);
+        SpanString.setSpan(new ForegroundColorSpan(Color.BLUE), 49, 63, 0);
+        SpanString.setSpan(new UnderlineSpan(), 32, 45, 0);
+        SpanString.setSpan(new UnderlineSpan(), 49, 63, 0);
+
+        binding.txtByRegistering.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.txtByRegistering.setText(SpanString, TextView.BufferType.SPANNABLE);
+        binding.txtByRegistering.setSelected(true);
 
         mSmsBroadcastReceiver.setOnOtpListeners(this);
         IntentFilter intentFilter = new IntentFilter();
@@ -121,18 +196,326 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
             }
         });
 
+        mResultReceiver = new AddressResultReceiver(new Handler());
+
+
+        // Set defaults, then update using values stored in the Bundle.
+
+
+        updateValuesFromBundle(savedInstanceState);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (mLastLocation != null) {
+            startIntentService();
+            return;
+        }
+
+        // If we have not yet retrieved the user location, we process the user's request by setting
+        // mAddressRequested to true. As far as the user is concerned, pressing the Fetch Address button
+        // immediately kicks off the process of getting the address.
+        mAddressRequested = true;
+        updateUIWidgets();
+
 
 
     }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if (!checkPermissions()) {
+            requestPermissions();
+        } else {
+            getAddress();
+        }
+    }
+
+    /**
+     * Updates fields based on data stored in the bundle.
+     */
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            // Check savedInstanceState to see if the address was previously requested.
+            if (savedInstanceState.keySet().contains(ADDRESS_REQUESTED_KEY)) {
+                mAddressRequested = savedInstanceState.getBoolean(ADDRESS_REQUESTED_KEY);
+            }
+            // Check savedInstanceState to see if the location address string was previously found
+            // and stored in the Bundle. If it was found, display the address string in the UI.
+            if (savedInstanceState.keySet().contains(LOCATION_ADDRESS_KEY)) {
+                mAddressOutput = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
+                mAddressLatitude = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
+                mAddressLongitude = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
+                mAddressPostalCode = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
+                displayAddressOutput();
+            }
+        }
+    }
+
+
+
+    /**
+     * Creates an intent, adds location data to it as an extra, and starts the intent service for
+     * fetching an address.
+     */
+    private void startIntentService() {
+        // Create an intent for passing to the intent service responsible for fetching the address.
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+
+        // Pass the result receiver as an extra to the service.
+        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+
+        // Pass the location data as an extra to the service.
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, mLastLocation);
+
+        // Start the service. If the service isn't already running, it is instantiated and started
+        // (creating a process for it if needed); if it is running then it remains running. The
+        // service kills itself automatically once all intents are processed.
+        startService(intent);
+    }
+
+    /**
+     * Gets the address for the last known location.
+     */
+    @SuppressWarnings("MissingPermission")
+    private void getAddress() {
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location == null) {
+                            Log.w(TAG, "onSuccess:null");
+                            return;
+                        }
+
+                        mLastLocation = location;
+
+                        // Determine whether a Geocoder is available.
+                        if (!Geocoder.isPresent()) {
+                            showSnackbar(getString(R.string.no_geocoder_available));
+                            return;
+                        }
+
+                        // If the user pressed the fetch address button before we had the location,
+                        // this will be set to true indicating that we should kick off the intent
+                        // service after fetching the location.
+                        if (mAddressRequested) {
+                            startIntentService();
+                        }
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "getLastLocation:onFailure", e);
+                    }
+                });
+    }
+
+    /**
+     * Updates the address in the UI.
+     */
+    private void displayAddressOutput() {
+
+        Log.d(TAG,"Current Location  : "+mAddressOutput);
+        Log.d(TAG,"Current Location  : "+mAddressLatitude);
+        Log.d(TAG,"Current Location  : "+mAddressLongitude);
+        Log.d(TAG,"Current Location  : "+mAddressPostalCode);
+
+    }
+
+    /**
+     * Toggles the visibility of the progress bar. Enables or disables the Fetch Address button.
+     */
+    private void updateUIWidgets() {
+        if (mAddressRequested) {
+
+
+            Log.d(TAG,"locationUpadted");
+        } else {
+
+            Log.d(TAG,"locationNotUpadted");
+        }
+    }
+
+    /**
+     * Shows a toast with the given text.
+     */
+    private void showToast(String text) {
+        //Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        Log.d(TAG,""+text);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save whether the address has been requested.
+        savedInstanceState.putBoolean(ADDRESS_REQUESTED_KEY, mAddressRequested);
+
+        // Save the address string.
+        savedInstanceState.putString(LOCATION_ADDRESS_KEY, mAddressOutput);
+        savedInstanceState.putString(LOCATION_ADDRESS_KEY, mAddressLatitude);
+        savedInstanceState.putString(LOCATION_ADDRESS_KEY, mAddressLongitude);
+        savedInstanceState.putString(LOCATION_ADDRESS_KEY, mAddressPostalCode);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    /**
+     * Receiver for data sent from FetchAddressIntentService.
+     */
+    private class AddressResultReceiver extends ResultReceiver {
+        AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         *  Receives data sent from FetchAddressIntentService and updates the UI in RegistrationActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string or an error message sent from the intent service.
+            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY_ADDRESS);
+            mAddressLatitude = resultData.getString(Constants.RESULT_DATA_KEY_LATITUDE);
+            mAddressLongitude = resultData.getString(Constants.RESULT_DATA_KEY_LONGITUDE);
+            mAddressPostalCode = resultData.getString(Constants.RESULT_DATA_KEY_POSTAL_CODE);
+            displayAddressOutput();
+
+            // Show a toast message if an address was found.
+            if (resultCode == Constants.SUCCESS_RESULT) {
+                showToast(getString(R.string.address_found));
+            }
+
+            // Reset. Enable the Fetch Address button and stop showing the progress bar.
+            mAddressRequested = false;
+            updateUIWidgets();
+        }
+    }
+
+    /**
+     * Shows a {@link Snackbar} using {@code text}.
+     *
+     * @param text The Snackbar text.
+     */
+    private void showSnackbar(final String text) {
+        View container = findViewById(android.R.id.content);
+        if (container != null) {
+            Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Shows a {@link Snackbar}.
+     *
+     * @param mainTextStringId The id for the string resource for the Snackbar text.
+     * @param actionStringId   The text of the action item.
+     * @param listener         The listener associated with the Snackbar action.
+     */
+    private void showSnackbar(final int mainTextStringId, final int actionStringId,
+                              View.OnClickListener listener) {
+        Snackbar.make(findViewById(android.R.id.content),
+                getString(mainTextStringId),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(getString(actionStringId), listener).show();
+    }
+
+    /**
+     * Return the current state of the permissions needed.
+     */
+    private boolean checkPermissions() {
+        int permissionState = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermissions() {
+        boolean shouldProvideRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+
+        // Provide an additional rationale to the user. This would happen if the user denied the
+        // request previously, but didn't check the "Don't ask again" checkbox.
+        if (shouldProvideRationale) {
+            Log.i(TAG, "Displaying permission rationale to provide additional context.");
+
+            showSnackbar(R.string.permission_rationale, android.R.string.ok,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Request permission
+                            ActivityCompat.requestPermissions(RegistrationActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    REQUEST_PERMISSIONS_REQUEST_CODE);
+                        }
+                    });
+
+        } else {
+            Log.i(TAG, "Requesting permission");
+            // Request permission. It's possible this can be auto answered if device policy
+            // sets the permission in a given state or the user denied the permission
+            // previously and checked "Never ask again".
+            ActivityCompat.requestPermissions(RegistrationActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_PERMISSIONS_REQUEST_CODE);
+        }
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Log.i(TAG, "onRequestPermissionResult");
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.length <= 0) {
+                // If user interaction was interrupted, the permission request is cancelled and you
+                // receive empty arrays.
+                Log.i(TAG, "User interaction was cancelled.");
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted.
+                getAddress();
+            } else {
+                // Permission denied.
+
+                // Notify the user via a SnackBar that they have rejected a core permission for the
+                // app, which makes the Activity useless. In a real app, core permissions would
+                // typically be best requested during a welcome-screen flow.
+
+                // Additionally, it is important to remember that a permission might have been
+                // rejected without asking the user for permission (device policy or "Never ask
+                // again" prompts). Therefore, a user interface affordance is typically implemented
+                // when permissions are denied. Otherwise, your app could appear unresponsive to
+                // touches or interactions which have required permissions.
+                showSnackbar(R.string.permission_denied_explanation, R.string.settings,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Build intent that displays the App settings screen.
+                                Intent intent = new Intent();
+                                intent.setAction(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package",
+                                        BuildConfig.APPLICATION_ID, null);
+                                intent.setData(uri);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        });
+            }
+        }
+    }
     public void sendOtp(View view) {
 
         number = binding.editTextNumber.getText().toString().trim();
         name = binding.editTextName.getText().toString().trim();
 
-        if (TextUtils.isEmpty(name)) {
+        if (TextUtils.isEmpty(name) ) {
             Toast.makeText(this, "Enter Name", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(number)) {
+        } else if (ConstantValues.validateFirstName1(name)) {
+            Toast.makeText(this, "Enter Valid Name", Toast.LENGTH_SHORT).show();
+        }else if (TextUtils.isEmpty(number)) {
             Toast.makeText(this, "Enter Mobile Number", Toast.LENGTH_SHORT).show();
         } else if (ConstantValues.isValidMoblie(number)) {
             Toast.makeText(this, "Enter Valid Number", Toast.LENGTH_SHORT).show();
@@ -235,52 +618,7 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
         pDialog.setCancelable(false);
         pDialog.show();
 
-        locationTrack = new LocationTrack(RegistrationActivity.this);
-        if (locationTrack.canGetLocation()) {
-
-
-            longitude = locationTrack.getLongitude();
-            latitude = locationTrack.getLatitude();
-
-            // Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
-
-            Log.d("LOCATION", "" + "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude));
-
-            Geocoder geocoder = new Geocoder(RegistrationActivity.this, Locale.ENGLISH);
-            List<Address> addresses = null;
-            try {
-                addresses = geocoder.getFromLocation(latitude, longitude, 1);
-
-
-                if (addresses != null && addresses.size() > 0) {
-
-                    addr = addresses.get(0).getAddressLine(0) + "," + addresses.get(0).getSubAdminArea();
-                    city = addresses.get(0).getLocality();
-                    state = addresses.get(0).getAdminArea();
-
-                    for (int i = 0; i < addresses.size(); i++) {
-                        address = addresses.get(i);
-                        if (address.getPostalCode() != null) {
-                            zipcode = address.getPostalCode();
-                            city = address.getLocality();
-                            Log.d("LOCATION", "" + zipcode + "" + city);
-                            break;
-                        }
-
-
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        } else {
-
-            locationTrack.showSettingsAlert();
-        }
-
-
-
+        
 
         if (otp_Num.equals(otp)) {
 
@@ -288,9 +626,10 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("mobile", number);
             jsonObject.addProperty("name", name);
-            jsonObject.addProperty("latitude", latitude);
-            jsonObject.addProperty("longitude", longitude);
-            jsonObject.addProperty("pincode", zipcode);
+            jsonObject.addProperty("latitude", mAddressLatitude);
+            jsonObject.addProperty("longitude", mAddressLongitude);
+            jsonObject.addProperty("pincode", mAddressPostalCode);
+            jsonObject.addProperty("location", mAddressOutput);
             jsonObject.addProperty("otp", otp_Num);
             jsonObject.addProperty("password", password);
             jsonObject.addProperty("check_tc", "1");
@@ -318,14 +657,14 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
                             user_id=userDeatilsList.get(0).getId();
                             name=userDeatilsList.get(0).getName();
                             number=userDeatilsList.get(0).getMobile();
-                            zipcode=userDeatilsList.get(0).getPincode();
+                            mAddressPostalCode=userDeatilsList.get(0).getPincode();
                             // Set UserLoggedIn in MyAppPrefsManager
 
                             myAppPrefsManager.setUserLoggedIn(true);
                             myAppPrefsManager.setUserId(user_id);
                             myAppPrefsManager.setUserMobile(number);
                             myAppPrefsManager.setUserName(name);
-                            myAppPrefsManager.setUserPincode(zipcode);
+                            myAppPrefsManager.setUserPincode(mAddressPostalCode);
 
                             // Set isLogged_in of ConstantValues
                             ConstantValues.IS_USER_LOGGED_IN = myAppPrefsManager.isUserLoggedIn();
@@ -366,15 +705,7 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
 
 
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
+   
 
     @Override
     public void onOtpReceived(String otp) {
@@ -391,10 +722,7 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
         Toast.makeText(this, "Time out, please resend", Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
+   
 
     public void startSMSListener() {
         SmsRetrieverClient mClient = SmsRetriever.getClient(this);
@@ -417,23 +745,13 @@ public class RegistrationActivity extends AppCompatActivity implements GoogleApi
         });
     }
 
-    public void getHintPhoneNumber() {
-        HintRequest hintRequest =
-                new HintRequest.Builder()
-                        .setPhoneNumberIdentifierSupported(true)
-                        .build();
-        PendingIntent mIntent = Auth.CredentialsApi.getHintPickerIntent(mGoogleApiClient, hintRequest);
-        try {
-            startIntentSenderForResult(mIntent.getIntentSender(), RESOLVE_HINT, null, 0, 0, 0);
-        } catch (IntentSender.SendIntentException e) {
-            e.printStackTrace();
-        }
-    }
+   
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //Result if we want hint number
+        int RESOLVE_HINT = 2;
         if (requestCode == RESOLVE_HINT) {
             if (resultCode == Activity.RESULT_OK) {
 

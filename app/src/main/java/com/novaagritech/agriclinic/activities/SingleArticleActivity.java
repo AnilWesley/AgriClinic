@@ -1,11 +1,6 @@
 package com.novaagritech.agriclinic.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,8 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
@@ -31,16 +29,16 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.CustomButton;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.databinding.ActivitySingleArticleBinding;
 import com.novaagritech.agriclinic.modals.ArticlesList;
+import com.novaagritech.agriclinic.modals.InfoData;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.Urls;
-import com.novaagritech.agriclinic.databinding.ActivitySingleArticleBinding;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +60,7 @@ public class SingleArticleActivity extends AppCompatActivity {
     ActivitySingleArticleBinding binding;
     private String article_id, user_id;
 
-    String str = "http://agriclinic.org/";
+    String str = "https://agriclinic.org/";
     MyAppPrefsManager myAppPrefsManager;
 
 
@@ -98,52 +96,20 @@ public class SingleArticleActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 onBackPressed ( );
+
+
             }
         } );
 
-        if (i.hasExtra ( "article_id" ))
-            getArticle ( article_id);
-        else {
+
+        getArticle();
 
 
-            FirebaseDynamicLinks.getInstance ( )
-                    .getDynamicLink ( getIntent ( ) )
-                    .addOnSuccessListener ( this, pendingDynamicLinkData -> {
-                        // Get deep link from result (may be null if no link is found)
-                        Uri deepLink = null;
-                        if (pendingDynamicLinkData != null) {
-                            deepLink = pendingDynamicLinkData.getLink ( );
 
-                            String referlink = deepLink.toString ( ).replace ( "https://agriclinic.org/viewcontent.php?id=", "" );
-                            Log.e ( TAG, " substring " + referlink ); //id=174
-
-                            getArticle (referlink);
-
-                        /*Intent intent=new Intent(SplashScreenActivity.this,SingleArticleActivity.class);
-                        intent.putExtra("article_id","179");
-                        startActivity(intent);*/
-
-                        }
-
-
-                        // Handle the deep link. For example, open the linked
-                        // content, or apply promotional credit to the user's
-                        // account.
-                        // ...
-
-                        // ...
-                    } )
-                    .addOnFailureListener ( this, new OnFailureListener ( ) {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e ( TAG, "getDynamicLink:onFailure", e );
-                        }
-                    } );
-        }
 
     }
 
-    public void getArticle(String article_id) {
+    public void getArticle() {
 
         pDialog.setMessage ( "Loading..." );
         pDialog.show ( );
@@ -180,7 +146,7 @@ public class SingleArticleActivity extends AppCompatActivity {
 
 
                                 binding.textAuthor.setText ( articlesDetails.get ( 0 ).getAuthor_info ( ) );
-                                //binding.textTags.setText(articleModalList.get(0).getTags());
+                                binding.textTitle.setText(articlesDetails.get(0).getTitle());
                                 String line = articlesDetails.get ( 0 ).getTags ( );
 
                                 //using String split function
@@ -194,7 +160,7 @@ public class SingleArticleActivity extends AppCompatActivity {
 
                                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams (
                                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                                        85 );
+                                        75 );
                                 layoutParams.setMargins ( 5, 5, 5, 5 );
 
 
@@ -233,14 +199,6 @@ public class SingleArticleActivity extends AppCompatActivity {
 
                                 binding.textDate.setText ( "Published on : " + ConstantValues.getFormattedDate ( MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, articlesDetails.get ( 0 ).getCreated_on ( ) ) );
 
-                              /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
-                                    text_desc.setText(Html.fromHtml(articleModalList.get(3).getDescription(), Html.FROM_HTML_MODE_COMPACT));
-
-                                } else {
-                                    text_desc.setText(Html.fromHtml(articleModalList.get(3).getDescription()));
-
-                                }*/
 
                                 binding.textDesc.loadDataWithBaseURL ( null, articlesDetails.get ( 0 ).getDescription ( ) + articlesDetails.get ( 0 ).getDescription2 ( ) + articlesDetails.get ( 0 ).getDescription3 ( ), "text/html; charset=utf-8", "UTF-8", null );
 
@@ -308,41 +266,23 @@ public class SingleArticleActivity extends AppCompatActivity {
         if (item.getItemId ( ) == R.id.share) {
             // do your code
 
-
-            //ConstantValues.shareDeepLink(SingleArticleActivity.this, String.format(getResources().getString(R.string.access_farmrise_articles), str));
-
             // Check if the User is Authenticated
             if (ConstantValues.IS_USER_LOGGED_IN) {
                 try {
 
 
-                           /* DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                                    .setLink(Uri.parse("http://agriclinic.org/"))
-                                    .setDomainUriPrefix("novaagritech1.page.link")
-                                    // Open links with this app on Android
-                                    .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
-                                    // Open links with com.example.ios on iOS
-                                    .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
-                                    .buildDynamicLink();
-
-                            Uri dynamicLinkUri = dynamicLink.getUri();
-                            Log.d("dynamicLinkUri",""+articleModal.getTitle());*/
-
-
-                    String sharelinktext = "https://novaagritech1.page.link/?" +
-                            "link=https://agriclinic.org/viewcontent.php?id=" + articlesDetails.get ( 0 ).getId ( ) +
-                            "&apn=" + getPackageName ( );
-
-
                     // shorten the link
                     Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance ( ).createDynamicLink ( )
-                            .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + articlesDetails.get ( 0 ).getId ( ) ) )// manually
-                            .setDomainUriPrefix ( "https://novaagritech1.page.link" )
+                            .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + articlesDetails.get ( 0 ).getId ( )+ "articles" ) )// manually
+                            .setDomainUriPrefix ( "https://agcl.in/a")
                             .setAndroidParameters ( new DynamicLink.AndroidParameters.Builder ( )
                                     .build ( ) )
                             .setSocialMetaTagParameters ( new DynamicLink.SocialMetaTagParameters.Builder ( )
                                     .setTitle ( articlesDetails.get ( 0 ).getTitle ( ) )
+                                    .setImageUrl(Uri.parse(Urls.IMAGE_URL + articlesDetails.get ( 0 ).getImage_path ( )))
+
                                     .setDescription ( getResources ( ).getString ( R.string.access_farmrise_articles1 ) )
+
                                     .build ( ) )
                             .buildShortDynamicLink ( ShortDynamicLink.Suffix.SHORT )
                             .addOnCompleteListener ( this, (OnCompleteListener<ShortDynamicLink>) task -> {
@@ -350,14 +290,15 @@ public class SingleArticleActivity extends AppCompatActivity {
                                     // Short link created
                                     Uri shortLink = task.getResult ( ).getShortLink ( );
                                     Uri flowchartLink = task.getResult ( ).getPreviewLink ( );
-                                    Log.e ( "main ", "short link " + shortLink );
-                                    Log.e ( "main ", "short link " + flowchartLink );
+                                    Log.e ( "main ", "substring1 " + shortLink );
+                                    Log.e ( "main ", "substring1 " + flowchartLink );
 
 
                                     Intent intent = new Intent ( );
                                     intent.setAction ( Intent.ACTION_SEND );
 
                                     intent.putExtra ( Intent.EXTRA_TEXT, shortLink.toString ( ) );
+                                    intent.putExtra("title","articles");
                                     intent.setType ( "text/plain" );
                                     startActivity ( intent );
 

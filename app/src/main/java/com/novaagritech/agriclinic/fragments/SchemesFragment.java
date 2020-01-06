@@ -4,13 +4,6 @@ package com.novaagritech.agriclinic.fragments;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,10 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.activities.SingleEventActivity;
-import com.novaagritech.agriclinic.activities.SingleNewsActivity;
+import com.novaagritech.agriclinic.activities.SingleSchemesActivity;
 import com.novaagritech.agriclinic.adapters.NewsAdapter;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.FragmentSchemesBinding;
@@ -119,16 +117,13 @@ public class SchemesFragment extends Fragment {
                     SchemesData articlesData = response.body();
                     infoDataSchemes = response.body().getResponse();
 
-
                     if (infoDataSchemes.isEmpty()) {
                         binding.articlesSchemes.setVisibility(View.GONE);
                         binding.emptyView.setVisibility(View.VISIBLE);
 
-
                     } else {
                         binding.emptyView.setVisibility(View.GONE);
                         binding.articlesSchemes.setVisibility(View.VISIBLE);
-
                     }
                     if (articlesData.isStatus()){
                         if (infoDataSchemes != null&&infoDataSchemes.size()>0  ) {
@@ -156,7 +151,7 @@ public class SchemesFragment extends Fragment {
                                 binding.articlesSchemes.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), binding.articlesSchemes, new RecyclerItemClickListener.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(View view, int position) {
-                                        Intent setIntent = new Intent(getActivity(), SingleNewsActivity.class);
+                                        Intent setIntent = new Intent(getActivity(), SingleSchemesActivity.class);
                                         setIntent.putExtra("scheme_id", infoDataSchemes.get(position).getId());
                                         setIntent.putExtra("title",getResources().getString(R.string.schemes));
                                         setIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -374,13 +374,9 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemViewType(int position) {
 
-        if (infoDataList.size ()<position){
 
-        }
 
-        return position % 5 == 0 ? LOADING : TYPE_ARTICLES;
-
-        //return (position == infoDataList.size() - 1 && isLoadingAdded) ? LOADING : TYPE_ARTICLES;
+        return (position == infoDataList.size() - 1 && isLoadingAdded) ? LOADING : TYPE_ARTICLES;
 
     }
 

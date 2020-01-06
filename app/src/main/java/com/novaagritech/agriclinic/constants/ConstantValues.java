@@ -1,21 +1,17 @@
 package com.novaagritech.agriclinic.constants;
 
 
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.widget.Toast;
 
 import androidx.core.app.ShareCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.novaagritech.agriclinic.BuildConfig;
 import com.novaagritech.agriclinic.receiver.NetworkStateChangeReceiver;
 
 import java.text.ParseException;
@@ -120,6 +116,19 @@ import static com.novaagritech.agriclinic.receiver.NetworkStateChangeReceiver.IS
 
     }
 
+    //Validtaing Names
+    public static boolean validateFirstName1( String firstName )
+    {
+        String PASSWORD_PATTERN =
+                "((?=.*[@#$%!?^*+_\\d]).{1,25})";
+
+        Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
+        Matcher matcher = pattern.matcher(firstName);
+        return matcher.matches();
+
+    }
+
+
     //Validating Mobile
       public  static boolean isValidMoblie(String pass1) {
 
@@ -204,6 +213,10 @@ import static com.novaagritech.agriclinic.receiver.NetworkStateChangeReceiver.IS
         }
 
     }
+
+
+
+
 
 
     public static void internetCheck(Activity context){

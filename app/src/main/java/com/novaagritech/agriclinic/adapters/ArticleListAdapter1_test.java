@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +29,8 @@ import com.novaagritech.agriclinic.comments.ChatActivity;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.modals.ArticlesList;
+import com.novaagritech.agriclinic.modals.BannerData;
 import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.InfoData_test;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.Urls;
@@ -52,7 +51,9 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     private static final int TYPE_ARTICLES = 0;
     private static final int LOADING = 1;
     private List<InfoData> infoDataList;
-    private List<InfoData_test> infoDataList1;
+    private static final int LIST_AD_DELTA = 1;
+
+    private List<BannerData.BannerDetails> dataModelList;
     private Context context;
     private DisplayImageOptions options;
 
@@ -61,18 +62,18 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     private String user_id;
     private int likes_count;
 
-    private List<Object> items = new ArrayList<> (  );
+    private List<Object> items = new ArrayList<> ();
 
 
     private static final String TAG = "ArticleListActivity11";
 
-    public ArticleListAdapter1_test(Context context, List<InfoData> infoDataList, List<InfoData_test> infoDataList1) {
+    public ArticleListAdapter1_test(Context context, List<InfoData> infoDataList,  List<BannerData.BannerDetails> dataModelList) {
         this.context = context;
         this.infoDataList = infoDataList;
-        this.infoDataList1 = infoDataList1;
+        this.dataModelList = dataModelList;
 
         items.addAll ( infoDataList );
-        items.addAll ( infoDataList1 );
+        items.addAll ( dataModelList );
 
         myAppPrefsManager = new MyAppPrefsManager ( context );
         options = new DisplayImageOptions.Builder ( )
@@ -109,7 +110,7 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
                 break;
             case LOADING:
                 View v2 = inflater.inflate ( R.layout.articlelayout_test, parent, false );
-                viewHolder = new ProgressViewHolder ( v2 );
+                viewHolder = new MyViewHolder1 ( v2 );
                 break;
         }
         return viewHolder;
@@ -119,6 +120,7 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
 
         if (holder instanceof MyViewHolder) {
 
@@ -368,36 +370,35 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
 
         else {
 
-            InfoData_test articleModal = (InfoData_test) items.get ( position );
+            BannerData.BannerDetails infoData=(BannerData.BannerDetails)items.get(position);
 
-            Log.v ( "hiiii",Urls.IMAGE_URL1 + articleModal.getImage ( ) );
+            Log.d("IMAGES",""+Urls.IMAGE_URL1+infoData.getImage());
 
-            ImageLoader.getInstance ( )
-                    .displayImage ( Urls.IMAGE_URL1 + articleModal.getImage ( ), ((ProgressViewHolder) holder).articleImage1, options,
-                            new SimpleImageLoadingListener ( ) {
+            ImageLoader.getInstance()
+                    .displayImage(Urls.IMAGE_URL1 +infoData.getImage(), ((MyViewHolder1)holder).imageView, options,
+                            new SimpleImageLoadingListener(){
                                 @Override
                                 public void onLoadingStarted(String imageUri, View view) {
-                                    ((ProgressViewHolder) holder).articleImage1.setVisibility ( View.VISIBLE );
+                                    ((MyViewHolder1)holder).progressBar.setVisibility(View.VISIBLE);
                                 }
-
                                 @Override
                                 public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                                    ((ProgressViewHolder) holder).articleImage1.setVisibility ( View.GONE );
+                                    ((MyViewHolder1)holder).progressBar.setVisibility(View.GONE);
 
                                 }
 
                                 @Override
                                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                                    ((ProgressViewHolder) holder).articleImage1.setVisibility ( View.GONE );
+                                    ((MyViewHolder1)holder).progressBar.setVisibility(View.GONE);
 
                                 }
 
                                 @Override
                                 public void onLoadingCancelled(String imageUri, View view) {
-                                    ((ProgressViewHolder) holder).articleImage1.setVisibility ( View.GONE );
+                                    ((MyViewHolder1)holder).progressBar.setVisibility(View.GONE);
 
                                 }
-                            } );
+                            });
 
         }
 
@@ -407,16 +408,28 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     @Override
     public int getItemCount() {
 
-        return items.size ();
+        return items == null? 0: items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
 
 
-        return items.get ( position ) instanceof InfoData? TYPE_ARTICLES:LOADING;
+        if (position % 2  == 0) {
+            return items.get(position) instanceof BannerData.BannerDetails ? LOADING : TYPE_ARTICLES;
+        }else {
 
-        //return (position == infoDataList.size() - 1 && isLoadingAdded) ? LOADING : TYPE_ARTICLES;
+            return items.get(position) instanceof InfoData ? TYPE_ARTICLES : LOADING;
+        }
+
+
+       // return position % 5 == 0 ? LOADING : TYPE_ARTICLES;
+        //return items.get (position) instanceof InfoData? TYPE_ARTICLES:LOADING;
+        //return items.get (position) instanceof InfoData? TYPE_ARTICLES:LOADING;
+
+
+
+        //return (position == items.size() - 1 && isLoadingAdded) ? LOADING : TYPE_ARTICLES;
 
     }
 
@@ -471,12 +484,15 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     }
 
 
-    private static class ProgressViewHolder extends RecyclerView.ViewHolder {
-        private ImageView articleImage1;
+    private static class MyViewHolder1 extends RecyclerView.ViewHolder {
+        ImageView imageView;
+        ProgressBar progressBar;
 
-        private ProgressViewHolder(View v) {
+
+        private MyViewHolder1(View v) {
             super ( v );
-            articleImage1 = (ImageView) v.findViewById ( R.id.articleImage1 );
+            imageView=(ImageView) itemView.findViewById(R.id.articleImageAdd);
+            progressBar=(ProgressBar) itemView.findViewById(R.id.progressBar);
         }
     }
 

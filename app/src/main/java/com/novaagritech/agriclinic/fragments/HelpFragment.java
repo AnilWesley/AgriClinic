@@ -1,14 +1,9 @@
 package com.novaagritech.agriclinic.fragments;
 
 
-import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +14,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.databinding.FragmentAboutBinding;
 import com.novaagritech.agriclinic.databinding.FragmentHelpBinding;
 
 
@@ -68,7 +62,7 @@ public class HelpFragment extends Fragment {
 
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"agriclinic.org@gmail.com"});
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"support@agriclinic.org"});
                 i.putExtra(Intent.EXTRA_SUBJECT, "Contact Details : " + "Name : " + yourName1 +"  "+ "Mobile : " + yourMobile1);
                 i.putExtra(Intent.EXTRA_TEXT   , "" + yourDescription1);
                 try {
@@ -82,7 +76,7 @@ public class HelpFragment extends Fragment {
             }
         });
         binding.infoUs.setOnClickListener(v -> {
-            String url = "http://agriclinic.org";
+            String url = "https://agriclinic.org";
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);

@@ -39,6 +39,7 @@
 
 
 
+
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -52,7 +53,7 @@
 
 
 
-        <androidx.recyclerview.widget.RecyclerView
+      <!--  <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/articlesStories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,27 +68,9 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_margin="5dp"
-            android:background="@color/quantum_grey"/>
+            android:background="@color/quantum_grey"/>-->
 
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="10dp"
-            android:orientation="vertical">
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/articlesRecycle1"
-                android:layout_width="match_parent"
-                android:layout_margin="5dp"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-
-
-        </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/articlesBanners"

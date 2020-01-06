@@ -20,7 +20,7 @@ public class ArticlesList implements Serializable {
 
     @SerializedName("blist")
     @Expose
-    private List<InfoData_test> blist = new ArrayList<InfoData_test>();
+    private List<BannerData.BannerDetails> blist = new ArrayList<BannerData.BannerDetails>();
 
     @SerializedName("message")
     @Expose
@@ -41,11 +41,11 @@ public class ArticlesList implements Serializable {
     private Integer likes_count;
 
 
-    public List<InfoData_test> getBlist() {
+    public List<BannerData.BannerDetails> getBlist() {
         return blist;
     }
 
-    public void setBlist(List<InfoData_test> blist) {
+    public void setBlist(List<BannerData.BannerDetails> blist) {
         this.blist = blist;
     }
 

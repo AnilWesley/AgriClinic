@@ -1,10 +1,5 @@
 package com.novaagritech.agriclinic.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,8 +11,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.google.gson.JsonObject;
@@ -34,6 +34,7 @@ import com.novaagritech.agriclinic.modals.InfoData;
 import com.novaagritech.agriclinic.modals.SchemesData;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
+import com.novaagritech.agriclinic.utilities.Urls;
 
 import java.util.List;
 
@@ -50,9 +51,9 @@ public class SingleNewsActivity extends AppCompatActivity {
 
     ActivitySingleNewsBinding binding;
     private  String news_id;
-    private String scheme_id;
 
-    String str ="http://agriclinic.org/";
+
+    String str ="https://agriclinic.org/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +76,7 @@ public class SingleNewsActivity extends AppCompatActivity {
                 .build();
         Intent i = getIntent();
         news_id = i.getStringExtra("news_id");
-        scheme_id = i.getStringExtra("scheme_id");
+
         String title = i.getStringExtra("title");
 
         //binding.toolbarTitle.setText(title);
@@ -87,8 +88,10 @@ public class SingleNewsActivity extends AppCompatActivity {
             }
         });
 
+
+
         getNews();
-        getScheme();
+
 
 
     }
@@ -168,80 +171,11 @@ public class SingleNewsActivity extends AppCompatActivity {
                                         });
 
 
+                                Log.d(TAG,""+Urls.IMAGE_URL1+infoDataList.get(0).getSource_logo());
 
-
-                                pDialog.dismiss();
-                            }
-                            //get values
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<SchemesData> call, @NonNull Throwable t) {
-                pDialog.dismiss();
-                Log.d("ResponseF",""+t);
-            }
-        });
-
-    }
-
-
-    public void getScheme(){
-
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-        pDialog.setCancelable(false);
-
-        // prepare call in Retrofit 2.0
-        JsonObject jsonObject = new JsonObject();
-
-        jsonObject.addProperty("language_id", "2");
-        jsonObject.addProperty("govtscheme_id", scheme_id);
-
-
-        Log.d(TAG,""+jsonObject);
-        ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<SchemesData> call = service.processGovtSchemeDetails(jsonObject);
-        call.enqueue(new Callback<SchemesData>() {
-            @Override
-            public void onResponse(@NonNull Call<SchemesData> call, @NonNull retrofit2.Response<SchemesData> response) {
-
-
-                // Check if the Response is successful
-                if (response.isSuccessful()){
-                    Log.d(TAG,""+response.toString());
-                    assert response.body() != null;
-                    SchemesData articlesData = response.body();
-                    infoDataList = response.body().getResponse();
-
-                    if (articlesData.isStatus()) {
-                        if (infoDataList != null && infoDataList.size() > 0) {
-                            for (int j = 0; j < infoDataList.size(); j++) {
-                                Log.d(TAG, "" + infoDataList.size());
-
-
-                                binding.textDate.setText("Published on : " + ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT,infoDataList.get(0).getCreated_on()));
-                                binding.textTitle.setText(infoDataList.get(0).getTitle());
-
-                              /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
-                                    text_desc.setText(Html.fromHtml(newsModalList.get(3).getDescription(), Html.FROM_HTML_MODE_COMPACT));
-
-                                } else {
-                                    text_desc.setText(Html.fromHtml(newsModalList.get(3).getDescription()));
-
-                                }*/
-
-                                binding.textDesc.loadDataWithBaseURL(null,infoDataList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
                                 ImageLoader.getInstance()
-                                        .displayImage(infoDataList.get(0).getImage(), binding.textImage, options,new SimpleImageLoadingListener(){
+                                        .displayImage(Urls.IMAGE_URL1+infoDataList.get(0).getSource_logo(), binding.textSource, options,new SimpleImageLoadingListener(){
                                             @Override
                                             public void onLoadingStarted(String imageUri, View view) {
                                                 binding.progressBar.setVisibility(View.VISIBLE);
@@ -268,6 +202,7 @@ public class SingleNewsActivity extends AppCompatActivity {
 
 
 
+
                                 pDialog.dismiss();
                             }
                             //get values
@@ -292,6 +227,7 @@ public class SingleNewsActivity extends AppCompatActivity {
 
 
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -306,46 +242,54 @@ public class SingleNewsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.share) {
             // do your code
+            if (ConstantValues.IS_USER_LOGGED_IN) {
+                try {
 
 
-           // ConstantValues.shareDeepLink(SingleNewsActivity.this, String.format(getResources().getString(R.string.access_farmrise_articles), str));
 
-            String sharelinktext  = "https://novaagritech.page.link/?"+
-                    "link=http://agriclinic.org/viewcontent.php?id="+infoDataList.get(0).getId() +
-                    "&apn="+ getPackageName()+
-                    "&st="+getResources().getString(R.string.access_farmrise_articles1)+
-                    "&sd="+infoDataList.get(0).getTitle()+
-                    "&si="+infoDataList.get(0).getImage();
+                  
+                    // shorten the link
+                    Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance ( ).createDynamicLink ( )
+                            .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + infoDataList.get ( 0 ).getId ( )+"news" ) )// manually
+                            .setDomainUriPrefix ( "https://agcl.in/a" )
+                            .setAndroidParameters ( new DynamicLink.AndroidParameters.Builder ( )
+                                    .build ( ) )
+                            .setSocialMetaTagParameters ( new DynamicLink.SocialMetaTagParameters.Builder ( )
+                                    .setTitle ( infoDataList.get ( 0 ).getTitle ( ) )
+                                    .setImageUrl(Uri.parse(infoDataList.get(0).getImage()))
+                                    .setDescription ( getResources ( ).getString ( R.string.access_farmrise_articles1 ) )
+                                    .build ( ) )
+                            .buildShortDynamicLink ( ShortDynamicLink.Suffix.SHORT )
+                            .addOnCompleteListener ( this, (OnCompleteListener<ShortDynamicLink>) task -> {
+                                if (task.isSuccessful ( )) {
+                                    // Short link created
+                                    Uri shortLink = task.getResult ( ).getShortLink ( );
+                                    Uri flowchartLink = task.getResult ( ).getPreviewLink ( );
+                                    Log.e ( "main ", "substring1 " + shortLink );
+                                    Log.e ( "main ", "substring1 " + flowchartLink );
+                                    Intent intent = new Intent ( );
+                                    intent.setAction ( Intent.ACTION_SEND );
+                                    intent.putExtra ( Intent.EXTRA_TEXT, shortLink.toString () );
+                                    intent.setType ( "text/plain" );
+                                    startActivity ( intent );
 
 
-            // shorten the link
-            Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                    .setLongLink((Uri.parse(sharelinktext)))  // manually
-                    .buildShortDynamicLink()
-                    .addOnCompleteListener((OnCompleteListener<ShortDynamicLink>) task -> {
-                        if (task.isSuccessful()) {
-                            // Short link created
-                            Uri shortLink = task.getResult().getShortLink();
-                            Uri flowchartLink = task.getResult().getPreviewLink();
-                            Log.e("main ", "short link "+ shortLink);
+                                } else {
+                                    // Error
+                                    // ...
+                                    Log.e ( "main", " error " + task.getException ( ) );
 
+                                }
+                            } );
 
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_SEND);
-                            intent.putExtra(Intent.EXTRA_TEXT,  shortLink.toString());
-                            intent.setType("text/plain");
-                            startActivity(intent);
+                    Log.e ( "main ", "short link " + shortLinkTask );
 
+                } catch (Exception e) {
+                    e.printStackTrace ( );
 
-                        } else {
-                            // Error
-                            // ...
-                            Log.e("main", " error "+task.getException() );
+                }
 
-                        }
-                    });
-
-            Log.e("main ", "short link "+ shortLinkTask);
+            }
 
 
             return true;

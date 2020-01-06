@@ -10,6 +10,8 @@ public class Urls {
 
     public static String IMAGE_URL = "https://www.agriclinic.org/admin/storage/articles/";
     public static String IMAGE_URL1 = "https://www.agriclinic.org/admin/";
+    public static String CROP_URL = "https://www.agriclinic.org/admin/app/ws/take_crop_problem";
+    public static String CROP_URL1 = "https://www.agriclinic.org/admin/app/ws/crop_problems_list";
 
     public static String REGISTER_USER=MAIN_URL+"register_user";
 
