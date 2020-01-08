@@ -3,10 +3,11 @@ package com.novaagritech.agriclinic.modals;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BannerData {
+public class Banners implements Serializable {
 
     @SerializedName("status")
     @Expose

@@ -139,4 +139,5 @@
     <string name="privacy_policy" translatable="false">Privacy Policy</string>
     <string name="rate_us">Rate Us</string>
     <string name="terms_of_use">Terms &amp; Policy</string>
+    <string name="enter_crop_name" translatable="false">Enter Crop Name</string>
 </resources>

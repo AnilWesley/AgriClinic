@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
@@ -23,11 +22,12 @@ import com.novaagritech.agriclinic.activities.SingleSchemesActivity;
 import com.novaagritech.agriclinic.adapters.NewsAdapter;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.FragmentSchemesBinding;
-import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.SchemesData;
+import com.novaagritech.agriclinic.modals.Home;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -39,14 +39,13 @@ import retrofit2.Callback;
  */
 public class SchemesFragment extends Fragment {
 
-    private RecyclerView articlesNews;
-    private RecyclerView articlesSchemes;
+
 
     private NewsAdapter mAdapter;
 
-    private List<InfoData> infoDataNews;
-    private List<InfoData> infoDataSchemes;
-    private List<InfoData> infoDataEvents;
+
+    private List<Info> infoSchemes;
+
 
 
     private String TAG = "News";
@@ -73,12 +72,24 @@ public class SchemesFragment extends Fragment {
         binding.shimmerViewContainer.startShimmer();
         handler = new Handler();
         pDialog = new ProgressDialog(getActivity());
-        /*pDialog.setMessage("Loading...");
-        pDialog.show();
-*/
+
         getSchemes();
 
 
+        binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            infoSchemes = new ArrayList<Info>();
+
+            binding.mSwipeRefreshLayout.post(() -> {
+                        //mSwipeLayout = true;
+
+                        binding.mSwipeRefreshLayout.setRefreshing(true);
+                        binding.shimmerViewContainer.startShimmer();
+                        getSchemes();
+                    }
+            );
+
+        });
+        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
 
         return view;
     }
@@ -105,19 +116,19 @@ public class SchemesFragment extends Fragment {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<SchemesData> call = service.processGovtSchemesList(jsonObject);
-        call.enqueue(new Callback<SchemesData>() {
+        Call<Home> call = service.processGovtSchemesList(jsonObject);
+        call.enqueue(new Callback<Home>() {
             @Override
-            public void onResponse(@NonNull Call<SchemesData> call, @NonNull retrofit2.Response<SchemesData> response) {
+            public void onResponse(@NonNull Call<Home> call, @NonNull retrofit2.Response<Home> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    SchemesData articlesData = response.body();
-                    infoDataSchemes = response.body().getResponse();
+                    Home articlesData = response.body();
+                    infoSchemes = response.body().getResponse();
 
-                    if (infoDataSchemes.isEmpty()) {
+                    if (infoSchemes.isEmpty()) {
                         binding.articlesSchemes.setVisibility(View.GONE);
                         binding.emptyView.setVisibility(View.VISIBLE);
 
@@ -126,9 +137,9 @@ public class SchemesFragment extends Fragment {
                         binding.articlesSchemes.setVisibility(View.VISIBLE);
                     }
                     if (articlesData.isStatus()){
-                        if (infoDataSchemes != null&&infoDataSchemes.size()>0  ) {
-                            for (int i = 0; i <infoDataSchemes.size(); i++) {
-                                Log.d(TAG, "" + infoDataSchemes.size());
+                        if (infoSchemes != null&& infoSchemes.size()>0  ) {
+                            for (int i = 0; i < infoSchemes.size(); i++) {
+                                Log.d(TAG, "" + infoSchemes.size());
 
 
                                 binding.articlesSchemes.setHasFixedSize(true);
@@ -139,20 +150,21 @@ public class SchemesFragment extends Fragment {
                                 binding.articlesSchemes.setLayoutManager(mLayoutManager);
 
                                 // create an Object for Adapter
-                                mAdapter = new NewsAdapter(getActivity(), infoDataSchemes, binding.articlesSchemes);
+                                mAdapter = new NewsAdapter(getActivity(), infoSchemes, binding.articlesSchemes);
 
                                 // set the adapter object to the Recyclerview
                                 binding.articlesSchemes.setAdapter(mAdapter);
 
 
-                                pDialog.dismiss();
+
+                                binding.mSwipeRefreshLayout.setRefreshing(false);
 
                                 //set click event
                                 binding.articlesSchemes.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), binding.articlesSchemes, new RecyclerItemClickListener.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(View view, int position) {
                                         Intent setIntent = new Intent(getActivity(), SingleSchemesActivity.class);
-                                        setIntent.putExtra("scheme_id", infoDataSchemes.get(position).getId());
+                                        setIntent.putExtra("scheme_id", infoSchemes.get(position).getId());
                                         setIntent.putExtra("title",getResources().getString(R.string.schemes));
                                         setIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                         startActivity(setIntent);
@@ -183,7 +195,7 @@ public class SchemesFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<SchemesData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Home> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }

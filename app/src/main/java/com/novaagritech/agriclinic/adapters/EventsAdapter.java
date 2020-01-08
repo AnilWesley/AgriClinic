@@ -1,8 +1,10 @@
 package com.novaagritech.agriclinic.adapters;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,8 +26,12 @@ import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Info;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -33,7 +39,7 @@ public class EventsAdapter extends RecyclerView.Adapter {
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
 
-    private List<InfoData> newsModalList;
+    private List<Info> newsModalList;
 
     // The minimum amount of items to have below your current scroll position
     // before loading more.
@@ -47,7 +53,7 @@ public class EventsAdapter extends RecyclerView.Adapter {
 
     EventsAdapter newsAdapter;
 
-    public EventsAdapter(Context context1, List<InfoData> newsModalList1, RecyclerView recyclerView) {
+    public EventsAdapter(Context context1, List<Info> newsModalList1, RecyclerView recyclerView) {
         context=context1;
         this.newsModalList = newsModalList1;
         this.newsAdapter = this; //This is an important line, you need this line to keep track the adapter variable
@@ -115,17 +121,29 @@ public class EventsAdapter extends RecyclerView.Adapter {
         return vh;
     }
 
+    @SuppressLint("SetTextI18n,SimpleDateFormat")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof MyViewHolder) {
 
-            InfoData newsModal = (InfoData) newsModalList.get(position);
+            Info newsModal = (Info) newsModalList.get(position);
 
             ((MyViewHolder) holder).tvName.setText(newsModal.getTitle());
             ((MyViewHolder) holder).tvStartDate.setText("Start : "+ConstantValues.getFormattedDate1(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, newsModal.getStart_date()));
             ((MyViewHolder) holder).tvEndDate.setText("End : "+ConstantValues.getFormattedDate1(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, newsModal.getEnd_date()));
             //((MyViewHolder) holder).tvDate.setText(articleModal.getCreated_on());
 
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Date date = null;
+            try {
+                date = inputFormat.parse(newsModal.getCreated_on());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String niceDateStr = String.valueOf(DateUtils.getRelativeTimeSpanString(date.getTime(), Calendar.getInstance().getTimeInMillis(), DateUtils.MINUTE_IN_MILLIS));
+
+            ((MyViewHolder)holder).tvDate.setText(niceDateStr);
             ImageLoader.getInstance()
                     .displayImage( newsModal.getImage_url(), ((MyViewHolder) holder).imageView, options, new SimpleImageLoadingListener(){
                         @Override
@@ -195,6 +213,7 @@ public class EventsAdapter extends RecyclerView.Adapter {
     //
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvName;
+        TextView tvDate;
 
         TextView tvStartDate;
         TextView tvEndDate;
@@ -207,6 +226,7 @@ public class EventsAdapter extends RecyclerView.Adapter {
         MyViewHolder(View v) {
             super(v);
             tvName = (TextView) v.findViewById(R.id.newsTitle);
+            tvDate = (TextView) v.findViewById(R.id.newsDate);
 
             tvStartDate = (TextView) v.findViewById(R.id.textStartTime);
             tvEndDate = (TextView) v.findViewById(R.id.textEndTime);

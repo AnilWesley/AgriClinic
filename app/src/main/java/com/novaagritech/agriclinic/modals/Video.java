@@ -3,21 +3,21 @@ package com.novaagritech.agriclinic.modals;
 
 import java.io.Serializable;
 
-public class YoutubeVideoModel implements Serializable {
+public class Video implements Serializable {
     private String videoId, title,url,videoTime;
 
-    public YoutubeVideoModel(String videoId, String title, String url, String videoTime) {
+    public Video(String videoId, String title, String url, String videoTime) {
         this.videoId = videoId;
         this.title = title;
         this.url = url;
         this.videoTime = videoTime;
     }
 
-    public YoutubeVideoModel(String videoId) {
+    public Video(String videoId) {
         this.videoId = videoId;
     }
 
-    public YoutubeVideoModel() {
+    public Video() {
     }
 
     public String getVideoTime() {
@@ -58,7 +58,7 @@ public class YoutubeVideoModel implements Serializable {
 
     @Override
     public String toString() {
-        return "YoutubeVideoModel{" +
+        return "Video{" +
                 "videoId='" + videoId + '\'' +
                 ", title='" + title + '\'' +
                 '}';

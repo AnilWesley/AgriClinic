@@ -1,11 +1,11 @@
 package com.novaagritech.agriclinic.fragments;
 
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
@@ -24,17 +23,12 @@ import com.novaagritech.agriclinic.activities.SingleNewsActivity;
 import com.novaagritech.agriclinic.adapters.NewsAdapter;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.FragmentNewsBinding;
-import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
-import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.SchemesData;
-import com.novaagritech.agriclinic.modals.YoutubeVideoModel;
+import com.novaagritech.agriclinic.modals.Home;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -46,21 +40,17 @@ import retrofit2.Callback;
  */
 public class NewsFragment extends Fragment {
 
-    private RecyclerView articlesNews;
-    private RecyclerView articlesSchemes;
+
 
     private NewsAdapter mAdapter;
 
-    private List<InfoData> infoDataNews;
+    private List<Info> infoNews;
     private LinearLayoutManager mLayoutManager;
-    private List<InfoData> infoDataSchemes;
-    private List<InfoData> infoDataEvents;
+
 
 
     private String TAG = "News";
 
-
-    private Handler handler;
     private ProgressDialog pDialog;
 
     public NewsFragment() {
@@ -68,8 +58,11 @@ public class NewsFragment extends Fragment {
     }
 
 
+    private Handler handler;
     private FragmentNewsBinding binding;
 
+
+    @SuppressLint("ResourceAsColor")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -86,13 +79,36 @@ public class NewsFragment extends Fragment {
         pDialog = new ProgressDialog(getActivity());
         /*pDialog.setMessage("Loading...");
         pDialog.show();
+
 */
         getNews();
+
+
+        binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            infoNews = new ArrayList<Info>();
+
+            binding.mSwipeRefreshLayout.post(() -> {
+                //mSwipeLayout = true;
+
+                        binding.mSwipeRefreshLayout.setRefreshing(true);
+                        binding.shimmerViewContainer.startShimmer();
+
+                        getNews();
+            }
+            );
+
+        });
+        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
+
+
+
 
 
 
         return view;
     }
+
+
 
 
     private void getNews(){
@@ -106,19 +122,19 @@ public class NewsFragment extends Fragment {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<SchemesData> call = service.processNewsList(jsonObject);
-        call.enqueue(new Callback<SchemesData>() {
+        Call<Home> call = service.processNewsList(jsonObject);
+        call.enqueue(new Callback<Home>() {
             @Override
-            public void onResponse(@NonNull Call<SchemesData> call, @NonNull retrofit2.Response<SchemesData> response) {
+            public void onResponse(@NonNull Call<Home> call, @NonNull retrofit2.Response<Home> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    SchemesData articlesData = response.body();
-                    infoDataNews = response.body().getResponse();
+                    Home articlesData = response.body();
+                    infoNews = response.body().getResponse();
 
-                    if (infoDataNews.isEmpty()) {
+                    if (infoNews.isEmpty()) {
                         binding.articlesNews.setVisibility(View.GONE);
                         binding.emptyView.setVisibility(View.VISIBLE);
 
@@ -133,9 +149,9 @@ public class NewsFragment extends Fragment {
                         if (response.code() == 200) {
 
 
-                            if (infoDataNews != null && infoDataNews.size() > 0) {
-                                for (int i = 0; i < infoDataNews.size(); i++) {
-                                    Log.d(TAG, "" + infoDataNews.size());
+                            if (infoNews != null && infoNews.size() > 0) {
+                                for (int i = 0; i < infoNews.size(); i++) {
+                                    Log.d(TAG, "" + infoNews.size());
 
 
                                     binding.articlesNews.setHasFixedSize(true);
@@ -146,10 +162,11 @@ public class NewsFragment extends Fragment {
                                     binding.articlesNews.setLayoutManager(mLayoutManager);
 
                                     // create an Object for Adapter
-                                    mAdapter = new NewsAdapter(getActivity(), infoDataNews,binding.articlesNews);
+                                    mAdapter = new NewsAdapter(getActivity(), infoNews,binding.articlesNews);
 
                                     // set the adapter object to the Recyclerview
                                     binding.articlesNews.setAdapter(mAdapter);
+                                    binding.mSwipeRefreshLayout.setRefreshing(false);
 
                                     //pDialog.dismiss();
 
@@ -157,18 +174,18 @@ public class NewsFragment extends Fragment {
                                         @Override
                                         public void onLoadMore() {
                                             //add null , so the mAdapter will check view_type and show progress bar at bottom
-                                            infoDataNews.add(null);
-                                            mAdapter.notifyItemInserted(infoDataNews.size() - 1);
+                                            infoNews.add(null);
+                                            mAdapter.notifyItemInserted(infoNews.size() - 1);
 
                                             handler.postDelayed(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     //   remove progress item
-                                                    infoDataNews.remove(infoDataNews.size() - 1);
-                                                    mAdapter.notifyItemRemoved(infoDataNews.size());
+                                                    infoNews.remove(infoNews.size() - 1);
+                                                    mAdapter.notifyItemRemoved(infoNews.size());
                                                     //add items one by one
 
-                                                    int start = infoDataNews.size();
+                                                    int start = infoNews.size();
 
                                                     int end = start + 7;
 
@@ -200,7 +217,7 @@ public class NewsFragment extends Fragment {
                                         public void onItemClick(View view, int position) {
                                             Intent setIntent = new Intent(getActivity(), SingleNewsActivity.class);
 
-                                            setIntent.putExtra("news_id", infoDataNews.get(position).getId());
+                                            setIntent.putExtra("news_id", infoNews.get(position).getId());
                                             setIntent.putExtra("title", getResources().getString(R.string.news));
                                             setIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                             startActivity(setIntent);
@@ -236,7 +253,7 @@ public class NewsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<SchemesData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Home> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }

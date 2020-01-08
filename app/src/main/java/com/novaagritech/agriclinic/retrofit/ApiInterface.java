@@ -4,14 +4,13 @@ package com.novaagritech.agriclinic.retrofit;
 
 
 import com.google.gson.JsonObject;
-import com.novaagritech.agriclinic.comments.FriendlyMessage;
-import com.novaagritech.agriclinic.modals.ArticlesData;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.BannerData;
-import com.novaagritech.agriclinic.modals.CropsData;
-import com.novaagritech.agriclinic.modals.SchemesData;
+import com.novaagritech.agriclinic.modals.Comments;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Banners;
+import com.novaagritech.agriclinic.modals.Crops;
+import com.novaagritech.agriclinic.modals.Home;
 import com.novaagritech.agriclinic.modals.Stories;
-import com.novaagritech.agriclinic.modals.UserData;
+import com.novaagritech.agriclinic.modals.Users;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -24,72 +23,70 @@ public interface ApiInterface {
 
         @Headers("Content-Type: application/json")
         @POST("register_user")
-        Call<UserData> processRegisterOtp(@Body JsonObject body);
+        Call<Users> processRegisterOtp(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("forgot_password")
-        Call<UserData> processForgotPassword(@Body JsonObject body);
+        Call<Users> processForgotPassword(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("update_password")
-        Call<UserData> processUpdatePassword(@Body JsonObject body);
+        Call<Users> processUpdatePassword(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("user_login")
-        Call<UserData> processUserLogin(@Body JsonObject body);
+        Call<Users> processUserLogin(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("main_categories")
-        Call<CropsData> processCropCategories(@Body JsonObject body);
+        Call<Crops> processCropCategories(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("sub_categories")
-        Call<CropsData> processCropSubCategories(@Body JsonObject body);
+        Call<Crops> processCropSubCategories(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("crops_list")
-        Call<CropsData> processCropLists(@Body JsonObject body);
+        Call<Crops> processCropLists(@Body JsonObject body);
 
 
         @Headers("Content-Type: application/json")
         @POST("banner_adds")
-        Call<BannerData> processBanners1(@Body JsonObject body);
+        Call<Banners> processBanners1(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("update_user_token")
-        Call<BannerData> processToken(@Body JsonObject body);
+        Call<Banners> processToken(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("update_user_pincode")
-        Call<BannerData> processLocation(@Body JsonObject body);
+        Call<Banners> processLocation(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("banner_adds")
-        Call<ArticlesList> processBanners(@Body JsonObject body);
+        Call<Articles> processBanners(@Body JsonObject body);
 
-        @Headers("Content-Type: application/json")
-        @POST("article_types")
-        Call<ArticlesData> processArticlesTypes(@Body JsonObject body);
+
 
         @Headers("Content-Type: application/json")
         @POST("articles")
-        Call<ArticlesList> processArticlesList1(@Body JsonObject body);
+        Call<Articles> processArticlesList1(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("update_likes")
-        Call<ArticlesList> processArticlesLikes(@Body JsonObject body);
+        Call<Articles> processArticlesLikes(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("update_likes")
-        Call<ArticlesList> processArticlesUnLikes(@Body JsonObject body);
+        Call<Articles> processArticlesUnLikes(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("article_details")
-        Call<ArticlesList> processArticlesDetails(@Body JsonObject body);
+        Call<Articles> processArticlesDetails(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("privacy_policy")
-        Call<ArticlesList> processPrivacyPolicy(@Body JsonObject body);
+        Call<Articles> processPrivacyPolicy(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("user_stories")
@@ -97,40 +94,51 @@ public interface ApiInterface {
 
         @Headers("Content-Type: application/json")
         @POST("news")
-        Call<SchemesData> processNewsList(@Body JsonObject body);
+        Call<Home> processNewsList(@Body JsonObject body);
+
+
+        @Headers("Content-Type: application/json")
+        @POST("take_crop_problem")
+        Call<Home> processTakeCropProblem(@Body JsonObject body);
+
+
+        @Headers("Content-Type: application/json")
+        @POST("crop_problems_list")
+        Call<Home> processCropProblemsList(@Body JsonObject body);
+
 
         @Headers("Content-Type: application/json")
         @POST("events")
-        Call<SchemesData> processEventsList(@Body JsonObject body);
+        Call<Home> processEventsList(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("govt_schemes")
-        Call<SchemesData> processGovtSchemesList(@Body JsonObject body);
+        Call<Home> processGovtSchemesList(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("news_details")
-        Call<SchemesData> processNewsDetails(@Body JsonObject body);
+        Call<Home> processNewsDetails(@Body JsonObject body);
 
 
         @Headers("Content-Type: application/json")
         @POST("about_us")
-        Call<SchemesData> processAboutUS(@Body JsonObject body);
+        Call<Home> processAboutUS(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("govtScheme_details")
-        Call<SchemesData> processGovtSchemeDetails(@Body JsonObject body);
+        Call<Home> processGovtSchemeDetails(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("event_details")
-        Call<SchemesData> processEventsDetails(@Body JsonObject body);
+        Call<Home> processEventsDetails(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("add_comment")
-        Call<FriendlyMessage> processAddComment(@Body JsonObject body);
+        Call<Comments> processAddComment(@Body JsonObject body);
 
         @Headers("Content-Type: application/json")
         @POST("list_commnets")
-        Call<FriendlyMessage> processListComment(@Body JsonObject body);
+        Call<Comments> processListComment(@Body JsonObject body);
 
 
         @Headers("Content-Type: application/json")

@@ -1,13 +1,18 @@
 package com.novaagritech.agriclinic.fragments;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -17,32 +22,42 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.gson.JsonObject;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.novaagritech.agriclinic.BuildConfig;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.adapters.CropReportSingleAdapter;
-import com.novaagritech.agriclinic.app.AppController;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.databinding.FragmentHelpCropBinding;
-import com.novaagritech.agriclinic.modals.ReportDetails;
-import com.novaagritech.agriclinic.utilities.Urls;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.novaagritech.agriclinic.databinding.FragmentHelpCropBinding;
+import com.novaagritech.agriclinic.modals.Home;
+import com.novaagritech.agriclinic.modals.Info;
+import com.novaagritech.agriclinic.retrofit.ApiInterface;
+import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
+import com.novaagritech.agriclinic.utilities.FileCompressor;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -59,24 +74,25 @@ public class HelpCropFragment extends Fragment {
 
 
 
+    FragmentHelpCropBinding binding;
+
+    private List<Info> dataList;
+
     private String TAG="HELPCROP";
+    private static final int REQUEST_TAKE_PHOTO = 1;
+    private static final int REQUEST_GALLERY_PHOTO = 2;
+    private File mPhotoFile;
+    private FileCompressor mCompressor;
 
-    private static final int CAMERA_REQUEST = 1888;
-    private static final int MY_CAMERA_PERMISSION_CODE = 100;
-
+    private String cropRemarks;
+    private String cropName;
     private String imageEncoded="";
-    private String  visitRemarks1;
-    private int PICK_IMAGE_REQUEST = 1;
-
-
-    private CropReportSingleAdapter visitorAdapter;
-    List<ReportDetails> list;
 
     ProgressDialog pDialog;
     private String user_id;
 
-    FragmentHelpCropBinding binding;
-    private ReportDetails visitorDetails;
+
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -86,53 +102,45 @@ public class HelpCropFragment extends Fragment {
         View view = binding.getRoot();
 
         MyAppPrefsManager myAppPrefsManager = new MyAppPrefsManager(getActivity());
+        mCompressor = new FileCompressor(getActivity());
 
-        list = new ArrayList<ReportDetails>();
-        visitorDetails =new ReportDetails();
-
-
-
-        user_id = myAppPrefsManager.getUserId ( );
+        user_id = myAppPrefsManager.getUserId();
 
 
-
-
-
-        binding.imageEmpCamera.setOnClickListener(v -> {
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, CAMERA_REQUEST);
-
-        /*    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                {
-                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
-                }
-                else
-                {
-
-                }
-            }*/
-        });
 
         binding.imageEmGallery.setOnClickListener(v -> {
-            chooseImage();
+
+
+
+            requestStoragePermission(false);
+
+
         });
 
-        binding.submitVisit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                 visitRemarks1 = Objects.requireNonNull(binding.visitRemarks.getText()).toString().trim();
-                if (TextUtils.isEmpty(visitRemarks1) ){
-                    Toast.makeText(getActivity(), "Enter Remarks", Toast.LENGTH_SHORT).show();
-                }else if (imageEncoded.equals("")){
-                    Toast.makeText(getActivity(), "Upload Photo", Toast.LENGTH_SHORT).show();
-                }else {
-                    cropUpload();
-                }
+        binding.imageEmpCamera.setOnClickListener(v -> {
 
+            requestStoragePermission(true);
+
+
+
+
+        });
+
+
+        binding.submitVisit.setOnClickListener(v -> {
+            cropName = Objects.requireNonNull(binding.cropName.getText()).toString().trim();
+            cropRemarks = Objects.requireNonNull(binding.cropRemarks.getText()).toString().trim();
+            if (TextUtils.isEmpty(cropName) ){
+                Toast.makeText(getActivity(), "Enter Crop Name", Toast.LENGTH_SHORT).show();
+            }else if (TextUtils.isEmpty(cropRemarks) ){
+                Toast.makeText(getActivity(), "Enter Remarks", Toast.LENGTH_SHORT).show();
+            }else if (imageEncoded.equals("")){
+                Toast.makeText(getActivity(), "Upload Photo", Toast.LENGTH_SHORT).show();
+            }else {
+                cropUpload1();
             }
-        });
 
+        });
 
 
         return  view;
@@ -140,172 +148,111 @@ public class HelpCropFragment extends Fragment {
     }
 
 
-    public void chooseImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-    }
 
-    private void cropUpload(){
+
+    private void cropUpload1(){
 
         pDialog= new ProgressDialog(getActivity());
-        pDialog.setMessage("Loading...");
+        pDialog.setMessage("Loading Please Wait...");
+        pDialog.setCancelable(false);
         pDialog.show();
+        // prepare call in Retrofit 2.0
+        JsonObject jsonObject = new JsonObject();
 
-            JSONObject jsonBody = new JSONObject();
-            try {
-
-                jsonBody.put("user_id", user_id);
-
-                jsonBody.put("remarks", visitRemarks1);
-                jsonBody.put("crop_image", imageEncoded);
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            final String mRequestBody = jsonBody.toString();
-            Log.d(TAG, ""+mRequestBody);
-            // Tag used to cancel the request
-            String tag_json_obj = "pqlist";
+        jsonObject.addProperty("user_id", user_id);
+        jsonObject.addProperty("crop_name", cropName);
+        jsonObject.addProperty("remarks", cropRemarks);
+        jsonObject.addProperty("crop_image", imageEncoded);
 
 
-
-            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
-                    Urls.CROP_URL, null,
-                    new Response.Listener<JSONObject>() {
-
-                        @Override
-                        public void onResponse(final JSONObject response) {
-
-                            Log.d(TAG, response.toString());
-
-                            try{
-                                if (response.getString("status").equalsIgnoreCase("true"))
-                                {
-
-                                    Toast.makeText(getActivity(), ""+response.getString("message"), Toast.LENGTH_SHORT).show();
+        //Log.d(TAG,""+jsonObject);
+        ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
+        Call<Home> call = service.processTakeCropProblem(jsonObject);
+        call.enqueue(new Callback<Home>() {
+            @Override
+            public void onResponse(@NonNull Call<Home> call, @NonNull Response<Home> response) {
 
 
-                                    binding.visitRemarks.setText("");
-                                    binding.imageEmpPhoto.setImageDrawable(getActivity().getDrawable(R.drawable.ic_account_circle_black_24dp));
-
-                                    imageEncoded="";
-                                    pDialog.hide();
-
-                                }
-                                else {
-
-                                    Toast.makeText(getActivity(), ""+response.getString("message"), Toast.LENGTH_SHORT).show();
-                                    pDialog.hide();
-                                }
-
-                            }
-                            catch (JSONException e){
-                                e.printStackTrace();
-                            }
+                // Check if the Response is successful
+                if (response.isSuccessful()){
 
 
+                    Log.d(TAG,""+response.toString());
+                    assert response.body() != null;
+                    Home articlesData = response.body();
+                    dataList = response.body ( ).getResult ( );
 
+                    if (articlesData.isStatus()) {
+                        if (dataList != null && dataList.size ( ) > 0) {
+                            Toast.makeText(getActivity(), "" + articlesData.getMessage(), Toast.LENGTH_SHORT).show();
 
+                            binding.cropName.setText("");
+                            binding.cropRemarks.setText("");
+                            binding.imageViewProfilePic.setImageDrawable(getActivity().getDrawable(R.drawable.ic_account_circle_black_24dp));
 
+                            imageEncoded = "";
+                            pDialog.hide();
                         }
-                    }, new Response.ErrorListener() {
 
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    VolleyLog.d(TAG, "Error: " + error.getMessage());
-                    Toast.makeText(getActivity(), "Try Again...", Toast.LENGTH_SHORT).show();
-                    // hide the progress dialog
-                    pDialog.dismiss();
-                }
-            }){
-                @Override
-                public String getBodyContentType() {
-                    return "application/json; charset=utf-8";
-                }
+                    }else {
+                        Toast.makeText(getActivity(), ""+articlesData.getMessage(), Toast.LENGTH_SHORT).show();
+                        pDialog.dismiss();
 
-                @Override
-                public byte[] getBody() {
-                    try {
-                        return mRequestBody == null ? null : mRequestBody.getBytes("utf-8");
-
-                    } catch (UnsupportedEncodingException uee) {
-
-
-                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", mRequestBody, "utf-8");
-                        return null;
                     }
 
+
                 }
 
-            };
-            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
-                    0,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            // Adding request to request queue
-            AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Home> call, @NonNull Throwable t) {
+                pDialog.dismiss();
+                Log.d("ResponseF",""+t);
+            }
+        });
 
 
+
+
+
+
+
+
+}
+
+    private void encodeFileToBase64Binary(String fileName)
+            throws IOException {
+
+        File file = new File(fileName);
+        byte[] bytes = loadFile(file);
+        imageEncoded = Base64.encodeToString(bytes,Base64.DEFAULT);
+        //Log.d(TAG,""+imageEncoded);
 
 
     }
 
+    private static byte[] loadFile(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
 
+        long length = file.length();
+        // File is too large
+        byte[] bytes = new byte[(int)length];
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_CAMERA_PERMISSION_CODE)
-        {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(getActivity(), "camera permission granted", Toast.LENGTH_LONG).show();
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
-            }
-            else
-            {
-                Toast.makeText(getActivity(), "camera permission denied", Toast.LENGTH_LONG).show();
-
-            }
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+                && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+            offset += numRead;
         }
+
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file "+file.getName());
+        }
+
+        is.close();
+        return bytes;
     }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
-            Bitmap photo = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
-            binding.imageEmpPhoto.setImageBitmap(photo);
-            assert photo != null;
-            encodeTobase64(photo);
-
-        }
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-
-            Uri uri = data.getData();
-
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
-                // Log.d(TAG, String.valueOf(bitmap));
-                binding.imageEmpPhoto.setImageBitmap(bitmap);
-                assert bitmap != null;
-                encodeTobase64(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
-
-
-
 
 
     private void encodeTobase64(Bitmap image) {
@@ -317,6 +264,198 @@ public class HelpCropFragment extends Fragment {
 
         // Log.e(TAG, ""+imageEncoded);
     }
+
+    /**
+     * Alert dialog for capture or select from galley
+     */
+    private void selectImage() {
+        final CharSequence[] items = {"Take Photo", "Choose from Library",
+                "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setItems(items, (dialog, item) -> {
+            if (items[item].equals("Take Photo")) {
+                requestStoragePermission(true);
+            } else if (items[item].equals("Choose from Library")) {
+                requestStoragePermission(false);
+            } else if (items[item].equals("Cancel")) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    /**
+     * Capture image from camera
+     */
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                // Error occurred while creating the File
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        photoFile);
+
+                mPhotoFile = photoFile;
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+
+            }
+        }
+    }
+
+
+    /**
+     * Select image fro gallery
+     */
+    private void dispatchGalleryIntent() {
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickPhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(pickPhoto, REQUEST_GALLERY_PHOTO);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_TAKE_PHOTO) {
+                try {
+                    mPhotoFile = mCompressor.compressToFile(mPhotoFile);
+                    //Log.d(TAG,""+mPhotoFile);
+                    encodeFileToBase64Binary(String.valueOf((mPhotoFile)));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Glide.with(getActivity()).load(mPhotoFile).apply(new RequestOptions().centerCrop().circleCrop().placeholder(R.drawable.image_not_available)).into(binding.imageViewProfilePic);
+
+            } else if (requestCode == REQUEST_GALLERY_PHOTO) {
+                Uri selectedImage = data.getData();
+                try {
+                    mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
+                    //Log.d(TAG,""+mPhotoFile);
+                    encodeFileToBase64Binary(String.valueOf((mPhotoFile)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Glide.with(getActivity()).load(mPhotoFile).apply(new RequestOptions().centerCrop().circleCrop().placeholder(R.drawable.image_not_available)).into(binding.imageViewProfilePic);
+
+            }
+        }
+    }
+
+    /**
+     * Requesting multiple permissions (storage and camera) at once
+     * This uses multiple permission model from dexter
+     * On permanent denial opens settings dialog
+     */
+    private void requestStoragePermission(boolean isCamera) {
+        Dexter.withActivity(getActivity()).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        // check if all permissions are granted
+                        if (report.areAllPermissionsGranted()) {
+                            if (isCamera) {
+                                dispatchTakePictureIntent();
+                            } else {
+                                dispatchGalleryIntent();
+                            }
+                        }
+                        // check for permanent denial of any permission
+                        if (report.isAnyPermissionPermanentlyDenied()) {
+                            // show alert dialog navigating to Settings
+                            showSettingsDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).withErrorListener(error -> Toast.makeText(getActivity(), "Error occurred! ", Toast.LENGTH_SHORT).show())
+                .onSameThread()
+                .check();
+    }
+
+
+    /**
+     * Showing Alert Dialog with Settings option
+     * Navigates user to app settings
+     * NOTE: Keep proper title and message depending on your app
+     */
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Need Permissions");
+        builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.");
+        builder.setPositiveButton("GOTO SETTINGS", (dialog, which) -> {
+            dialog.cancel();
+            openSettings();
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+
+    }
+
+    // navigating user to app settings
+    private void openSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
+        intent.setData(uri);
+        startActivityForResult(intent, 101);
+    }
+
+    /**
+     * Create file with current timestamp name
+     *
+     * @return
+     * @throws IOException
+     */
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        @SuppressLint("SimpleDateFormat")
+        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        String mFileName = "PNG" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(mFileName, ".png", storageDir);
+    }
+
+    /**
+     * Get real file path from URI
+     *
+     * @param contentUri
+     * @return
+     */
+    private String getRealPathFromUri(Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = getActivity().getContentResolver().query(contentUri, proj, null, null, null);
+            assert cursor != null;
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+
+
+
+
+
+
 
 
 

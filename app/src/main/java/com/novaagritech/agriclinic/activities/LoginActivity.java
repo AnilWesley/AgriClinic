@@ -19,7 +19,7 @@ import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.ActivityLoginBinding;
-import com.novaagritech.agriclinic.modals.UserData;
+import com.novaagritech.agriclinic.modals.Users;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
 
     ActivityLoginBinding binding;
     ProgressDialog pDialog;
-    private List<UserData.UserDeatils> userDeatilsList;
+    private List<Users.UserDeatils> userDeatilsList;
     String user_id,name,number,zipcode;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,17 +81,17 @@ public class LoginActivity extends AppCompatActivity {
 
             Log.d(TAG,""+jsonObject);
             ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-            Call<UserData> call = service.processUserLogin(jsonObject);
-            call.enqueue(new Callback<UserData>() {
+            Call<Users> call = service.processUserLogin(jsonObject);
+            call.enqueue(new Callback<Users>() {
                 @Override
-                public void onResponse(@NonNull Call<UserData> call, @NonNull retrofit2.Response<UserData> response) {
+                public void onResponse(@NonNull Call<Users> call, @NonNull retrofit2.Response<Users> response) {
 
                     // Check if the Response is successful
                     if (response.isSuccessful()){
 
 
-                        UserData userData = response.body();
-                        if (userData.isStatus()){
+                        Users users = response.body();
+                        if (users.isStatus()){
                             assert response.body() != null;
 
 
@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Set isLogged_in of ConstantValues
                             ConstantValues.IS_USER_LOGGED_IN = myAppPrefsManager.isUserLoggedIn();
                             Toast.makeText(LoginActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity1.class);
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
                             finish();
@@ -122,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         }else {
                             pDialog.dismiss();
-                            Toast.makeText(LoginActivity.this, ""+userData.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, ""+ users.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -131,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<UserData> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<Users> call, @NonNull Throwable t) {
                     pDialog.dismiss();
                     Log.d("ResponseF",""+t);
                 }

@@ -82,6 +82,19 @@
                 android:textStyle="bold"
                 android:gravity="center"/>
         </LinearLayout>
+        <TextView
+            android:id="@+id/newsDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Crop"
+            android:ellipsize="end"
+            android:visibility="gone"
+            android:gravity="end"
+            android:layout_gravity="bottom"
+            android:maxEms="15"
+            android:textSize="12sp"
+            android:layout_margin="5dp"
+            android:textColor="@color/quantum_grey"/>
     </LinearLayout>
 
 

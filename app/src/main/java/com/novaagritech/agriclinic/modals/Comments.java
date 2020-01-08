@@ -1,4 +1,4 @@
-package com.novaagritech.agriclinic.comments;
+package com.novaagritech.agriclinic.modals;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -12,7 +12,7 @@ import java.util.List;
  * Created by evolutyz on 21/02/18.
  */
 
-public  class FriendlyMessage implements Serializable {
+public  class Comments implements Serializable {
 
     @SerializedName("status")
     @Expose

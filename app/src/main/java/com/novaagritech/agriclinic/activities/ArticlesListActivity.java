@@ -4,38 +4,25 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.adapters.DataAdapter;
+import com.novaagritech.agriclinic.adapters.ArticlesListViewAdapter;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.ActivityArticlesListBinding;
-import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
-import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.YoutubeVideoModel;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
-
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -47,9 +34,9 @@ public class ArticlesListActivity extends AppCompatActivity {
 
     
 
-    private DataAdapter mAdapter;
+    private ArticlesListViewAdapter mAdapter;
 
-    private List<InfoData> articlesDetails;
+    private List<Info> articlesDetails;
 
     ActivityArticlesListBinding binding;
 
@@ -105,17 +92,17 @@ public class ArticlesListActivity extends AppCompatActivity {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<ArticlesList> call = service.processArticlesList1(jsonObject);
-        call.enqueue(new Callback<ArticlesList>() {
+        Call<Articles> call = service.processArticlesList1(jsonObject);
+        call.enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    ArticlesList articlesData = response.body();
+                    Articles articlesData = response.body();
                     articlesDetails = response.body().getResponse();
 
                     if (articlesData.isStatus()) {
@@ -123,7 +110,7 @@ public class ArticlesListActivity extends AppCompatActivity {
                             for (int i = 0; i < articlesDetails.size(); i++) {
                                 Log.d(TAG, "" + articlesDetails.size());
 
-                                mAdapter = new DataAdapter(ArticlesListActivity.this, articlesDetails, binding.articlesRecycle);
+                                mAdapter = new ArticlesListViewAdapter(ArticlesListActivity.this, articlesDetails, binding.articlesRecycle);
 
                                 LinearLayoutManager gridLayoutManager = new LinearLayoutManager(ArticlesListActivity.this);
                                 //gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -132,6 +119,7 @@ public class ArticlesListActivity extends AppCompatActivity {
                                 binding.articlesRecycle.setHasFixedSize(true);
                                 // Set the Adapter and LayoutManager to the RecyclerView
                                 binding.articlesRecycle.setAdapter(mAdapter);
+
 
 
 
@@ -160,7 +148,7 @@ public class ArticlesListActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }

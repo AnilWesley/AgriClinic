@@ -21,12 +21,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.adapters.ArticleListAdapter1;
+import com.novaagritech.agriclinic.adapters.ArticleListAdapterPagination;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 
 import com.novaagritech.agriclinic.databinding.FragmentSearchMarticlesBinding;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
@@ -46,7 +46,7 @@ public class SearchMArticlesFragment extends Fragment {
     private FragmentSearchMarticlesBinding binding;
     private ProgressDialog pDialog;
     private static final String TAG = "ArticleListActivity11";
-    private ArticleListAdapter1 adapter;
+    private ArticleListAdapterPagination adapter;
     private LinearLayoutManager linearLayoutManager;
 
     private int PAGE_START = 1;
@@ -56,7 +56,7 @@ public class SearchMArticlesFragment extends Fragment {
     private int currentPage = PAGE_START;
     private ApiInterface apiService;
 
-    private List<InfoData> articlesDetails;
+    private List<Info> articlesDetails;
     private String article_tag="";
     private int currentYear,currentMonth;
 
@@ -94,7 +94,7 @@ public class SearchMArticlesFragment extends Fragment {
         Intent i = getActivity().getIntent();
 
         article_tag = i.getStringExtra("article_tag");
-        adapter = new ArticleListAdapter1(getActivity());
+        adapter = new ArticleListAdapterPagination(getActivity());
 
         MyAppPrefsManager myAppPrefsManager = new MyAppPrefsManager(getActivity());
         user_id= myAppPrefsManager.getUserId();
@@ -206,7 +206,7 @@ public class SearchMArticlesFragment extends Fragment {
 
                     callArticleListApi();
                     loadFirstPage();
-                    adapter = new ArticleListAdapter1(getActivity());
+                    adapter = new ArticleListAdapterPagination(getActivity());
                     linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                     binding.articlesRecycle.setLayoutManager(linearLayoutManager);
                     binding.articlesRecycle.setItemAnimator(new DefaultItemAnimator());
@@ -236,7 +236,7 @@ public class SearchMArticlesFragment extends Fragment {
 
                     callArticleListApi();
                     loadFirstPage();
-                    adapter = new ArticleListAdapter1(getActivity());
+                    adapter = new ArticleListAdapterPagination(getActivity());
                     linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                     binding.articlesRecycle.setLayoutManager(linearLayoutManager);
                     binding.articlesRecycle.setItemAnimator(new DefaultItemAnimator());
@@ -259,6 +259,23 @@ public class SearchMArticlesFragment extends Fragment {
 
 
 
+        binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            articlesDetails = new ArrayList<Info>();
+
+            binding.mSwipeRefreshLayout.post(() -> {
+                        //mSwipeLayout = true;
+
+                        binding.mSwipeRefreshLayout.setRefreshing(true);
+                        binding.shimmerViewContainer.startShimmer();
+
+                        loadFirstPage();
+                    }
+            );
+
+        });
+        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
+
+
 
 
         return  view;
@@ -273,9 +290,9 @@ public class SearchMArticlesFragment extends Fragment {
         //init service and load data
 
         apiService = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        callArticleListApi().enqueue(new Callback<ArticlesList>() {
+        callArticleListApi().enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
                 // Got data. Send it to adapter
 
                 if (response.isSuccessful()) {
@@ -284,7 +301,7 @@ public class SearchMArticlesFragment extends Fragment {
 
                         Log.d(TAG, "" + response.toString());
                         assert response.body() != null;
-                        ArticlesList articlesData = response.body();
+                        Articles articlesData = response.body();
                         if (articlesData.isStatus()) {
                             articlesDetails = fetchResults(response);
                             TOTAL_PAGES = response.body().getArticle_pages();
@@ -295,6 +312,7 @@ public class SearchMArticlesFragment extends Fragment {
                             binding.articlesRecycle.setVisibility(View.VISIBLE);
                             binding.emptyView.setVisibility(View.GONE);
 
+                            binding.mSwipeRefreshLayout.setRefreshing(false);
                         } else {
                             pDialog.dismiss();
                             binding.articlesRecycle.setVisibility(View.GONE);
@@ -317,7 +335,7 @@ public class SearchMArticlesFragment extends Fragment {
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+                    public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                         t.printStackTrace();
                         // TODO: 08/11/16 handle failure
                     }
@@ -327,26 +345,26 @@ public class SearchMArticlesFragment extends Fragment {
     }
 
     /**
-     * @param response extracts List<{@link InfoData>} from response
+     * @param response extracts List<{@link Info >} from response
      * @return
      */
-    private List<InfoData> fetchResults(Response<ArticlesList> response) {
+    private List<Info> fetchResults(Response<Articles> response) {
 
-        ArticlesList articlesList = response.body();
-        if (articlesList.isStatus()){
-            Log.d(TAG,""+articlesList.getResponse());
+        Articles articles = response.body();
+        if (articles.isStatus()){
+            Log.d(TAG,""+ articles.getResponse());
         }
 
-        return articlesList.getResponse();
+        return articles.getResponse();
 
     }
 
     private void loadNextPage() {
         Log.d(TAG, "loadNextPage: " + currentPage);
 
-        callArticleListApi().enqueue(new Callback<ArticlesList>() {
+        callArticleListApi().enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
                 adapter.removeLoadingFooter();
                 isLoading = false;
 
@@ -358,7 +376,7 @@ public class SearchMArticlesFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 t.printStackTrace();
                 // TODO: 08/11/16 handle failure
             }
@@ -372,7 +390,7 @@ public class SearchMArticlesFragment extends Fragment {
      * As {@link #currentPage} will be incremented automatically
      * by @{@link PaginationScrollListener} to load next page.
      */
-    private Call<ArticlesList> callArticleListApi() {
+    private Call<Articles> callArticleListApi() {
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("limit", "");

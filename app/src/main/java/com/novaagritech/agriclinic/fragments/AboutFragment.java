@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.databinding.FragmentAboutBinding;
-import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.SchemesData;
+import com.novaagritech.agriclinic.modals.Home;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
@@ -33,7 +33,7 @@ public class AboutFragment extends Fragment {
     String TAG="ABOUTFRAGMENT";
 
 
-    private List<InfoData> infoDataList;
+    private List<Info> infoList;
     public AboutFragment() {
         // Required empty public constructor
     }
@@ -74,25 +74,25 @@ public class AboutFragment extends Fragment {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<SchemesData> call = service.processAboutUS(jsonObject);
-        call.enqueue(new Callback<SchemesData>() {
+        Call<Home> call = service.processAboutUS(jsonObject);
+        call.enqueue(new Callback<Home>() {
             @Override
-            public void onResponse(@NonNull Call<SchemesData> call, @NonNull retrofit2.Response<SchemesData> response) {
+            public void onResponse(@NonNull Call<Home> call, @NonNull retrofit2.Response<Home> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    SchemesData articlesData = response.body();
-                    infoDataList = response.body().getResult();
+                    Home articlesData = response.body();
+                    infoList = response.body().getResult();
 
                     if (articlesData.isStatus()) {
-                        if (infoDataList != null && infoDataList.size() > 0) {
+                        if (infoList != null && infoList.size() > 0) {
 
-                                Log.d(TAG, "" + infoDataList.size());
+                                Log.d(TAG, "" + infoList.size());
 
-                                binding.textDesc.loadDataWithBaseURL(null,infoDataList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
+                                binding.textDesc.loadDataWithBaseURL(null, infoList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
 
 
@@ -107,7 +107,7 @@ public class AboutFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<SchemesData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Home> call, @NonNull Throwable t) {
 
                 Log.d("ResponseF",""+t);
             }

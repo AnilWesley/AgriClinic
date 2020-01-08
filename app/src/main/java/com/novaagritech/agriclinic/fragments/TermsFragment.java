@@ -3,7 +3,6 @@ package com.novaagritech.agriclinic.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,8 +16,8 @@ import androidx.fragment.app.Fragment;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.databinding.FragmentTermsBinding;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
@@ -37,14 +36,14 @@ public class TermsFragment extends Fragment {
     String TAG="ABOUTFRAGMENT";
 
 
-    private List<InfoData> infoDataList;
+    private List<Info> infoList;
     public TermsFragment() {
         // Required empty public constructor
     }
     private ProgressDialog pDialog;
 
     private FragmentTermsBinding binding;
-    private List<InfoData> articlesDetails;
+    private List<Info> articlesDetails;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -85,18 +84,18 @@ public class TermsFragment extends Fragment {
         jsonObject.addProperty ( "user_id", "1" );
 
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-        Call<ArticlesList> call = service.processPrivacyPolicy ( jsonObject );
-        call.enqueue ( new Callback<ArticlesList>( ) {
+        Call<Articles> call = service.processPrivacyPolicy ( jsonObject );
+        call.enqueue ( new Callback<Articles>( ) {
             @SuppressLint("SetTextI18n")
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful ( )) {
 
                     assert response.body ( ) != null;
-                    ArticlesList articlesData = response.body ( );
+                    Articles articlesData = response.body ( );
                     articlesDetails = response.body ( ).getResponse ( );
 
                     if (articlesData.isStatus ( )) {
@@ -121,7 +120,7 @@ public class TermsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 pDialog.dismiss ( );
                 Log.d ( "ResponseF", "" + t );
             }

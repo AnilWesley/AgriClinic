@@ -263,7 +263,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
                     if (ConstantValues.IS_USER_LOGGED_IN = myAppPrefsManager.isUserLoggedIn()) {
 
-                            Intent intent = new Intent(getBaseContext(), HomeActivity1.class);
+                            Intent intent = new Intent(getBaseContext(), HomeActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
                             finish();

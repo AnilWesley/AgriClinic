@@ -1,4 +1,4 @@
-package com.novaagritech.agriclinic.comments;
+package com.novaagritech.agriclinic.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,27 +18,20 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.activities.ArticlesListActivity;
-import com.novaagritech.agriclinic.activities.CropsCategoriesActivity;
-import com.novaagritech.agriclinic.adapters.CropsListAdapater;
+import com.novaagritech.agriclinic.modals.Comments;
+import com.novaagritech.agriclinic.adapters.MessageAdapter;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.modals.CropsData;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,7 +50,7 @@ public class ChatActivity extends AppCompatActivity {
     String mUsername;
     TextView emptyView;
     ListView mMessageListView;
-    List<FriendlyMessage.CommentDetails> friendlyMessages;
+    List<Comments.CommentDetails> friendlyMessages;
     String user_id,article_id;
     MyAppPrefsManager myAppPrefsManager;
     ImageView action_image;
@@ -147,10 +140,10 @@ public class ChatActivity extends AppCompatActivity {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<FriendlyMessage> call = service.processAddComment(jsonObject);
-        call.enqueue(new Callback<FriendlyMessage>() {
+        Call<Comments> call = service.processAddComment(jsonObject);
+        call.enqueue(new Callback<Comments>() {
             @Override
-            public void onResponse(@NonNull Call<FriendlyMessage> call, @NonNull Response<FriendlyMessage> response) {
+            public void onResponse(@NonNull Call<Comments> call, @NonNull Response<Comments> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
@@ -165,7 +158,7 @@ public class ChatActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<FriendlyMessage> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Comments> call, @NonNull Throwable t) {
 
                 Log.d("ResponseF",""+t);
             }
@@ -183,16 +176,16 @@ public class ChatActivity extends AppCompatActivity {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<FriendlyMessage> call = service.processListComment(jsonObject);
-        call.enqueue(new Callback<FriendlyMessage>() {
+        Call<Comments> call = service.processListComment(jsonObject);
+        call.enqueue(new Callback<Comments>() {
             @Override
-            public void onResponse(@NonNull Call<FriendlyMessage> call, @NonNull Response<FriendlyMessage> response) {
+            public void onResponse(@NonNull Call<Comments> call, @NonNull Response<Comments> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    FriendlyMessage cropsData = response.body();
+                    Comments cropsData = response.body();
                     friendlyMessages = response.body().getResponse();
                     if (cropsData.isStatus()){
                         if (friendlyMessages != null&&friendlyMessages.size()>0  ) {
@@ -215,7 +208,7 @@ public class ChatActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<FriendlyMessage> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Comments> call, @NonNull Throwable t) {
 
                 Log.d("ResponseF",""+t);
             }

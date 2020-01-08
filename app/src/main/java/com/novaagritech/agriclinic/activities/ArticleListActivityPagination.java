@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,17 +13,15 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.adapters.ArticleListAdapter1;
+import com.novaagritech.agriclinic.adapters.ArticleListAdapterPagination;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.ActivityArticlesListBinding;
-import com.novaagritech.agriclinic.databinding.ActivityArticlesListBindingImpl;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
@@ -37,11 +34,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class ArticleListActivity1 extends AppCompatActivity {
+public class ArticleListActivityPagination extends AppCompatActivity {
 
     private static final String TAG = "ArticleListActivity11";
 
-    ArticleListAdapter1 adapter;
+    ArticleListAdapterPagination adapter;
     LinearLayoutManager linearLayoutManager;
 
     int PAGE_START = 1;
@@ -52,7 +49,7 @@ public class ArticleListActivity1 extends AppCompatActivity {
     ApiInterface movieService;
     ActivityArticlesListBinding binding;
     ProgressDialog pDialog;
-    private List<InfoData> articlesDetails;
+    private List<Info> articlesDetails;
     String article_tag="";
     String user_id;
     @Override
@@ -63,9 +60,9 @@ public class ArticleListActivity1 extends AppCompatActivity {
         Intent i = getIntent();
 
         article_tag = i.getStringExtra("article_tag");
-        adapter = new ArticleListAdapter1(this);
+        adapter = new ArticleListAdapterPagination(this);
 
-        MyAppPrefsManager myAppPrefsManager = new MyAppPrefsManager(ArticleListActivity1.this);
+        MyAppPrefsManager myAppPrefsManager = new MyAppPrefsManager(ArticleListActivityPagination.this);
         user_id= myAppPrefsManager.getUserId();
 
         linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -124,20 +121,20 @@ public class ArticleListActivity1 extends AppCompatActivity {
 
     private void loadFirstPage() {
         Log.d(TAG, "loadFirstPage: ");
-        pDialog = new ProgressDialog(ArticleListActivity1.this);
+        pDialog = new ProgressDialog(ArticleListActivityPagination.this);
         pDialog.setMessage("Loading...");
         pDialog.setCancelable(false);
         pDialog.show();
 
-        callArticleListApi().enqueue(new Callback<ArticlesList>() {
+        callArticleListApi().enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
                 // Got data. Send it to adapter
 
                 if (response.isSuccessful()) {
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    ArticlesList articlesData = response.body();
+                    Articles articlesData = response.body();
                     if (articlesData.isStatus()) {
                         articlesDetails = fetchResults(response);
                         TOTAL_PAGES = response.body().getArticle_pages();
@@ -162,7 +159,7 @@ public class ArticleListActivity1 extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 t.printStackTrace();
                 // TODO: 08/11/16 handle failure
             }
@@ -172,7 +169,7 @@ public class ArticleListActivity1 extends AppCompatActivity {
         binding.articlesRecycle.addOnItemTouchListener(new RecyclerItemClickListener(this, binding.articlesRecycle, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent setIntent = new Intent(ArticleListActivity1.this, SingleArticleActivity.class);
+                Intent setIntent = new Intent(ArticleListActivityPagination.this, SingleArticleActivity.class);
 
                 setIntent.putExtra("article_id", articlesDetails.get(position).getId());
                 Log.d(TAG,""+articlesDetails.get(position).getId());
@@ -189,26 +186,26 @@ public class ArticleListActivity1 extends AppCompatActivity {
     }
 
     /**
-     * @param response extracts List<{@link InfoData>} from response
+     * @param response extracts List<{@link Info >} from response
      * @return
      */
-    private List<InfoData> fetchResults(Response<ArticlesList> response) {
+    private List<Info> fetchResults(Response<Articles> response) {
 
-        ArticlesList articlesList = response.body();
-        if (articlesList.isStatus()){
-            Log.d(TAG,""+articlesList.getResponse());
+        Articles articles = response.body();
+        if (articles.isStatus()){
+            Log.d(TAG,""+ articles.getResponse());
         }
 
-        return articlesList.getResponse();
+        return articles.getResponse();
 
     }
 
     private void loadNextPage() {
         Log.d(TAG, "loadNextPage: " + currentPage);
 
-        callArticleListApi().enqueue(new Callback<ArticlesList>() {
+        callArticleListApi().enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
                 adapter.removeLoadingFooter();
                 isLoading = false;
 
@@ -220,7 +217,7 @@ public class ArticleListActivity1 extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 t.printStackTrace();
                 // TODO: 08/11/16 handle failure
             }
@@ -234,7 +231,7 @@ public class ArticleListActivity1 extends AppCompatActivity {
      * As {@link #currentPage} will be incremented automatically
      * by @{@link PaginationScrollListener} to load next page.
      */
-    private Call<ArticlesList> callArticleListApi() {
+    private Call<Articles> callArticleListApi() {
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("limit", "10");

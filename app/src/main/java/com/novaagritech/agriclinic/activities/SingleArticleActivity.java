@@ -34,8 +34,8 @@ import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.CustomButton;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.ActivitySingleArticleBinding;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.Urls;
@@ -53,7 +53,7 @@ public class SingleArticleActivity extends AppCompatActivity {
     String TAG = "Articles";
     private ProgressDialog pDialog;
 
-    private List<InfoData> articlesDetails;
+    private List<Info> articlesDetails;
 
     private DisplayImageOptions options;
 
@@ -101,6 +101,22 @@ public class SingleArticleActivity extends AppCompatActivity {
             }
         } );
 
+       /* binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+
+            articlesDetails = new ArrayList<Info>();
+
+
+            binding.mSwipeRefreshLayout.post(() -> {
+                        //mSwipeLayout = true;
+
+                        binding.mSwipeRefreshLayout.setRefreshing(true);
+                        getArticle();
+                    }
+            );
+
+        });
+        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);*/
+
 
         getArticle();
 
@@ -110,6 +126,7 @@ public class SingleArticleActivity extends AppCompatActivity {
     }
 
     public void getArticle() {
+
 
         pDialog.setMessage ( "Loading..." );
         pDialog.show ( );
@@ -125,18 +142,18 @@ public class SingleArticleActivity extends AppCompatActivity {
 
         Log.d ( TAG, "" + jsonObject );
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-        Call<ArticlesList> call = service.processArticlesDetails ( jsonObject );
-        call.enqueue ( new Callback<ArticlesList> ( ) {
+        Call<Articles> call = service.processArticlesDetails ( jsonObject );
+        call.enqueue ( new Callback<Articles> ( ) {
             @SuppressLint("SetTextI18n")
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful ( )) {
                     Log.d ( TAG, "" + response.toString ( ) );
                     assert response.body ( ) != null;
-                    ArticlesList articlesData = response.body ( );
+                    Articles articlesData = response.body ( );
                     articlesDetails = response.body ( ).getResponse ( );
 
                     if (articlesData.isStatus ( )) {
@@ -151,6 +168,8 @@ public class SingleArticleActivity extends AppCompatActivity {
 
                                 //using String split function
                                 String[] words = line.split ( "," );
+
+
                                 Log.d ( TAG, "" + Arrays.toString ( words ) );
 
                                 Log.d ( TAG, "" + words.length );
@@ -168,6 +187,7 @@ public class SingleArticleActivity extends AppCompatActivity {
                                     // create a new textview
                                     final CustomButton rowTextView = new CustomButton ( SingleArticleActivity.this );
 
+
                                     // set some properties of rowTextView or something
                                     rowTextView.setText ( words[i] + " " );
                                     rowTextView.setTextColor ( Color.parseColor ( "#FFFFFF" ) );
@@ -180,6 +200,7 @@ public class SingleArticleActivity extends AppCompatActivity {
 
                                     // save a reference to the textview for later
                                     myTextViews[i] = rowTextView;
+
 
                                     int finalI = i;
                                     rowTextView.setOnClickListener ( new View.OnClickListener ( ) {
@@ -228,7 +249,7 @@ public class SingleArticleActivity extends AppCompatActivity {
                                             }
                                         } );
 
-
+                                //binding.mSwipeRefreshLayout.setRefreshing(false);
                                 pDialog.dismiss ( );
                             }
                             //get values
@@ -242,7 +263,7 @@ public class SingleArticleActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 pDialog.dismiss ( );
                 Log.d ( "ResponseF", "" + t );
             }

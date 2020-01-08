@@ -31,18 +31,17 @@ import com.daimajia.slider.library.Transformers.BaseTransformer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.novaagritech.agriclinic.activities.ArticleListActivity1;
-import com.novaagritech.agriclinic.activities.HomeActivity;
+import com.novaagritech.agriclinic.activities.ArticleListActivityPagination;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.BannerData;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Banners;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.LocationTrack;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
-import com.novaagritech.agriclinic.adapters.ArticlesListHomeAdapater;
+import com.novaagritech.agriclinic.adapters.ArticlesListHome2Adapater;
 import com.novaagritech.agriclinic.activities.SingleArticleActivity;
 import com.novaagritech.agriclinic.modals.weathermodel.OpenWeatherMap;
 
@@ -59,13 +58,13 @@ public class HomeFragment2 extends Fragment {
 
     private String TAG = "HOME_ACTIVITY";
     private ProgressDialog pDialog;
-    private ArticlesListHomeAdapater articlesListHomeAdapater;
+    private ArticlesListHome2Adapater articlesListHome2Adapater;
 
     private RecyclerView articlesRecycle;
     private SliderLayout sliderLayout;
     private PagerIndicator pagerIndicator;
 
-    private List<BannerData.BannerDetails> bannerDetailsList;
+    private List<Banners.BannerDetails> bannerDetailsList;
     TextView articleMore;
     Address address = null;
     String addr = "";
@@ -79,7 +78,7 @@ public class HomeFragment2 extends Fragment {
     private TextView temp_type;
     private TextView temp_desc;
     private OpenWeatherMap openWeatherMap;
-    private List<InfoData> articlesDetails;
+    private List<Info> articlesDetails;
     private String user_id;
     public HomeFragment2() {
         // Required empty public constructor
@@ -125,7 +124,7 @@ public class HomeFragment2 extends Fragment {
         articleMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =new Intent(getActivity(), ArticleListActivity1.class);
+                Intent intent =new Intent(getActivity(), ArticleListActivityPagination.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
 
@@ -147,17 +146,17 @@ public class HomeFragment2 extends Fragment {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<ArticlesList> call = service.processArticlesList1(jsonObject);
-        call.enqueue(new Callback<ArticlesList>() {
+        Call<Articles> call = service.processArticlesList1(jsonObject);
+        call.enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull retrofit2.Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull retrofit2.Response<Articles> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    ArticlesList articlesData = response.body();
+                    Articles articlesData = response.body();
                     articlesDetails = response.body().getResponse();
 
                     if (articlesData.isStatus()) {
@@ -165,17 +164,17 @@ public class HomeFragment2 extends Fragment {
                             for (int i = 0; i < articlesDetails.size(); i++) {
                                 Log.d(TAG, "" + articlesDetails.size());
 
-                                articlesListHomeAdapater = new ArticlesListHomeAdapater(getActivity(), articlesDetails);
+                                articlesListHome2Adapater = new ArticlesListHome2Adapater(getActivity(), articlesDetails);
                                /* DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(articlesRecycle.getContext(),DividerItemDecoration.VERTICAL);
                                 articlesRecycle.addItemDecoration(dividerItemDecoration);*/
 
                                 GridLayoutManager llm = new GridLayoutManager(getActivity(),2);
                                 llm.setOrientation(GridLayoutManager.VERTICAL);
                                 articlesRecycle.setLayoutManager(llm);
-                                articlesRecycle.setAdapter(articlesListHomeAdapater);
+                                articlesRecycle.setAdapter(articlesListHome2Adapater);
 
 
-                                articlesListHomeAdapater.notifyDataSetChanged();
+                                articlesListHome2Adapater.notifyDataSetChanged();
                                 pDialog.dismiss();
                             }
                             //get values
@@ -189,7 +188,7 @@ public class HomeFragment2 extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }
@@ -230,20 +229,20 @@ public class HomeFragment2 extends Fragment {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<BannerData> call = service.processBanners1(jsonObject);
-        call.enqueue(new Callback<BannerData>() {
+        Call<Banners> call = service.processBanners1(jsonObject);
+        call.enqueue(new Callback<Banners>() {
             @Override
-            public void onResponse(@NonNull Call<BannerData> call, @NonNull retrofit2.Response<BannerData> response) {
+            public void onResponse(@NonNull Call<Banners> call, @NonNull retrofit2.Response<Banners> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    BannerData bannerData = response.body();
+                    Banners banners = response.body();
                     bannerDetailsList = response.body().getResponse();
 
 
-                    if (bannerData.isStatus()){
+                    if (banners.isStatus()){
                         if (bannerDetailsList != null&&bannerDetailsList.size()>0  ) {
                             for (int i = 0; i <bannerDetailsList.size(); i++) {
                                 Log.d(TAG, "" + bannerDetailsList.size());
@@ -255,7 +254,7 @@ public class HomeFragment2 extends Fragment {
 
                         }
                     } else {
-                        Toast.makeText(getActivity(), ""+bannerData.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), ""+ banners.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -264,7 +263,7 @@ public class HomeFragment2 extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<BannerData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Banners> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }
@@ -278,7 +277,7 @@ public class HomeFragment2 extends Fragment {
 
 
 
-    private void setupBannerSlider(final List<BannerData.BannerDetails> bannerImages) {
+    private void setupBannerSlider(final List<Banners.BannerDetails> bannerImages) {
 
 
         // Initialize new LinkedHashMap<ImageName, ImagePath>
@@ -290,7 +289,7 @@ public class HomeFragment2 extends Fragment {
 
         for (int i=0;  i< bannerImages.size();  i++) {
             // Get bannerDetails at given Position from bannerImages List
-            BannerData.BannerDetails bannerData = bannerImages.get(i);
+            Banners.BannerDetails bannerData = bannerImages.get(i);
 
             // Put Image's Name and URL to the HashMap slider_covers
             slider_covers.put

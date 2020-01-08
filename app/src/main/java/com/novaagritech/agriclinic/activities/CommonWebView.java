@@ -14,8 +14,8 @@ import androidx.databinding.DataBindingUtil;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.databinding.ActivityCommonWebViewBinding;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
@@ -32,7 +32,7 @@ public class CommonWebView extends AppCompatActivity {
     String TAG = "Articles";
 
 
-    private List<InfoData> articlesDetails;
+    private List<Info> articlesDetails;
 
     private ProgressDialog pDialog;
     String value;
@@ -77,18 +77,18 @@ public class CommonWebView extends AppCompatActivity {
         jsonObject.addProperty ( "user_id", "1" );
 
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-        Call<ArticlesList> call = service.processPrivacyPolicy ( jsonObject );
-        call.enqueue ( new Callback<ArticlesList>( ) {
+        Call<Articles> call = service.processPrivacyPolicy ( jsonObject );
+        call.enqueue ( new Callback<Articles>( ) {
             @SuppressLint("SetTextI18n")
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful ( )) {
 
                     assert response.body ( ) != null;
-                    ArticlesList articlesData = response.body ( );
+                    Articles articlesData = response.body ( );
                     articlesDetails = response.body ( ).getResponse ( );
 
                     if (articlesData.isStatus ( )) {
@@ -111,7 +111,7 @@ public class CommonWebView extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 pDialog.dismiss ( );
                 Log.d ( "ResponseF", "" + t );
             }
@@ -133,18 +133,18 @@ public class CommonWebView extends AppCompatActivity {
         jsonObject.addProperty ( "user_id", "1" );
 
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-        Call<ArticlesList> call = service.processPrivacyPolicy ( jsonObject );
-        call.enqueue ( new Callback<ArticlesList>( ) {
+        Call<Articles> call = service.processPrivacyPolicy ( jsonObject );
+        call.enqueue ( new Callback<Articles>( ) {
             @SuppressLint("SetTextI18n")
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful ( )) {
 
                     assert response.body ( ) != null;
-                    ArticlesList articlesData = response.body ( );
+                    Articles articlesData = response.body ( );
                     articlesDetails = response.body ( ).getResponse ( );
 
                     if (articlesData.isStatus ( )) {
@@ -167,7 +167,7 @@ public class CommonWebView extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                 pDialog.dismiss ( );
                 Log.d ( "ResponseF", "" + t );
             }

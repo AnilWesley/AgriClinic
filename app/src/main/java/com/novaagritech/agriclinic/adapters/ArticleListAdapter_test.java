@@ -25,12 +25,12 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.activities.SingleArticleActivity;
-import com.novaagritech.agriclinic.comments.ChatActivity;
+import com.novaagritech.agriclinic.activities.ChatActivity;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.BannerData;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Banners;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.Urls;
@@ -46,19 +46,18 @@ import retrofit2.Response;
  * Created by Suleiman on 19/10/16.
  */
 
-public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ArticleListAdapter_test extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ARTICLES = 0;
     private static final int LOADING = 1;
-    private List<InfoData> infoDataList;
+    private List<Info> infoList;
     private static final int LIST_AD_DELTA = 1;
 
-    private List<BannerData.BannerDetails> dataModelList;
+    private List<Banners.BannerDetails> dataModelList;
     private Context context;
     private DisplayImageOptions options;
 
 
-    private MyAppPrefsManager myAppPrefsManager;
     private String user_id;
     private int likes_count;
 
@@ -67,15 +66,15 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
 
     private static final String TAG = "ArticleListActivity11";
 
-    public ArticleListAdapter1_test(Context context, List<InfoData> infoDataList,  List<BannerData.BannerDetails> dataModelList) {
+    public ArticleListAdapter_test(Context context, List<Info> infoList, List<Banners.BannerDetails> dataModelList) {
         this.context = context;
-        this.infoDataList = infoDataList;
+        this.infoList = infoList;
         this.dataModelList = dataModelList;
 
-        items.addAll ( infoDataList );
+        items.addAll (infoList);
         items.addAll ( dataModelList );
 
-        myAppPrefsManager = new MyAppPrefsManager ( context );
+
         options = new DisplayImageOptions.Builder ( )
                 .showImageOnLoading ( R.drawable.image_not_available )
                 .showImageForEmptyUri ( R.drawable.image_not_available )
@@ -89,17 +88,20 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     }
 
 
-    public List<InfoData> getInfoDataList() {
-        return infoDataList;
+    public List<Info> getInfoList() {
+        return infoList;
     }
 
-    public void setInfoDataList(List<InfoData> infoDataList) {
-        this.infoDataList = infoDataList;
+    public void setInfoList(List<Info> infoList) {
+        this.infoList = infoList;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+
+
         RecyclerView.ViewHolder viewHolder = null;
         LayoutInflater inflater = LayoutInflater.from ( parent.getContext ( ) );
 
@@ -121,10 +123,10 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-
+        MyAppPrefsManager myAppPrefsManager = new MyAppPrefsManager(context);
         if (holder instanceof MyViewHolder) {
 
-            InfoData articleModal = (InfoData) items.get ( position );
+            Info articleModal = (Info) items.get ( position );
 
             user_id = myAppPrefsManager.getUserId ( );
 
@@ -138,7 +140,7 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
 
             ImageLoader.getInstance ( )
                     .displayImage ( Urls.IMAGE_URL + articleModal.getImage_path ( ), ((MyViewHolder) holder).imageView, options,
-                            new SimpleImageLoadingListener ( ) {
+                            new SimpleImageLoadingListener( ) {
                                 @Override
                                 public void onLoadingStarted(String imageUri, View view) {
                                     ((MyViewHolder) holder).progressBar.setVisibility ( View.VISIBLE );
@@ -168,7 +170,7 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
                 @Override
                 public void onClick(View v) {
                     Intent setIntent = new Intent ( context, SingleArticleActivity.class );
-                    setIntent.putExtra ( "article_id", infoDataList.get ( position ).getId ( ) );
+                    setIntent.putExtra ( "article_id", infoList.get ( position ).getId ( ) );
                     setIntent.setFlags ( Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
                     context.startActivity ( setIntent );
                 }
@@ -213,10 +215,10 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
 
                             Log.d ( TAG, "" + jsonObject );
                             ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-                            Call<ArticlesList> call = service.processArticlesLikes ( jsonObject );
-                            call.enqueue ( new Callback<ArticlesList> ( ) {
+                            Call<Articles> call = service.processArticlesLikes ( jsonObject );
+                            call.enqueue ( new Callback<Articles>( ) {
                                 @Override
-                                public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+                                public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
                                     // Check if the Response is successful
                                     if (response.isSuccessful ( )) {
@@ -227,15 +229,15 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
                                             likes_count = response.body ( ).getLikes_count ( );
                                             Log.d ( TAG, "Count : " + likes_count );
                                             //((MyViewHolder) holder).articlelikes.setText((likes_count)+" "+"likes");
-                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoDataList.get ( position ).getLikes_count ( )) + 1) + " " + "likes" );
-                                            infoDataList.get ( position ).setLikes_count ( ((infoDataList.get ( position ).getLikes_count ( )) + 1) );
+                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoList.get ( position ).getLikes_count ( )) + 1) + " " + "likes" );
+                                            infoList.get ( position ).setLikes_count ( ((infoList.get ( position ).getLikes_count ( )) + 1) );
                                         }
 
                                     }
                                 }
 
                                 @Override
-                                public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+                                public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
 
                                     Log.d ( "ResponseF", "" + t );
                                 }
@@ -256,10 +258,10 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
 
                             Log.d ( TAG, "" + jsonObject );
                             ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-                            Call<ArticlesList> call = service.processArticlesUnLikes ( jsonObject );
-                            call.enqueue ( new Callback<ArticlesList> ( ) {
+                            Call<Articles> call = service.processArticlesUnLikes ( jsonObject );
+                            call.enqueue ( new Callback<Articles> ( ) {
                                 @Override
-                                public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+                                public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
                                     // Check if the Response is successful
                                     if (response.isSuccessful ( )) {
@@ -270,8 +272,8 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
                                             likes_count = response.body ( ).getLikes_count ( );
                                             Log.d ( TAG, "Count : " + likes_count );
                                             // ((MyViewHolder) holder).articlelikes.setText((likes_count)+" "+"likes");
-                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoDataList.get ( position ).getLikes_count ( )) - 1) + " " + "likes" );
-                                            infoDataList.get ( position ).setLikes_count ( ((infoDataList.get ( position ).getLikes_count ( )) - 1) );
+                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoList.get ( position ).getLikes_count ( )) - 1) + " " + "likes" );
+                                            infoList.get ( position ).setLikes_count ( ((infoList.get ( position ).getLikes_count ( )) - 1) );
 
                                         }
 
@@ -279,7 +281,7 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
                                 }
 
                                 @Override
-                                public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+                                public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
 
                                     Log.d ( "ResponseF", "" + t );
                                 }
@@ -370,7 +372,7 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
 
         else {
 
-            BannerData.BannerDetails infoData=(BannerData.BannerDetails)items.get(position);
+            Banners.BannerDetails infoData=(Banners.BannerDetails)items.get(position);
 
             Log.d("IMAGES",""+Urls.IMAGE_URL1+infoData.getImage());
 
@@ -402,6 +404,10 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
 
         }
 
+
+
+
+
     }
 
 
@@ -409,32 +415,26 @@ public class ArticleListAdapter1_test extends RecyclerView.Adapter<RecyclerView.
     public int getItemCount() {
 
         return items == null? 0: items.size();
+
     }
+
+
 
     @Override
     public int getItemViewType(int position) {
 
 
-        if (position % 2  == 0) {
-            return items.get(position) instanceof BannerData.BannerDetails ? LOADING : TYPE_ARTICLES;
-        }else {
 
-            return items.get(position) instanceof InfoData ? TYPE_ARTICLES : LOADING;
+        //return (position % 2 == 0) ? LOADING : TYPE_ARTICLES;
+
+        if (position % 2 == 0) {
+            return items.get(position) instanceof Info ? TYPE_ARTICLES : LOADING;
+
+        }else {
+            return items.get(position) instanceof Banners.BannerDetails ? LOADING : TYPE_ARTICLES;
         }
 
-
-       // return position % 5 == 0 ? LOADING : TYPE_ARTICLES;
-        //return items.get (position) instanceof InfoData? TYPE_ARTICLES:LOADING;
-        //return items.get (position) instanceof InfoData? TYPE_ARTICLES:LOADING;
-
-
-
-        //return (position == items.size() - 1 && isLoadingAdded) ? LOADING : TYPE_ARTICLES;
-
-    }
-
-
-
+}
 
 
 

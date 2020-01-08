@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +15,7 @@ import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.adapters.CropsListAdapater;
-import com.novaagritech.agriclinic.modals.CropsData;
+import com.novaagritech.agriclinic.modals.Crops;
 import com.novaagritech.agriclinic.databinding.ActivityCropsCategoriesBinding;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
@@ -36,7 +35,7 @@ public class CropsCategoriesActivity extends AppCompatActivity {
     ProgressDialog pDialog;
     String TAG="CROPS_LIST";
     CropsListAdapater cropsListAdapater;
-    List<CropsData.CropDetails> cropsModalList;
+    List<Crops.CropDetails> cropsModalList;
 
 
     @Override
@@ -64,20 +63,20 @@ public class CropsCategoriesActivity extends AppCompatActivity {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<CropsData> call = service.processCropCategories(jsonObject);
-        call.enqueue(new Callback<CropsData>() {
+        Call<Crops> call = service.processCropCategories(jsonObject);
+        call.enqueue(new Callback<Crops>() {
             @Override
-            public void onResponse(@NonNull Call<CropsData> call, @NonNull Response<CropsData> response) {
+            public void onResponse(@NonNull Call<Crops> call, @NonNull Response<Crops> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    CropsData cropsData = response.body();
+                    Crops crops = response.body();
                     cropsModalList = response.body().getResponse();
 
 
-                    if (cropsData.isStatus()){
+                    if (crops.isStatus()){
                         if (cropsModalList != null&&cropsModalList.size()>0  ) {
                             for (int i = 0; i <cropsModalList.size(); i++) {
                                 Log.d(TAG, "" + cropsModalList.size());
@@ -111,7 +110,7 @@ public class CropsCategoriesActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<CropsData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Crops> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }

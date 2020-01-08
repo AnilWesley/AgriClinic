@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserData implements Serializable {
+public class Users implements Serializable {
 
     @SerializedName("status")
     @Expose

@@ -1,10 +1,10 @@
 package com.novaagritech.agriclinic.app;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
@@ -36,6 +36,7 @@ public class AppSignatureHelper extends ContextWrapper {
             // Get all package signatures for the current package
             String packageName = getPackageName();
             PackageManager packageManager = getPackageManager();
+            @SuppressLint("PackageManagerGetSignatures")
             Signature[] signatures = packageManager.getPackageInfo(packageName,
                     PackageManager.GET_SIGNATURES).signatures;
 
@@ -59,9 +60,7 @@ public class AppSignatureHelper extends ContextWrapper {
         String appInfo = packageName + " " + signature;
         try {
             MessageDigest messageDigest = MessageDigest.getInstance(HASH_TYPE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                messageDigest.update(appInfo.getBytes(StandardCharsets.UTF_8));
-            }
+            messageDigest.update(appInfo.getBytes(StandardCharsets.UTF_8));
             byte[] hashSignature = messageDigest.digest();
 
             // truncated into NUM_HASHED_BYTES

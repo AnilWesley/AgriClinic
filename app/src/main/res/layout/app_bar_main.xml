@@ -78,7 +78,7 @@
         android:layout_gravity="bottom"
         android:orientation="horizontal"
         android:weightSum="4"
-        android:background="@drawable/drop1"
+        android:background="@drawable/drop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

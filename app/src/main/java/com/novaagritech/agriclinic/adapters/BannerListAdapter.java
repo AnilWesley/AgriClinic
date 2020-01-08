@@ -20,14 +20,14 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.modals.BannerData;
+import com.novaagritech.agriclinic.modals.Banners;
 import com.novaagritech.agriclinic.utilities.Urls;
 
 import java.util.List;
 
-public class ArticlesListAdapter3 extends RecyclerView.Adapter<ArticlesListAdapter3.ViewHolder>{
+public class BannerListAdapter extends RecyclerView.Adapter<BannerListAdapter.ViewHolder>{
 
-    private List<BannerData.BannerDetails> dataModelList;
+    private List<Banners.BannerDetails> dataModelList;
     private Context context;
 
 
@@ -41,7 +41,7 @@ public class ArticlesListAdapter3 extends RecyclerView.Adapter<ArticlesListAdapt
 
 
 
-    public ArticlesListAdapter3(Context ctx, List<BannerData.BannerDetails> dataModelList) {
+    public BannerListAdapter(Context ctx, List<Banners.BannerDetails> dataModelList) {
         this.dataModelList = dataModelList;
         this.context = ctx;
 
@@ -72,8 +72,8 @@ public class ArticlesListAdapter3 extends RecyclerView.Adapter<ArticlesListAdapt
 
     @NonNull
     @Override
-    public ArticlesListAdapter3.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-                                                              int viewType) {
+    public BannerListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                           int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.articlelayout_adds,null);
@@ -83,7 +83,7 @@ public class ArticlesListAdapter3 extends RecyclerView.Adapter<ArticlesListAdapt
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        BannerData.BannerDetails infoData=dataModelList.get(position);
+        Banners.BannerDetails infoData=dataModelList.get(position);
 
         Log.d("IMAGES",""+Urls.IMAGE_URL1+infoData.getImage());
 

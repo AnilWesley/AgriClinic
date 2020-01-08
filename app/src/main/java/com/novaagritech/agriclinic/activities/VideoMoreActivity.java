@@ -35,7 +35,7 @@ import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.utilities.Config;
 
-import com.novaagritech.agriclinic.modals.YoutubeVideoModel;
+import com.novaagritech.agriclinic.modals.Video;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,7 +60,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
     int mVideoType;
     String videoid,videoid1,videotitle,videourl,videoTime;
     String url;
-    List<YoutubeVideoModel> youtubeVideoModelArrayList;
+    List<Video> videoArrayList;
     DrawerLayout drawer;
     Toolbar toolbar;
     YoutubeVideoAdapter mAdapter;
@@ -106,7 +106,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
         channelID=intent.getStringExtra("channelID");
         Log.d("channelID",""+channelID);
 
-        youtubeVideoModelArrayList = new ArrayList<>();
+        videoArrayList = new ArrayList<>();
         data(channelID);
 
 
@@ -133,7 +133,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
             public void onResponse(String response) {
 
                 try {
-                    youtubeVideoModelArrayList.clear();
+                    videoArrayList.clear();
                     JSONObject jsonObject = new JSONObject(response);
                     mNextPageToken=jsonObject.getString("nextPageToken");
                     Log.e("TOKEN1",""+mNextPageToken);
@@ -159,7 +159,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
                             e.printStackTrace();
                         }
 
-                        youtubeVideoModelArrayList.add(new YoutubeVideoModel(videoid, videotitle, videourl, niceDateStr));
+                        videoArrayList.add(new Video(videoid, videotitle, videourl, niceDateStr));
 
 
 
@@ -174,7 +174,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
 
                     // create an Object for Adapter
 
-                    mAdapter = new YoutubeVideoAdapter(VideoMoreActivity.this, youtubeVideoModelArrayList,recyclerView);
+                    mAdapter = new YoutubeVideoAdapter(VideoMoreActivity.this, videoArrayList,recyclerView);
 
                     recyclerView.setAdapter(mAdapter);
 
@@ -183,18 +183,18 @@ public class VideoMoreActivity extends YouTubeBaseActivity
                         @Override
                         public void onLoadMore() {
                             //add null , so the mAdapter will check view_type and show progress bar at bottom
-                            youtubeVideoModelArrayList.add(null);
-                            mAdapter.notifyItemInserted(youtubeVideoModelArrayList.size() - 1);
+                            videoArrayList.add(null);
+                            mAdapter.notifyItemInserted(videoArrayList.size() - 1);
 
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     //   remove progress item
-                                    youtubeVideoModelArrayList.remove(youtubeVideoModelArrayList.size() - 1);
-                                    mAdapter.notifyItemRemoved(youtubeVideoModelArrayList.size());
+                                    videoArrayList.remove(videoArrayList.size() - 1);
+                                    mAdapter.notifyItemRemoved(videoArrayList.size());
                                     //add items one by one
 
-                                    int start = youtubeVideoModelArrayList.size();
+                                    int start = videoArrayList.size();
 
                                     int end = start + 7;
 
@@ -225,9 +225,9 @@ public class VideoMoreActivity extends YouTubeBaseActivity
                                             }
 
 
-                                            youtubeVideoModelArrayList.add(new YoutubeVideoModel(videoid, videotitle, videourl, niceDateStr));
+                                            videoArrayList.add(new Video(videoid, videotitle, videourl, niceDateStr));
 
-                                            mAdapter.notifyItemInserted(youtubeVideoModelArrayList.size());
+                                            mAdapter.notifyItemInserted(videoArrayList.size());
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -249,7 +249,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
                         }
                     });
 
-                    if (youtubeVideoModelArrayList.isEmpty()) {
+                    if (videoArrayList.isEmpty()) {
                         recyclerView.setVisibility(View.GONE);
 
 
@@ -260,7 +260,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
 
 
                     mAdapter.notifyDataSetChanged();
-                    videoid1 = youtubeVideoModelArrayList.get(0).getVideoId();
+                    videoid1 = videoArrayList.get(0).getVideoId();
                     Log.e("VideoId",videoid1);
                     player.cueVideo(videoid1);
                     pDialog.dismiss();
@@ -284,7 +284,7 @@ public class VideoMoreActivity extends YouTubeBaseActivity
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                player.loadVideo(youtubeVideoModelArrayList.get(position).getVideoId());
+                player.loadVideo(videoArrayList.get(position).getVideoId());
                 TextView picture=(TextView) view.findViewById(R.id.video_title_label);
                /* index= position;
                 if (index==position){

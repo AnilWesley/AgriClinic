@@ -17,14 +17,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.adapters.ArticleListAdapter1_test;
-import com.novaagritech.agriclinic.adapters.ArticlesListAdapter3;
+import com.novaagritech.agriclinic.adapters.ArticleListAdapter_test;
+import com.novaagritech.agriclinic.adapters.BannerListAdapter;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.FragmentHomeTestBinding;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.BannerData;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Banners;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.modals.Stories1;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
@@ -43,9 +43,9 @@ public class HomeFragment_test extends Fragment {
 
     private ProgressDialog pDialog;
     private static final String TAG = "ArticleListActivity11";
-    //private ArticleListAdapter1 adapter;
-    private ArticleListAdapter1_test articleListAdapterTest;
-    private ArticlesListAdapter3 articlesListAdapter;
+    //private ArticleListAdapterPagination adapter;
+    private ArticleListAdapter_test articleListAdapterTest;
+    private BannerListAdapter articlesListAdapter;
 
     private LinearLayoutManager linearLayoutManager;
 
@@ -57,8 +57,8 @@ public class HomeFragment_test extends Fragment {
     private ApiInterface apiService;
 
 
-    private List<InfoData> articlesDetails;
-    private List<BannerData.BannerDetails> bannerDetails;
+    private List<Info> articlesDetails;
+    private List<Banners.BannerDetails> bannerDetails;
 
 
     private String article_tag="";
@@ -116,7 +116,7 @@ public class HomeFragment_test extends Fragment {
         Intent i = getActivity().getIntent();
 
         article_tag = i.getStringExtra("article_tag");
-       // adapter = new ArticleListAdapter1(getActivity());
+       // adapter = new ArticleListAdapterPagination(getActivity());
 
 
         MyAppPrefsManager myAppPrefsManager = new MyAppPrefsManager(getActivity());
@@ -152,16 +152,16 @@ public class HomeFragment_test extends Fragment {
         //init service and load data
 
         apiService = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        callArticleListApi().enqueue(new Callback<ArticlesList>() {
+        callArticleListApi().enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
                 // Got data. Send it to adapter
 
                 if (response.isSuccessful()) {
                     if (response.code() == 200) {
 
                         assert response.body() != null;
-                        ArticlesList articlesData = response.body();
+                        Articles articlesData = response.body();
                         if (articlesData.isStatus()) {
 
                             articlesDetails = response.body().getResponse();
@@ -182,7 +182,7 @@ public class HomeFragment_test extends Fragment {
                             adapter.addAll(articlesDetails);
 
                             adapter.notifyDataSetChanged();*/
-                            articleListAdapterTest = new ArticleListAdapter1_test (getActivity(),articlesDetails,bannerDetails);
+                            articleListAdapterTest = new ArticleListAdapter_test(getActivity(),articlesDetails,bannerDetails);
                             linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                             binding.articlesRecycle.setLayoutManager(linearLayoutManager);
 
@@ -220,7 +220,7 @@ public class HomeFragment_test extends Fragment {
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+                    public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                         t.printStackTrace();
                         // TODO: 08/11/16 handle failure
                     }
@@ -239,7 +239,7 @@ public class HomeFragment_test extends Fragment {
      * As {@link #currentPage} will be incremented automatically
      * by @{@link PaginationScrollListener} to load next page.
      */
-    private Call<ArticlesList> callArticleListApi() {
+    private Call<Articles> callArticleListApi() {
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("limit", "4");

@@ -19,13 +19,13 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.modals.CropsData;
+import com.novaagritech.agriclinic.modals.Crops;
 
 import java.util.List;
 
 public class CropsListAdapater  extends RecyclerView.Adapter<CropsListAdapater.ViewHolder>{
 
-    private List<CropsData.CropDetails> dataModelList;
+    private List<Crops.CropDetails> dataModelList;
     private Context context;
 
     CropsListAdapater adapter;
@@ -39,7 +39,7 @@ public class CropsListAdapater  extends RecyclerView.Adapter<CropsListAdapater.V
 
     MyAppPrefsManager myAppPrefsManager;
 
-    public  CropsListAdapater( Context ctx,List<CropsData.CropDetails> dataModelList) {
+    public  CropsListAdapater( Context ctx,List<Crops.CropDetails> dataModelList) {
         this.dataModelList = dataModelList;
         context = ctx;
         this.adapter = this; //This is an important line, you need this line to keep track the adapter variable
@@ -69,7 +69,7 @@ public class CropsListAdapater  extends RecyclerView.Adapter<CropsListAdapater.V
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        CropsData.CropDetails cropsModal=dataModelList.get(position);
+        Crops.CropDetails cropsModal=dataModelList.get(position);
         holder.textView.setText(cropsModal.getTitle());
         ImageLoader.getInstance()
                 .displayImage(cropsModal.getImage_url(), holder.imageView, options);

@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArticlesList implements Serializable {
+public class Articles implements Serializable {
 
     @SerializedName("status")
     @Expose
@@ -15,12 +15,12 @@ public class ArticlesList implements Serializable {
 
     @SerializedName("response")
     @Expose
-    private List<InfoData> response = new ArrayList<InfoData>();
+    private List<Info> response = new ArrayList<Info>();
 
 
     @SerializedName("blist")
     @Expose
-    private List<BannerData.BannerDetails> blist = new ArrayList<BannerData.BannerDetails>();
+    private List<Banners.BannerDetails> blist = new ArrayList<Banners.BannerDetails>();
 
     @SerializedName("message")
     @Expose
@@ -41,11 +41,11 @@ public class ArticlesList implements Serializable {
     private Integer likes_count;
 
 
-    public List<BannerData.BannerDetails> getBlist() {
+    public List<Banners.BannerDetails> getBlist() {
         return blist;
     }
 
-    public void setBlist(List<BannerData.BannerDetails> blist) {
+    public void setBlist(List<Banners.BannerDetails> blist) {
         this.blist = blist;
     }
 
@@ -80,11 +80,11 @@ public class ArticlesList implements Serializable {
         this.status = status;
     }
 
-    public List<InfoData> getResponse() {
+    public List<Info> getResponse() {
         return response;
     }
 
-    public void setResponse(List<InfoData> response) {
+    public void setResponse(List<Info> response) {
         this.response = response;
     }
 

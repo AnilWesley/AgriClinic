@@ -3,7 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mSwipeRefreshLayout">
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
@@ -21,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:layout_weight="1"
-                android:background="@drawable/drop1">
+                android:background="@drawable/drop">
 
                 <Spinner
                     android:id="@+id/spinnerMonth"
@@ -38,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:layout_weight="1"
-                android:background="@drawable/drop1">
+                android:background="@drawable/drop">
 
                 <Spinner
                     android:id="@+id/spinnerYear"
@@ -107,4 +110,5 @@
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
 
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>

@@ -1,7 +1,7 @@
 <layout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<androidx.core.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
 
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -80,7 +80,7 @@
                             android:layout_width="150dp"
                             android:layout_height="150dp"
                             android:scaleType="fitXY"
-                            android:id="@+id/imageEmpPhoto"
+                            android:id="@+id/imageViewProfilePic"
                             android:layout_centerInParent="true"
                             android:src="@drawable/ic_account_circle_black_24dp"
                             android:contentDescription="@string/app_name" />
@@ -98,13 +98,13 @@
                             android:orientation="vertical">
 
 
-                        <ImageView
-                            android:id="@+id/imageEmpCamera"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="end"
-                            android:contentDescription="@string/app_name"
-                            android:src="@drawable/ic_camera_alt_black_24dp" />
+                            <ImageView
+                                android:id="@+id/imageEmpCamera"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:contentDescription="@string/app_name"
+                                android:src="@drawable/ic_camera_alt_black_24dp" />
                             <ImageView
                                 android:id="@+id/imageEmGallery"
                                 android:layout_width="wrap_content"
@@ -118,22 +118,39 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_margin="5dp"
                         android:background="#eeeeee" />
 
                     <com.google.android.material.textfield.TextInputLayout
 
                         android:layout_width="match_parent"
+                        android:layout_margin="5dp"
+                        android:visibility="visible"
+                       android:layout_height="wrap_content">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/cropName"
+                            android:hint="@string/enter_crop_name"
+                            android:inputType="textCapCharacters"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="15sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                       android:layout_width="match_parent"
+                        android:layout_margin="5dp"
                         android:layout_height="wrap_content">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:id="@+id/visit_remarks"
+                            android:id="@+id/cropRemarks"
                             android:hint="@string/enter_remarks"
                             android:inputType="textCapCharacters"
                             android:textColor="@color/colorPrimaryDark"
-                            android:textSize="15sp"
-                            android:textStyle="bold"/>
+                            android:textSize="15sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <Button

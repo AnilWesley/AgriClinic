@@ -1,8 +1,10 @@
 package com.novaagritech.agriclinic.adapters;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,11 +23,13 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.constants.ConstantValues;
-import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Info;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -33,7 +37,7 @@ public class NewsAdapter extends RecyclerView.Adapter {
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
 
-    private List<InfoData> newsModalList;
+    private List<Info> newsModalList;
 
     // The minimum amount of items to have below your current scroll position
     // before loading more.
@@ -41,14 +45,14 @@ public class NewsAdapter extends RecyclerView.Adapter {
     private int lastVisibleItem, totalItemCount;
     private boolean loading;
     private OnLoadMoreListener onLoadMoreListener;
-    private Context context;
+    Context context;
 
     private DisplayImageOptions options;
 
     NewsAdapter newsAdapter;
 
-    public NewsAdapter(Context context1, List<InfoData> newsModalList1, RecyclerView recyclerView) {
-        context=context1;
+    public NewsAdapter(Context context1, List<Info> newsModalList1, RecyclerView recyclerView) {
+        this.context=context1;
         this.newsModalList = newsModalList1;
         this.newsAdapter = this; //This is an important line, you need this line to keep track the adapter variable
         options = new DisplayImageOptions.Builder()
@@ -121,14 +125,26 @@ public class NewsAdapter extends RecyclerView.Adapter {
     }
 
     @Override
+    @SuppressLint("SimpleDateFormat")
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof MyViewHolder) {
 
-            InfoData newsModal = (InfoData) newsModalList.get(position);
+            Info newsModal = (Info) newsModalList.get(position);
 
             ((MyViewHolder) holder).tvName.setText(newsModal.getTitle());
-            ((MyViewHolder) holder).tvDate.setText(ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, newsModal.getCreated_on()));
-            //((MyViewHolder) holder).tvDate.setText(articleModal.getCreated_on());
+
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Date date = null;
+            try {
+                date = inputFormat.parse(newsModal.getCreated_on());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String niceDateStr = String.valueOf(DateUtils.getRelativeTimeSpanString(date.getTime(), Calendar.getInstance().getTimeInMillis(), DateUtils.MINUTE_IN_MILLIS));
+
+            ((MyViewHolder)holder).tvDate.setText(niceDateStr);
+            //((MyViewHolder) holder).tvDate.setText(ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, newsModal.getCreated_on()));
 
             ImageLoader.getInstance()
                     .displayImage( newsModal.getImage_url(), ((MyViewHolder) holder).imageView, options, new SimpleImageLoadingListener(){
@@ -197,8 +213,8 @@ public class NewsAdapter extends RecyclerView.Adapter {
 
     //
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvName;
-        public TextView tvDate;
+         TextView tvName;
+         TextView tvDate;
         ImageView imageView;
 
         ProgressBar progressBar;
@@ -206,7 +222,7 @@ public class NewsAdapter extends RecyclerView.Adapter {
 
 
 
-        public MyViewHolder(View v) {
+         MyViewHolder(View v) {
             super(v);
             tvName = (TextView) v.findViewById(R.id.newsTitle);
             tvDate = (TextView) v.findViewById(R.id.newsDate);
@@ -221,7 +237,7 @@ public class NewsAdapter extends RecyclerView.Adapter {
     public static class ProgressViewHolder extends RecyclerView.ViewHolder {
         public ProgressBar progressBar;
 
-        public ProgressViewHolder(View v) {
+         ProgressViewHolder(View v) {
             super(v);
             progressBar = (ProgressBar) v.findViewById(R.id.progressBar1);
         }

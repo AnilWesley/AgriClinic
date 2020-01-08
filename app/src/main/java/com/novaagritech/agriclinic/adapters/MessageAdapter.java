@@ -1,5 +1,6 @@
-package com.novaagritech.agriclinic.comments;
+package com.novaagritech.agriclinic.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 
 
 import com.novaagritech.agriclinic.R;
+import com.novaagritech.agriclinic.modals.Comments;
 
 import java.util.List;
 
@@ -18,11 +20,12 @@ import java.util.List;
  * Created by anil on 21/02/18.
  */
 
-public class MessageAdapter extends ArrayAdapter<FriendlyMessage.CommentDetails> {
-    public MessageAdapter(Context context, int resource, List<FriendlyMessage.CommentDetails> objects) {
+public class MessageAdapter extends ArrayAdapter<Comments.CommentDetails> {
+    public MessageAdapter(Context context, int resource, List<Comments.CommentDetails> objects) {
         super(context, resource, objects);
     }
 
+    @SuppressLint("SetTextI18n")
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -34,7 +37,7 @@ public class MessageAdapter extends ArrayAdapter<FriendlyMessage.CommentDetails>
         TextView messageTextView = (TextView) convertView.findViewById(R.id.messageTextView);
         TextView authorTextView = (TextView) convertView.findViewById(R.id.nameTextView);
 
-        FriendlyMessage.CommentDetails message = getItem(position);
+        Comments.CommentDetails message = getItem(position);
         assert message != null;
         messageTextView.setText(message.getComment());
 

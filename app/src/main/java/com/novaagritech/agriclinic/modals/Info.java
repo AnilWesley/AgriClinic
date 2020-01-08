@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class InfoData implements Serializable {
+public class Info implements Serializable {
 
     @SerializedName("id")
     @Expose
@@ -128,6 +128,45 @@ public class InfoData implements Serializable {
     @SerializedName("privacy_policy")
     @Expose
     private String privacy_policy;
+
+    @SerializedName("remarks")
+    @Expose
+    private String remarks;
+
+    @SerializedName("reply")
+    @Expose
+    private String reply;
+
+
+    @SerializedName("crop_name")
+    @Expose
+    private String crop_name;
+
+
+    public String getCrop_name() {
+        return crop_name;
+    }
+
+    public void setCrop_name(String crop_name) {
+        this.crop_name = crop_name;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getReply() {
+        return reply;
+    }
+
+    public void setReply(String reply) {
+        this.reply = reply;
+    }
 
 
     public String getTerms_conditions() {
@@ -365,7 +404,7 @@ public class InfoData implements Serializable {
     @NonNull
     @Override
     public String toString() {
-        return "InfoData{" +
+        return "Info{" +
                 "id='" + id + '\'' +
                 ", category_id='" + category_id + '\'' +
                 ", sub_category_id='" + sub_category_id + '\'' +

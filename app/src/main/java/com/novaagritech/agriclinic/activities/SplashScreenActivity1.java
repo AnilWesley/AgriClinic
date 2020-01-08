@@ -21,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
@@ -61,22 +60,6 @@ public class SplashScreenActivity1 extends AppCompatActivity {
             }
         }, 3000);
 
-
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        //To do//
-                        String msg = getString(R.string.fcm_token, "");
-                        Log.d(TAG, msg);
-                        return;
-                    }
-
-                    // Get the Instance ID token//
-                    String token = task.getResult().getToken();
-                    String msg = getString(R.string.fcm_token, token);
-                    Log.d(TAG, msg);
-
-                });
 
 
 

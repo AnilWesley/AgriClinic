@@ -2,29 +2,29 @@ package com.novaagritech.agriclinic.app;
 
 import android.graphics.Bitmap;
 
+import androidx.annotation.NonNull;
 import androidx.collection.LruCache;
 
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 
 public class LruBitmapCache extends LruCache<String, Bitmap> implements
         ImageCache {
-	public static int getDefaultLruCacheSize() {
+	private static int getDefaultLruCacheSize() {
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-		final int cacheSize = maxMemory / 8;
 
-		return cacheSize;
+		return (maxMemory / 8);
 	}
 
-	public LruBitmapCache() {
+	LruBitmapCache() {
 		this(getDefaultLruCacheSize());
 	}
 
-	public LruBitmapCache(int sizeInKiloBytes) {
+	private LruBitmapCache(int sizeInKiloBytes) {
 		super(sizeInKiloBytes);
 	}
 
 	@Override
-	protected int sizeOf(String key, Bitmap value) {
+	protected int sizeOf(@NonNull String key, Bitmap value) {
 		return value.getRowBytes() * value.getHeight() / 1024;
 	}
 

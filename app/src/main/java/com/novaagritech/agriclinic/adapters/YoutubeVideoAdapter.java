@@ -3,7 +3,6 @@ package com.novaagritech.agriclinic.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.activities.VideoMoreActivity;
 import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
-import com.novaagritech.agriclinic.modals.YoutubeVideoModel;
+import com.novaagritech.agriclinic.modals.Video;
 
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class YoutubeVideoAdapter extends RecyclerView.Adapter {
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
 
-    private List<YoutubeVideoModel> articleModalList;
+    private List<Video> articleModalList;
 
     // The minimum amount of items to have below your current scroll position
     // before loading more.
@@ -45,7 +44,7 @@ public class YoutubeVideoAdapter extends RecyclerView.Adapter {
     private DisplayImageOptions options;
 
 
-    public YoutubeVideoAdapter(VideoMoreActivity context, List<YoutubeVideoModel> articleModal1List, RecyclerView recyclerView) {
+    public YoutubeVideoAdapter(VideoMoreActivity context, List<Video> articleModal1List, RecyclerView recyclerView) {
         this.context=context;
         articleModalList = articleModal1List;
 
@@ -117,7 +116,7 @@ public class YoutubeVideoAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof MyViewHolder) {
 
-            YoutubeVideoModel articleModal = (YoutubeVideoModel) articleModalList.get(position);
+            Video articleModal = (Video) articleModalList.get(position);
 
             ((MyViewHolder) holder).videoTitle.setText(articleModal.getTitle());
             ((MyViewHolder) holder).videoTime.setText( articleModal.getVideoTime());

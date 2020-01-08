@@ -30,11 +30,12 @@ import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.ActivitySingleEventsBinding;
-import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.SchemesData;
+import com.novaagritech.agriclinic.modals.Home;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -45,7 +46,7 @@ public class SingleEventActivity extends AppCompatActivity {
     String TAG="Articles";
     private ProgressDialog pDialog;
 
-    private List<InfoData> infoDataList;
+    private List<Info> infoList;
 
     private DisplayImageOptions options;
 
@@ -91,7 +92,19 @@ public class SingleEventActivity extends AppCompatActivity {
        getEvents();
 
 
+        binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            infoList = new ArrayList<Info>();
 
+            binding.mSwipeRefreshLayout.post(() -> {
+                        //mSwipeLayout = true;
+
+                        binding.mSwipeRefreshLayout.setRefreshing(true);
+                        getEvents();
+                    }
+            );
+
+        });
+        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
 
 
     }
@@ -117,35 +130,35 @@ public class SingleEventActivity extends AppCompatActivity {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<SchemesData> call = service.processEventsDetails(jsonObject);
-        call.enqueue(new Callback<SchemesData>() {
+        Call<Home> call = service.processEventsDetails(jsonObject);
+        call.enqueue(new Callback<Home>() {
             @Override
-            public void onResponse(@NonNull Call<SchemesData> call, @NonNull retrofit2.Response<SchemesData> response) {
+            public void onResponse(@NonNull Call<Home> call, @NonNull retrofit2.Response<Home> response) {
 
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    SchemesData articlesData = response.body();
-                    infoDataList = response.body().getResponse();
+                    Home articlesData = response.body();
+                    infoList = response.body().getResponse();
 
                     if (articlesData.isStatus()) {
-                        if (infoDataList != null && infoDataList.size() > 0) {
-                            for (int j = 0; j < infoDataList.size(); j++) {
-                                Log.d(TAG, "" + infoDataList.size());
+                        if (infoList != null && infoList.size() > 0) {
+                            for (int j = 0; j < infoList.size(); j++) {
+                                Log.d(TAG, "" + infoList.size());
 
 
-                                binding.textDate.setText("Published on : " + ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT,infoDataList.get(0).getCreated_on()));
-                                binding.textTitle.setText(infoDataList.get(0).getTitle());
-                                binding.textLocation.setText(infoDataList.get(0).getLocation());
-                                binding.textStartTime.setText("Start Date : "+infoDataList.get(0).getStart_date());
-                                binding.textEndTime.setText("End Date : "+infoDataList.get(0).getEnd_date());
+                                binding.textDate.setText("Published on : " + ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, infoList.get(0).getCreated_on()));
+                                binding.textTitle.setText(infoList.get(0).getTitle());
+                                binding.textLocation.setText(infoList.get(0).getLocation());
+                                binding.textStartTime.setText("Start Date : "+ infoList.get(0).getStart_date());
+                                binding.textEndTime.setText("End Date : "+ infoList.get(0).getEnd_date());
 
-                                binding.textDesc.loadDataWithBaseURL(null,infoDataList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
+                                binding.textDesc.loadDataWithBaseURL(null, infoList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
                                 ImageLoader.getInstance()
-                                        .displayImage(infoDataList.get(0).getImage(), binding.textImage, options,new SimpleImageLoadingListener(){
+                                        .displayImage(infoList.get(0).getImage(), binding.textImage, options,new SimpleImageLoadingListener(){
                                             @Override
                                             public void onLoadingStarted(String imageUri, View view) {
                                                 binding.progressBar.setVisibility(View.VISIBLE);
@@ -171,7 +184,7 @@ public class SingleEventActivity extends AppCompatActivity {
 
 
 
-
+                                binding.mSwipeRefreshLayout.setRefreshing(false);
                                 pDialog.dismiss();
                             }
 
@@ -185,7 +198,7 @@ public class SingleEventActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<SchemesData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Home> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }
@@ -213,13 +226,13 @@ public class SingleEventActivity extends AppCompatActivity {
 
                     // shorten the link
                     Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance ( ).createDynamicLink ( )
-                            .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + infoDataList.get ( 0 ).getId ( )+"events" ) )// manually
+                            .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + infoList.get ( 0 ).getId ( )+"events" ) )// manually
                             .setDomainUriPrefix ( "https://agcl.in/a" )
                             .setAndroidParameters ( new DynamicLink.AndroidParameters.Builder ( )
                                     .build ( ) )
                             .setSocialMetaTagParameters ( new DynamicLink.SocialMetaTagParameters.Builder ( )
-                                    .setTitle ( infoDataList.get ( 0 ).getTitle ( ) )
-                                    .setImageUrl(Uri.parse(infoDataList.get(0).getImage()))
+                                    .setTitle ( infoList.get ( 0 ).getTitle ( ) )
+                                    .setImageUrl(Uri.parse(infoList.get(0).getImage()))
 
                                     .setDescription ( getResources ( ).getString ( R.string.access_farmrise_articles1 ) )
                                     .build ( ) )

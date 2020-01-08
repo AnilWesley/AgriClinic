@@ -53,7 +53,7 @@ import com.novaagritech.agriclinic.databinding.ActivityRegistrationBinding;
 import com.novaagritech.agriclinic.interfaces.OtpReceivedInterface;
 import com.novaagritech.agriclinic.location.Constants;
 import com.novaagritech.agriclinic.location.FetchAddressIntentService;
-import com.novaagritech.agriclinic.modals.UserData;
+import com.novaagritech.agriclinic.modals.Users;
 import com.novaagritech.agriclinic.receiver.SmsBroadcastReceiver;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
@@ -84,7 +84,7 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
 
     String user_id;
 
-    private List<UserData.UserDeatils> userDeatilsList;
+    private List<Users.UserDeatils> userDeatilsList;
 
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
@@ -552,17 +552,17 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<UserData> call = service.processRegisterOtp(jsonObject);
-        call.enqueue(new Callback<UserData>() {
+        Call<Users> call = service.processRegisterOtp(jsonObject);
+        call.enqueue(new Callback<Users>() {
             @Override
-            public void onResponse(@NonNull Call<UserData> call, @NonNull retrofit2.Response<UserData> response) {
+            public void onResponse(@NonNull Call<Users> call, @NonNull retrofit2.Response<Users> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
 
 
-                    UserData userData = response.body();
-                    if (userData.isStatus()){
+                    Users users = response.body();
+                    if (users.isStatus()){
                         assert response.body() != null;
                         pDialog.dismiss();
                         userDeatilsList=response.body().getResponse();
@@ -575,7 +575,7 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
                         startSMSListener();
                     }else {
                         pDialog.dismiss();
-                        Toast.makeText(RegistrationActivity.this, ""+userData.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegistrationActivity.this, ""+ users.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -584,7 +584,7 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
             }
 
             @Override
-            public void onFailure(@NonNull Call<UserData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Users> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }
@@ -638,17 +638,17 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
 
             Log.d(TAG,""+jsonObject);
             ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-            Call<UserData> call = service.processRegisterOtp(jsonObject);
-            call.enqueue(new Callback<UserData>() {
+            Call<Users> call = service.processRegisterOtp(jsonObject);
+            call.enqueue(new Callback<Users>() {
                 @Override
-                public void onResponse(@NonNull Call<UserData> call, @NonNull retrofit2.Response<UserData> response) {
+                public void onResponse(@NonNull Call<Users> call, @NonNull retrofit2.Response<Users> response) {
 
                     // Check if the Response is successful
                     if (response.isSuccessful()){
 
 
-                        UserData userData = response.body();
-                        if (userData.isStatus()){
+                        Users users = response.body();
+                        if (users.isStatus()){
                             assert response.body() != null;
 
                             pDialog.dismiss();
@@ -670,14 +670,14 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
                             ConstantValues.IS_USER_LOGGED_IN = myAppPrefsManager.isUserLoggedIn();
                             Toast.makeText(RegistrationActivity.this, "Success", Toast.LENGTH_SHORT).show();
 
-                            Intent intent=new Intent(RegistrationActivity.this,HomeActivity1.class);
+                            Intent intent=new Intent(RegistrationActivity.this, HomeActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
                             finish();
                             pDialog.dismiss();
                         }else {
                             pDialog.dismiss();
-                            Toast.makeText(RegistrationActivity.this, ""+userData.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegistrationActivity.this, ""+ users.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -687,7 +687,7 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<UserData> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<Users> call, @NonNull Throwable t) {
                     pDialog.dismiss();
                     Log.d("ResponseF",""+t);
                 }

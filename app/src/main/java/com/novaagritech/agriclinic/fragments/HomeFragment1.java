@@ -1,11 +1,11 @@
 package com.novaagritech.agriclinic.fragments;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -15,23 +15,34 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.adapters.ArticlesListAdapter3;
-import com.novaagritech.agriclinic.adapters.ArticlesListAdapterTest2;
+import com.novaagritech.agriclinic.adapters.ArticlesListAdapter;
+import com.novaagritech.agriclinic.adapters.BannerListAdapter;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
+import com.novaagritech.agriclinic.app.AppController;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.databinding.FragmentHome1Binding;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.BannerData;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Banners;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.modals.Stories1;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -42,11 +53,11 @@ public class HomeFragment1 extends Fragment {
 
 
 
-    private ProgressDialog pDialog;
+
     private static final String TAG = "ArticleListActivity11";
-    //private ArticleListAdapter1 adapter;
-    private ArticlesListAdapterTest2 articleListAdapterTest;
-    private ArticlesListAdapter3 articlesListAdapter;
+    //private ArticleListAdapterPagination adapter;
+    private ArticlesListAdapter articleListAdapterTest;
+    private BannerListAdapter bannerListAdapter;
 
     private LinearLayoutManager linearLayoutManager;
 
@@ -58,8 +69,8 @@ public class HomeFragment1 extends Fragment {
     private ApiInterface apiService;
 
 
-    private List<InfoData> articlesDetails;
-    private List<BannerData.BannerDetails> bannerDetails;
+    private List<Info> articlesDetails;
+    private List<Banners.BannerDetails> bannerDetails;
 
     private String article_tag="";
     private Stories1 stories;
@@ -105,15 +116,13 @@ public class HomeFragment1 extends Fragment {
 
 
 
-        //list=new ArrayList<>();
+        list=new ArrayList<>();
 
         binding.shimmerViewContainer.startShimmer();
 
 
 
-        pDialog = new ProgressDialog(getActivity());
-       /* pDialog.setMessage("Loading...");
-        pDialog.show();*/
+
 
 
 
@@ -138,7 +147,7 @@ public class HomeFragment1 extends Fragment {
        /* Intent i = getActivity().getIntent();
 
         article_tag = i.getStringExtra("article_tag");*/
-       // adapter = new ArticleListAdapter1(getActivity());
+       // adapter = new ArticleListAdapterPagination(getActivity());
 
 
         MyAppPrefsManager myAppPrefsManager = new MyAppPrefsManager(getActivity());
@@ -153,8 +162,9 @@ public class HomeFragment1 extends Fragment {
 
 
 
+
         //data();
-        //getStories1();
+        getStories1();
 
         loadFirstPage();
 
@@ -163,6 +173,24 @@ public class HomeFragment1 extends Fragment {
 
 
 
+        binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            articlesDetails = new ArrayList<Info>();
+            bannerDetails = new ArrayList<Banners.BannerDetails>();
+
+            binding.mSwipeRefreshLayout.post(() -> {
+                        //mSwipeLayout = true;
+
+                        binding.mSwipeRefreshLayout.setRefreshing(true);
+                        binding.shimmerViewContainer.startShimmer();
+
+                        loadFirstPage();
+
+                        loadBanners();
+                    }
+            );
+
+        });
+        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
 
 
 
@@ -234,33 +262,22 @@ public class HomeFragment1 extends Fragment {
         //init service and load data
 
         apiService = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        callArticleListApi().enqueue(new Callback<ArticlesList>() {
+        callArticleListApi().enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<ArticlesList> call, @NonNull retrofit2.Response<ArticlesList> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull retrofit2.Response<Articles> response) {
                 // Got data. Send it to adapter
 
                 if (response.isSuccessful()) {
                     if (response.code() == 200) {
 
                         assert response.body() != null;
-                        ArticlesList articlesData = response.body();
+                        Articles articlesData = response.body();
                         if (articlesData.isStatus()) {
 
                             articlesDetails = response.body().getResponse();
                             TOTAL_PAGES = response.body().getArticle_pages();
-                            int size = articlesDetails.size();
-                           // Log.d(TAG, "SIZE" + size);
-                           /* linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-                            binding.articlesRecycle.setLayoutManager(linearLayoutManager);
 
-                            binding.articlesRecycle.setItemAnimator(new DefaultItemAnimator());
-                            binding.articlesRecycle.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-
-                            binding.articlesRecycle.setAdapter(adapter);
-                            adapter.addAll(articlesDetails);
-
-                            adapter.notifyDataSetChanged();*/
-                            articleListAdapterTest = new ArticlesListAdapterTest2(getActivity(),articlesDetails);
+                            articleListAdapterTest = new ArticlesListAdapter(getActivity(),articlesDetails);
                             linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                             binding.articlesRecycle.setLayoutManager(linearLayoutManager);
 
@@ -270,13 +287,14 @@ public class HomeFragment1 extends Fragment {
                             binding.articlesRecycle.setAdapter(articleListAdapterTest);
 
                             articleListAdapterTest.notifyDataSetChanged();
-                            pDialog.dismiss();
+
+                            binding.mSwipeRefreshLayout.setRefreshing(false);
                             binding.articlesRecycle.setVisibility(View.VISIBLE);
                             binding.emptyView.setVisibility(View.GONE);
 
 
                         } else {
-                            pDialog.dismiss();
+
                             binding.articlesRecycle.setVisibility(View.GONE);
                             binding.emptyView.setVisibility(View.VISIBLE);
                         }
@@ -298,7 +316,7 @@ public class HomeFragment1 extends Fragment {
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+                    public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
                         t.printStackTrace();
                         // TODO: 08/11/16 handle failure
                     }
@@ -318,16 +336,16 @@ public class HomeFragment1 extends Fragment {
 
         //Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<BannerData> call = service.processBanners1(jsonObject);
-        call.enqueue(new Callback<BannerData>() {
+        Call<Banners> call = service.processBanners1(jsonObject);
+        call.enqueue(new Callback<Banners>() {
             @Override
-            public void onResponse(@NonNull Call<BannerData> call, @NonNull Response<BannerData> response) {
+            public void onResponse(@NonNull Call<Banners> call, @NonNull Response<Banners> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()) {
                     if (response.code() == 200) {
                         assert response.body() != null;
-                        BannerData articlesData1 = response.body();
+                        Banners articlesData1 = response.body();
                         bannerDetails = response.body().getResponse();
 
                         if (articlesData1.isStatus()) {
@@ -336,15 +354,16 @@ public class HomeFragment1 extends Fragment {
                                     //Log.d(TAG, "SIZE" + bannerDetails.size());
 
                                     //get values
-                                    articlesListAdapter = new ArticlesListAdapter3(getActivity(), bannerDetails);
+                                    bannerListAdapter = new BannerListAdapter(getActivity(), bannerDetails);
 
                                     LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
                                     binding.articlesBanners.setLayoutManager(linearLayoutManager1);
 
 
-                                    binding.articlesBanners.setAdapter(articlesListAdapter);
-                                    articlesListAdapter.notifyDataSetChanged();
+                                    binding.articlesBanners.setAdapter(bannerListAdapter);
+                                    bannerListAdapter.notifyDataSetChanged();
 
+                                    binding.mSwipeRefreshLayout.setRefreshing(false);
 
 
 
@@ -364,7 +383,7 @@ public class HomeFragment1 extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<BannerData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Banners> call, @NonNull Throwable t) {
 
                 Log.d("ResponseF",""+t);
             }
@@ -385,7 +404,7 @@ public class HomeFragment1 extends Fragment {
      * As {@link #currentPage} will be incremented automatically
      * by @{@link PaginationScrollListener} to load next page.
      */
-    private Call<ArticlesList> callArticleListApi() {
+    private Call<Articles> callArticleListApi() {
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("limit", "20");
@@ -396,13 +415,13 @@ public class HomeFragment1 extends Fragment {
         jsonObject.addProperty("search_byDate", "");
         jsonObject.addProperty("user_id", user_id);
 
-        Log.d(TAG,"JSONOB"+jsonObject);
+        //Log.d(TAG,"JSONOB"+jsonObject);
 
         return apiService.processArticlesList1(jsonObject);
     }
 
 
-   /* private void getStories1(){
+    private void getStories1(){
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("language_id", "2");
@@ -451,10 +470,10 @@ public class HomeFragment1 extends Fragment {
 
                                             String value1 = innerJObject.getString(key1);
 
-                                            Log.v(TAG+key1, value1);
+                                            Log.v(TAG, value1);
 
                                             JSONObject innerJObject1 = new JSONObject(value1);
-                                            Log.v(TAG+key1, innerJObject1.getString("image_url"));
+
                                             stories=new Stories1(innerJObject1.getString("story_id"),
                                                     innerJObject1.getString("user_id"),
                                                     innerJObject1.getString("image_url"),
@@ -488,12 +507,12 @@ public class HomeFragment1 extends Fragment {
                                 catch (JSONException e)
                                 {   e.printStackTrace();    }
 
-                                pDialog.dismiss();
+
 
                             }
                             else {
-                                //Toast.makeText(VisitorListActivity.this, ""+response.getString("Mssg"), Toast.LENGTH_SHORT).show();
-                                pDialog.dismiss();
+
+                                Log.d(TAG,"MSG");
                             }
 
                         }
@@ -511,7 +530,7 @@ public class HomeFragment1 extends Fragment {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 Toast.makeText(getActivity(), "Try Again...", Toast.LENGTH_SHORT).show();
                 // hide the progress dialog
-                pDialog.dismiss();
+
             }
         }){
             @Override
@@ -534,7 +553,7 @@ public class HomeFragment1 extends Fragment {
             }
 
         };
-        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy (
+        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
                 0,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
@@ -542,7 +561,6 @@ public class HomeFragment1 extends Fragment {
         AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
 
     }
-*/
 
     @Override
     public void onResume() {

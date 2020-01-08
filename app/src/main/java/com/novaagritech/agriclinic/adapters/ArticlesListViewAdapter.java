@@ -25,18 +25,18 @@ import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.utilities.Urls;
 
 import java.util.List;
 
 
 
-public class DataAdapter extends RecyclerView.Adapter {
+public class ArticlesListViewAdapter extends RecyclerView.Adapter {
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
 
-    private List<InfoData> articleModalList;
+    private List<Info> articleModalList;
 
     // The minimum amount of items to have below your current scroll position
     // before loading more.
@@ -49,7 +49,7 @@ public class DataAdapter extends RecyclerView.Adapter {
     private DisplayImageOptions options;
 
 
-    public DataAdapter(ArticlesListActivity context, List<InfoData> articleModal1List, RecyclerView recyclerView) {
+    public ArticlesListViewAdapter(ArticlesListActivity context, List<Info> articleModal1List, RecyclerView recyclerView) {
         this.context=context;
         articleModalList = articleModal1List;
 
@@ -106,7 +106,7 @@ public class DataAdapter extends RecyclerView.Adapter {
         RecyclerView.ViewHolder vh;
         if (viewType == VIEW_ITEM) {
             View v = LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.articlelayout1, parent, false);
+                    R.layout.articlelayoutlist, parent, false);
 
             vh = new MyViewHolder(v);
         } else {
@@ -122,7 +122,7 @@ public class DataAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof MyViewHolder) {
 
-            InfoData articleModal = (InfoData) articleModalList.get(position);
+            Info articleModal = (Info) articleModalList.get(position);
 
             ((MyViewHolder) holder).tvName.setText(articleModal.getTitle());
             ((MyViewHolder) holder).tvDate.setText(ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, articleModal.getCreated_on()));

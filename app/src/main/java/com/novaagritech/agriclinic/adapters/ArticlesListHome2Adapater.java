@@ -21,17 +21,17 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Info;
 
 
 import java.util.List;
 
-public class ArticlesListHomeAdapater extends RecyclerView.Adapter<ArticlesListHomeAdapater.ViewHolder>{
+public class ArticlesListHome2Adapater extends RecyclerView.Adapter<ArticlesListHome2Adapater.ViewHolder>{
 
-    private List<InfoData> dataModelList;
+    private List<Info> dataModelList;
     private Context context;
 
-    ArticlesListHomeAdapater adapter;
+    ArticlesListHome2Adapater adapter;
 
     private DisplayImageOptions options;
 
@@ -42,7 +42,7 @@ public class ArticlesListHomeAdapater extends RecyclerView.Adapter<ArticlesListH
 
 
 
-    public ArticlesListHomeAdapater(Context ctx, List<InfoData> dataModelList) {
+    public ArticlesListHome2Adapater(Context ctx, List<Info> dataModelList) {
         this.dataModelList = dataModelList;
         context = ctx;
         this.adapter = this; //This is an important line, you need this line to keep track the adapter variable
@@ -61,21 +61,21 @@ public class ArticlesListHomeAdapater extends RecyclerView.Adapter<ArticlesListH
 
     @NonNull
     @Override
-    public ArticlesListHomeAdapater.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-                                                                  int viewType) {
+    public ArticlesListHome2Adapater.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                                   int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.articlelayout0,null);
+        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.articlelayouthome2,null);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        InfoData infoData=dataModelList.get(position);
-        holder.textView.setText(infoData.getTitle());
+        Info info =dataModelList.get(position);
+        holder.textView.setText(info.getTitle());
         ImageLoader.getInstance()
-                .displayImage(infoData.getImage_url(), holder.imageView, options,
+                .displayImage(info.getImage_url(), holder.imageView, options,
                         new SimpleImageLoadingListener(){
                             @Override
                             public void onLoadingStarted(String imageUri, View view) {

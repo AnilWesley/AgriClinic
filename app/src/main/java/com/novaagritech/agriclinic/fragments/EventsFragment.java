@@ -1,7 +1,6 @@
 package com.novaagritech.agriclinic.fragments;
 
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,25 +14,21 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.activities.SingleEventActivity;
-import com.novaagritech.agriclinic.activities.SingleNewsActivity;
 import com.novaagritech.agriclinic.adapters.EventsAdapter;
-import com.novaagritech.agriclinic.adapters.NewsAdapter;
 import com.novaagritech.agriclinic.constants.RecyclerItemClickListener;
 import com.novaagritech.agriclinic.databinding.FragmentEventsBinding;
-import com.novaagritech.agriclinic.databinding.FragmentNewsBinding;
 import com.novaagritech.agriclinic.interfaces.OnLoadMoreListener;
-import com.novaagritech.agriclinic.modals.InfoData;
-import com.novaagritech.agriclinic.modals.SchemesData;
+import com.novaagritech.agriclinic.modals.Home;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -45,21 +40,18 @@ import retrofit2.Callback;
  */
 public class EventsFragment extends Fragment {
 
-    private RecyclerView articlesNews;
-    private RecyclerView articlesSchemes;
+
 
     private EventsAdapter mAdapter;
 
-    private List<InfoData> infoDataNews;
-    private List<InfoData> infoDataSchemes;
-    private List<InfoData> infoDataEvents;
+    private List<Info> infoEvents;
 
 
     private String TAG = "News";
 
     private LinearLayoutManager mLayoutManager;
     private Handler handler;
-    private ProgressDialog pDialog;
+
 
     public EventsFragment() {
         // Required empty public constructor
@@ -78,12 +70,23 @@ public class EventsFragment extends Fragment {
         View view = binding.getRoot();
         binding.shimmerViewContainer.startShimmer();
         handler = new Handler();
-        pDialog = new ProgressDialog(getActivity());
-       /* pDialog.setMessage("Loading...");
-        pDialog.show();*/
+
         getEvents();
 
+        binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            infoEvents = new ArrayList<Info>();
 
+            binding.mSwipeRefreshLayout.post(() -> {
+                        //mSwipeLayout = true;
+
+                        binding.mSwipeRefreshLayout.setRefreshing(true);
+                        binding.shimmerViewContainer.startShimmer();
+                        getEvents();
+                    }
+            );
+
+        });
+        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
 
         return view;
     }
@@ -103,19 +106,19 @@ public class EventsFragment extends Fragment {
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<SchemesData> call = service.processEventsList(jsonObject);
-        call.enqueue(new Callback<SchemesData>() {
+        Call<Home> call = service.processEventsList(jsonObject);
+        call.enqueue(new Callback<Home>() {
             @Override
-            public void onResponse(@NonNull Call<SchemesData> call, @NonNull retrofit2.Response<SchemesData> response) {
+            public void onResponse(@NonNull Call<Home> call, @NonNull retrofit2.Response<Home> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
                     Log.d(TAG,""+response.toString());
                     assert response.body() != null;
-                    SchemesData articlesData = response.body();
-                    infoDataEvents = response.body().getResponse();
+                    Home articlesData = response.body();
+                    infoEvents = response.body().getResponse();
 
-                    if (infoDataEvents.isEmpty()) {
+                    if (infoEvents.isEmpty()) {
                         binding.articlesEvents.setVisibility(View.GONE);
                         binding.emptyView.setVisibility(View.VISIBLE);
 
@@ -125,13 +128,13 @@ public class EventsFragment extends Fragment {
                         binding.articlesEvents.setVisibility(View.VISIBLE);
 
                     }
-                    Collections.sort(infoDataEvents, (lhs, rhs) ->
+                    Collections.sort(infoEvents, (lhs, rhs) ->
                             lhs.getStart_date().compareTo(rhs.getStart_date()));
 
                     if (articlesData.isStatus()){
-                        if (infoDataEvents != null&&infoDataEvents.size()>0  ) {
-                            for (int i = 0; i <infoDataEvents.size(); i++) {
-                                Log.d(TAG, "" + infoDataEvents.size());
+                        if (infoEvents != null&& infoEvents.size()>0  ) {
+                            for (int i = 0; i < infoEvents.size(); i++) {
+                                Log.d(TAG, "" + infoEvents.size());
 
 
 
@@ -144,7 +147,7 @@ public class EventsFragment extends Fragment {
                                 binding.articlesEvents.setLayoutManager(mLayoutManager);
 
                                 // create an Object for Adapter
-                                mAdapter = new EventsAdapter(getActivity(), infoDataEvents, binding.articlesEvents);
+                                mAdapter = new EventsAdapter(getActivity(), infoEvents, binding.articlesEvents);
 
                                 // set the adapter object to the Recyclerview
                                 binding.articlesEvents.setAdapter(mAdapter);
@@ -157,14 +160,14 @@ public class EventsFragment extends Fragment {
                                 });
 
 
-                                pDialog.dismiss();
 
+                                binding.mSwipeRefreshLayout.setRefreshing(false);
                                 //set click event
                                 binding.articlesEvents.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), binding.articlesEvents, new RecyclerItemClickListener.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(View view, int position) {
                                         Intent setIntent = new Intent(getActivity(), SingleEventActivity.class);
-                                        setIntent.putExtra("event_id", infoDataEvents.get(position).getId());
+                                        setIntent.putExtra("event_id", infoEvents.get(position).getId());
                                         setIntent.putExtra("title",getResources().getString(R.string.events));
 
                                         setIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -184,7 +187,7 @@ public class EventsFragment extends Fragment {
                         }
 
                     } else {
-                        pDialog.dismiss();
+
                         Toast.makeText(getActivity(), ""+articlesData.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
@@ -195,8 +198,8 @@ public class EventsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<SchemesData> call, @NonNull Throwable t) {
-                pDialog.dismiss();
+            public void onFailure(@NonNull Call<Home> call, @NonNull Throwable t) {
+
                 Log.d("ResponseF",""+t);
             }
         });

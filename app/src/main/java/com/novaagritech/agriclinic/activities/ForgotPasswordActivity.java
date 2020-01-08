@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
-import android.location.Address;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,12 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
 import com.google.android.gms.auth.api.credentials.HintRequest;
@@ -38,24 +31,17 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.app.AppController;
 import com.novaagritech.agriclinic.app.AppSignatureHelper;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 
 import com.novaagritech.agriclinic.databinding.ActivityForgotPasswordBinding;
 import com.novaagritech.agriclinic.interfaces.OtpReceivedInterface;
-import com.novaagritech.agriclinic.modals.UserData;
+import com.novaagritech.agriclinic.modals.Users;
 import com.novaagritech.agriclinic.receiver.SmsBroadcastReceiver;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
-import com.novaagritech.agriclinic.utilities.LocationTrack;
-import com.novaagritech.agriclinic.utilities.Urls;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -77,7 +63,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
     String otp_Num;
     String password,confirmpassword;
 
-    private List<UserData.UserDeatils> userDeatilsList;
+    private List<Users.UserDeatils> userDeatilsList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,17 +135,17 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
 
         Log.d(TAG,""+jsonObject);
         ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-        Call<UserData> call = service.processForgotPassword(jsonObject);
-        call.enqueue(new Callback<UserData>() {
+        Call<Users> call = service.processForgotPassword(jsonObject);
+        call.enqueue(new Callback<Users>() {
             @Override
-            public void onResponse(@NonNull Call<UserData> call, @NonNull retrofit2.Response<UserData> response) {
+            public void onResponse(@NonNull Call<Users> call, @NonNull retrofit2.Response<Users> response) {
 
                 // Check if the Response is successful
                 if (response.isSuccessful()){
 
 
-                    UserData userData = response.body();
-                    if (userData.isStatus()){
+                    Users users = response.body();
+                    if (users.isStatus()){
                         assert response.body() != null;
                         pDialog.dismiss();
                         userDeatilsList=response.body().getResponse();
@@ -174,7 +160,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
 
                     }else {
                         pDialog.dismiss();
-                        Toast.makeText(ForgotPasswordActivity.this, ""+userData.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ForgotPasswordActivity.this, ""+ users.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -183,7 +169,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
             }
 
             @Override
-            public void onFailure(@NonNull Call<UserData> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Users> call, @NonNull Throwable t) {
                 pDialog.dismiss();
                 Log.d("ResponseF",""+t);
             }
@@ -228,17 +214,17 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
 
                 Log.d(TAG,""+jsonObject);
                 ApiInterface service = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
-                Call<UserData> call = service.processUpdatePassword(jsonObject);
-                call.enqueue(new Callback<UserData>() {
+                Call<Users> call = service.processUpdatePassword(jsonObject);
+                call.enqueue(new Callback<Users>() {
                     @Override
-                    public void onResponse(@NonNull Call<UserData> call, @NonNull retrofit2.Response<UserData> response) {
+                    public void onResponse(@NonNull Call<Users> call, @NonNull retrofit2.Response<Users> response) {
 
                         // Check if the Response is successful
                         if (response.isSuccessful()){
 
 
-                            UserData userData = response.body();
-                            if (userData.isStatus()){
+                            Users users = response.body();
+                            if (users.isStatus()){
                                 assert response.body() != null;
 
 
@@ -251,7 +237,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
                                 pDialog.dismiss();
                             }else {
                                 pDialog.dismiss();
-                                Toast.makeText(ForgotPasswordActivity.this, ""+userData.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ForgotPasswordActivity.this, ""+ users.getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
 
@@ -260,7 +246,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements GoogleA
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<UserData> call, @NonNull Throwable t) {
+                    public void onFailure(@NonNull Call<Users> call, @NonNull Throwable t) {
                         pDialog.dismiss();
                         Log.d("ResponseF",""+t);
                     }

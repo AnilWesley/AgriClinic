@@ -25,11 +25,11 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.activities.SingleArticleActivity;
-import com.novaagritech.agriclinic.comments.ChatActivity;
+import com.novaagritech.agriclinic.activities.ChatActivity;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.modals.ArticlesList;
-import com.novaagritech.agriclinic.modals.InfoData;
+import com.novaagritech.agriclinic.modals.Articles;
+import com.novaagritech.agriclinic.modals.Info;
 import com.novaagritech.agriclinic.retrofit.ApiInterface;
 import com.novaagritech.agriclinic.retrofit.RetrofitClientInstance;
 import com.novaagritech.agriclinic.utilities.Urls;
@@ -45,11 +45,11 @@ import retrofit2.Response;
  * Created by Suleiman on 19/10/16.
  */
 
-public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ArticleListAdapterPagination extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ARTICLES = 0;
     private static final int LOADING = 1;
-    private List<InfoData> infoDataList;
+    private List<Info> infoList;
     private Context context;
     private DisplayImageOptions options;
     private boolean isLoadingAdded = false;
@@ -60,9 +60,9 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private static final String TAG = "ArticleListActivity11";
 
-    public ArticleListAdapter1(Context context) {
+    public ArticleListAdapterPagination(Context context) {
         this.context = context;
-        infoDataList = new ArrayList<> ( );
+        infoList = new ArrayList<> ( );
         myAppPrefsManager = new MyAppPrefsManager ( context );
         options = new DisplayImageOptions.Builder ( )
                 .showImageOnLoading ( R.drawable.image_not_available )
@@ -77,12 +77,12 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-    public List<InfoData> getInfoDataList() {
-        return infoDataList;
+    public List<Info> getInfoList() {
+        return infoList;
     }
 
-    public void setInfoDataList(List<InfoData> infoDataList) {
-        this.infoDataList = infoDataList;
+    public void setInfoList(List<Info> infoList) {
+        this.infoList = infoList;
     }
 
     @NonNull
@@ -118,7 +118,7 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
 
         if (holder instanceof MyViewHolder) {
 
-            InfoData articleModal = (InfoData) infoDataList.get ( position );
+            Info articleModal = (Info) infoList.get ( position );
 
             user_id = myAppPrefsManager.getUserId ( );
 
@@ -162,7 +162,7 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
                 @Override
                 public void onClick(View v) {
                     Intent setIntent = new Intent ( context, SingleArticleActivity.class );
-                    setIntent.putExtra ( "article_id", infoDataList.get ( position ).getId ( ) );
+                    setIntent.putExtra ( "article_id", infoList.get ( position ).getId ( ) );
                     setIntent.setFlags ( Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
                     context.startActivity ( setIntent );
                 }
@@ -207,10 +207,10 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
 
                             Log.d ( TAG, "" + jsonObject );
                             ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-                            Call<ArticlesList> call = service.processArticlesLikes ( jsonObject );
-                            call.enqueue ( new Callback<ArticlesList> ( ) {
+                            Call<Articles> call = service.processArticlesLikes ( jsonObject );
+                            call.enqueue ( new Callback<Articles> ( ) {
                                 @Override
-                                public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+                                public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
                                     // Check if the Response is successful
                                     if (response.isSuccessful ( )) {
@@ -221,15 +221,15 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
                                             likes_count = response.body ( ).getLikes_count ( );
                                             Log.d ( TAG, "Count : " + likes_count );
                                             //((MyViewHolder) holder).articlelikes.setText((likes_count)+" "+"likes");
-                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoDataList.get ( position ).getLikes_count ( )) + 1) + " " + "likes" );
-                                            infoDataList.get ( position ).setLikes_count ( ((infoDataList.get ( position ).getLikes_count ( )) + 1) );
+                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoList.get ( position ).getLikes_count ( )) + 1) + " " + "likes" );
+                                            infoList.get ( position ).setLikes_count ( ((infoList.get ( position ).getLikes_count ( )) + 1) );
                                         }
 
                                     }
                                 }
 
                                 @Override
-                                public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+                                public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
 
                                     Log.d ( "ResponseF", "" + t );
                                 }
@@ -250,10 +250,10 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
 
                             Log.d ( TAG, "" + jsonObject );
                             ApiInterface service = RetrofitClientInstance.getRetrofitInstance ( ).create ( ApiInterface.class );
-                            Call<ArticlesList> call = service.processArticlesUnLikes ( jsonObject );
-                            call.enqueue ( new Callback<ArticlesList> ( ) {
+                            Call<Articles> call = service.processArticlesUnLikes ( jsonObject );
+                            call.enqueue ( new Callback<Articles> ( ) {
                                 @Override
-                                public void onResponse(@NonNull Call<ArticlesList> call, @NonNull Response<ArticlesList> response) {
+                                public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
 
                                     // Check if the Response is successful
                                     if (response.isSuccessful ( )) {
@@ -264,8 +264,8 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
                                             likes_count = response.body ( ).getLikes_count ( );
                                             Log.d ( TAG, "Count : " + likes_count );
                                             // ((MyViewHolder) holder).articlelikes.setText((likes_count)+" "+"likes");
-                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoDataList.get ( position ).getLikes_count ( )) - 1) + " " + "likes" );
-                                            infoDataList.get ( position ).setLikes_count ( ((infoDataList.get ( position ).getLikes_count ( )) - 1) );
+                                            ((MyViewHolder) holder).articlelikes.setText ( ((infoList.get ( position ).getLikes_count ( )) - 1) + " " + "likes" );
+                                            infoList.get ( position ).setLikes_count ( ((infoList.get ( position ).getLikes_count ( )) - 1) );
 
                                         }
 
@@ -273,7 +273,7 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
                                 }
 
                                 @Override
-                                public void onFailure(@NonNull Call<ArticlesList> call, @NonNull Throwable t) {
+                                public void onFailure(@NonNull Call<Articles> call, @NonNull Throwable t) {
 
                                     Log.d ( "ResponseF", "" + t );
                                 }
@@ -368,7 +368,7 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemCount() {
-        return infoDataList == null ? 0 : infoDataList.size ( );
+        return infoList == null ? 0 : infoList.size ( );
     }
 
     @Override
@@ -376,7 +376,7 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
-        return (position == infoDataList.size() - 1 && isLoadingAdded) ? LOADING : TYPE_ARTICLES;
+        return (position == infoList.size() - 1 && isLoadingAdded) ? LOADING : TYPE_ARTICLES;
 
     }
 
@@ -386,21 +386,21 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
    _________________________________________________________________________________________________
     */
 
-    private void add(InfoData r) {
-        infoDataList.add ( r );
-        notifyItemInserted ( infoDataList.size ( ) - 1 );
+    private void add(Info r) {
+        infoList.add ( r );
+        notifyItemInserted ( infoList.size ( ) - 1 );
     }
 
-    public void addAll(List<InfoData> moveResults) {
-        for (InfoData result : moveResults) {
+    public void addAll(List<Info> moveResults) {
+        for (Info result : moveResults) {
             add ( result );
         }
     }
 
-    private void remove(InfoData r) {
-        int position = infoDataList.indexOf ( r );
+    private void remove(Info r) {
+        int position = infoList.indexOf ( r );
         if (position > -1) {
-            infoDataList.remove ( position );
+            infoList.remove ( position );
             notifyItemRemoved ( position );
         }
     }
@@ -419,23 +419,23 @@ public class ArticleListAdapter1 extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void addLoadingFooter() {
         isLoadingAdded = true;
-        add ( new InfoData ( ) );
+        add ( new Info( ) );
     }
 
     public void removeLoadingFooter() {
         isLoadingAdded = false;
 
-        int position = infoDataList.size ( ) - 1;
-        InfoData result = getItem ( position );
+        int position = infoList.size ( ) - 1;
+        Info result = getItem ( position );
 
         if (result != null) {
-            infoDataList.remove ( position );
+            infoList.remove ( position );
             notifyItemRemoved ( position );
         }
     }
 
-    private InfoData getItem(int position) {
-        return infoDataList.get ( position );
+    private Info getItem(int position) {
+        return infoList.get ( position );
     }
 
 
