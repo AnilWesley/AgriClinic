@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.JsonObject;
 import com.novaagritech.agriclinic.R;
-import com.novaagritech.agriclinic.adapters.ArticleListAdapter_test;
+import com.novaagritech.agriclinic.adapters.ArticleListAdapter_test1;
 import com.novaagritech.agriclinic.adapters.BannerListAdapter;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
@@ -32,19 +32,20 @@ import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeFragment_test extends Fragment {
+public class HomeFragment_test1 extends Fragment {
 
 
 
     private ProgressDialog pDialog;
     private static final String TAG = "ArticleListActivity11";
     //private ArticleListAdapterPagination adapter;
-    private ArticleListAdapter_test articleListAdapterTest;
+    private ArticleListAdapter_test1 articleListAdapterTest;
     private BannerListAdapter articlesListAdapter;
 
     private LinearLayoutManager linearLayoutManager;
@@ -65,7 +66,7 @@ public class HomeFragment_test extends Fragment {
     private Stories1 stories;
 
 
-    public HomeFragment_test() {
+    public HomeFragment_test1() {
         // Required empty public constructor
     }
 
@@ -113,7 +114,7 @@ public class HomeFragment_test extends Fragment {
 
 
 
-        Intent i = getActivity().getIntent();
+        Intent i = Objects.requireNonNull(getActivity()).getIntent();
 
         article_tag = i.getStringExtra("article_tag");
        // adapter = new ArticleListAdapterPagination(getActivity());
@@ -182,12 +183,15 @@ public class HomeFragment_test extends Fragment {
                             adapter.addAll(articlesDetails);
 
                             adapter.notifyDataSetChanged();*/
-                            articleListAdapterTest = new ArticleListAdapter_test(getActivity(),articlesDetails,bannerDetails);
+                            articleListAdapterTest = new ArticleListAdapter_test1(getActivity(),articlesDetails,bannerDetails);
                             linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                             binding.articlesRecycle.setLayoutManager(linearLayoutManager);
 
                             binding.articlesRecycle.setItemAnimator(new DefaultItemAnimator());
-                            binding.articlesRecycle.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+                            binding.articlesRecycle.addItemDecoration(new DividerItemDecoration(Objects.requireNonNull(getActivity()), DividerItemDecoration.VERTICAL));
+
+
+
 
                             binding.articlesRecycle.setAdapter(articleListAdapterTest);
 

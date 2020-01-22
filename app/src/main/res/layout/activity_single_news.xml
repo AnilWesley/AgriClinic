@@ -78,7 +78,7 @@
 
 
                         <TextView
-                            android:id="@+id/textTitle"
+                            android:id="@+id/textTitle1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="18sp"
@@ -89,7 +89,7 @@
                             android:gravity="center"/>
                     <ImageView
 
-                        android:layout_below="@+id/textTitle"
+                        android:layout_below="@+id/textTitle1"
                         android:id="@+id/textImage"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"

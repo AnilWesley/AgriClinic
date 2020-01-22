@@ -16,16 +16,16 @@
 
         <View
 
-            android:layout_width="0dp"
-            android:layout_height="175dp"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
             android:layout_margin="5dp"
-            android:layout_weight="1"
             android:background="@color/background"
             android:layout_gravity="center"/>
         <View
 
             android:layout_width="40dp"
             android:layout_height="175dp"
+            android:visibility="gone"
             android:layout_margin="5dp"
             android:background="@color/background"
             android:layout_gravity="center"/>

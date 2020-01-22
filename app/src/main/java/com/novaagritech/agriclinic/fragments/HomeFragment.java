@@ -4,7 +4,6 @@ package com.novaagritech.agriclinic.fragments;
 
 
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -21,9 +22,15 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.daimajia.slider.library.Indicators.PagerIndicator;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
+import com.daimajia.slider.library.Transformers.BaseTransformer;
+import com.facebook.shimmer.Shimmer;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.gson.JsonObject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -36,7 +43,8 @@ import com.novaagritech.agriclinic.adapters.BannerListAdapter;
 import com.novaagritech.agriclinic.adapters.MyAdapter;
 import com.novaagritech.agriclinic.adapters.StoryAdapter;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
-import com.novaagritech.agriclinic.databinding.FragmentHome1Binding;
+
+
 import com.novaagritech.agriclinic.modals.Articles;
 import com.novaagritech.agriclinic.modals.Banners;
 import com.novaagritech.agriclinic.modals.Info;
@@ -47,18 +55,17 @@ import com.novaagritech.agriclinic.utilities.PaginationScrollListener;
 import com.novaagritech.agriclinic.utilities.Urls;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import me.relex.circleindicator.CircleIndicator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeFragment1 extends Fragment {
+public class HomeFragment extends Fragment {
 
 
 
@@ -79,9 +86,9 @@ public class HomeFragment1 extends Fragment {
 
 
     private List<Info> articlesDetails;
-    private List<Banners.BannerDetails> bannerDetails;
-
-    private String article_tag="";
+    private SliderLayout sliderLayout;
+    private PagerIndicator pagerIndicator;
+    private List<Banners.BannerDetails> bannerDetailsList;
     private Stories1 stories;
     private LinearLayoutManager linearLayoutManager1;
 
@@ -90,36 +97,29 @@ public class HomeFragment1 extends Fragment {
     private static int currentPage1 = 0;
 
 
-    public HomeFragment1() {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
 
-    private String user_id,selected;
+    private String user_id;
     private StoryAdapter mAdapter;
 
     String token;
     private LinearLayoutManager mLayoutManager,mLayoutManager1;
 
 
-    private FragmentHome1Binding binding;
+
+    private View view1;
 
 
-    private List<Stories1> list;
-    private List<String> crops;
     private String name;
-    private DisplayImageOptions options;
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final Runnable SCROLLING_RUNNABLE = new Runnable() {
+    private ShimmerFrameLayout shimmer;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView articlesRecycle;
+    private TextView emptyView;
 
-        @Override
-        public void run() {
-            int pixelsToMove = 25;
-            binding.articlesBanners.smoothScrollBy(pixelsToMove, 0);
-            int duration = 5;
-            mHandler.postDelayed(this, duration);
-        }
-    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,28 +131,33 @@ public class HomeFragment1 extends Fragment {
 
         // Inflate the layout for this fragment
 
-        binding = DataBindingUtil.inflate(
-                inflater, R.layout.fragment_home1, container, false);
-        View view = binding.getRoot();
-        crops=new ArrayList<>();
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        shimmer=view.findViewById(R.id.shimmer_view_container);
+        swipeRefreshLayout=view.findViewById(R.id.mSwipeRefreshLayout);
+        articlesRecycle=view.findViewById(R.id.articlesRecycle);
+        emptyView=view.findViewById(R.id.emptyView);
+        view1=view.findViewById(R.id.view1);
+        sliderLayout = (SliderLayout) view.findViewById(R.id.banner_slider1);
+        pagerIndicator = (PagerIndicator)view. findViewById(R.id.banner_slider_indicator);
+
+        List<String> crops = new ArrayList<>();
 
 
-        options = new DisplayImageOptions.Builder ( )
-                .showImageOnLoading ( R.drawable.image_not_available )
-                .showImageForEmptyUri ( R.drawable.image_not_available )
-                .showImageOnFail ( R.drawable.image_not_available )
-                .cacheInMemory ( true )
-                .cacheOnDisk ( true )
-                .considerExifParams ( true )
-                .bitmapConfig ( Bitmap.Config.RGB_565 )
-                .displayer ( new RoundedBitmapDisplayer( 20 ) )
-                .build ( );
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.image_not_available)
+                .showImageForEmptyUri(R.drawable.image_not_available)
+                .showImageOnFail(R.drawable.image_not_available)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .displayer(new RoundedBitmapDisplayer(20))
+                .build();
 
 
+        List<Stories1> list = new ArrayList<>();
 
-        list=new ArrayList<>();
-
-        binding.shimmerViewContainer.startShimmer();
+        shimmer.startShimmer();
 
 
 
@@ -191,7 +196,7 @@ public class HomeFragment1 extends Fragment {
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        selected= ""+ currentYear +"-"+ currentMonth;
+        String selected = "" + currentYear + "-" + currentMonth;
 
 
 
@@ -202,30 +207,31 @@ public class HomeFragment1 extends Fragment {
         //getStories1();
 
         loadFirstPage();
-
-        loadBanners();
-
+        getBanners();
 
 
 
-        binding.mSwipeRefreshLayout.setOnRefreshListener(() -> {
+
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
             articlesDetails = new ArrayList<Info>();
-            bannerDetails = new ArrayList<Banners.BannerDetails>();
+            bannerDetailsList = new ArrayList<Banners.BannerDetails>();
 
-            binding.mSwipeRefreshLayout.post(() -> {
+            swipeRefreshLayout.post(() -> {
                         //mSwipeLayout = true;
 
-                        binding.mSwipeRefreshLayout.setRefreshing(true);
-                        binding.shimmerViewContainer.startShimmer();
+                        swipeRefreshLayout.setRefreshing(true);
+                        shimmer.startShimmer();
 
+                        //getBanners();
                         loadFirstPage();
 
-                        //loadBanners();
+
                     }
             );
 
         });
-        binding.mSwipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
+        swipeRefreshLayout.setColorSchemeResources(R.color.green,R.color.red,R.color.blue);
 
 
 
@@ -299,7 +305,7 @@ public class HomeFragment1 extends Fragment {
         apiService = RetrofitClientInstance.getRetrofitInstance().create(ApiInterface.class);
         callArticleListApi().enqueue(new Callback<Articles>() {
             @Override
-            public void onResponse(@NonNull Call<Articles> call, @NonNull retrofit2.Response<Articles> response) {
+            public void onResponse(@NonNull Call<Articles> call, @NonNull Response<Articles> response) {
                 // Got data. Send it to adapter
 
                 if (response.isSuccessful()) {
@@ -314,24 +320,24 @@ public class HomeFragment1 extends Fragment {
 
                             articleListAdapterTest = new ArticlesListAdapter(getActivity(),articlesDetails);
                             linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-                            binding.articlesRecycle.setLayoutManager(linearLayoutManager);
+                            articlesRecycle.setLayoutManager(linearLayoutManager);
 
-                            binding.articlesRecycle.setItemAnimator(new DefaultItemAnimator());
-                            binding.articlesRecycle.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+                            articlesRecycle.setItemAnimator(new DefaultItemAnimator());
+                            articlesRecycle.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
 
-                            binding.articlesRecycle.setAdapter(articleListAdapterTest);
+                            articlesRecycle.setAdapter(articleListAdapterTest);
 
                             articleListAdapterTest.notifyDataSetChanged();
 
-                            binding.mSwipeRefreshLayout.setRefreshing(false);
-                            binding.articlesRecycle.setVisibility(View.VISIBLE);
-                            binding.emptyView.setVisibility(View.GONE);
+                            swipeRefreshLayout.setRefreshing(false);
+                            articlesRecycle.setVisibility(View.VISIBLE);
+                            emptyView.setVisibility(View.GONE);
 
 
                         } else {
 
-                            binding.articlesRecycle.setVisibility(View.GONE);
-                            binding.emptyView.setVisibility(View.VISIBLE);
+                            articlesRecycle.setVisibility(View.GONE);
+                            emptyView.setVisibility(View.VISIBLE);
                         }
 
 
@@ -343,8 +349,9 @@ public class HomeFragment1 extends Fragment {
                         }*/
                     }
                     // Stopping Shimmer Effect's animation after data is loaded to ListView
-                    binding.shimmerViewContainer.stopShimmer();
-                    binding.shimmerViewContainer.setVisibility(View.GONE);
+                    view1.setVisibility(View.VISIBLE);
+                    shimmer.stopShimmer();
+                    shimmer.setVisibility(View.GONE);
                 }
 
 
@@ -360,7 +367,10 @@ public class HomeFragment1 extends Fragment {
 
     }
 
-    private void loadBanners() {
+
+    private void getBanners() {
+
+
 
 
 
@@ -374,124 +384,34 @@ public class HomeFragment1 extends Fragment {
         Call<Banners> call = service.processBanners1(jsonObject);
         call.enqueue(new Callback<Banners>() {
             @Override
-            public void onResponse(@NonNull Call<Banners> call, @NonNull Response<Banners> response) {
+            public void onResponse(@NonNull Call<Banners> call, @NonNull retrofit2.Response<Banners> response) {
 
                 // Check if the Response is successful
-                if (response.isSuccessful()) {
-                    if (response.code() == 200) {
-                        assert response.body() != null;
-                        Banners articlesData1 = response.body();
-                        bannerDetails = response.body().getResponse();
+                if (response.isSuccessful()){
+                    //Log.d(TAG,""+response.toString());
+                    assert response.body() != null;
+                    Banners banners = response.body();
+                    bannerDetailsList = response.body().getResponse();
 
 
-                        if (articlesData1.isStatus()) {
-
-                            binding.pager.setAdapter(new MyAdapter(getActivity(),bannerDetails));
-
-
-
-                            //Necessary or the pager will only have one extra page to show
-                            // make this at least however many pages you can see
-                            binding.pager.setOffscreenPageLimit(bannerDetails.size());
-                            //A little space between pages
-                            binding.pager.setPageMargin(15);
-
-                            //If hardware acceleration is enabled, you should also remove
-                            // clipping on the pager for its children.
-                            binding.pager.setClipChildren(true);
-
-                            binding.indicator.setViewPager(binding.pager);
-
-                            // Auto start of viewpager
-                            final Handler handler = new Handler();
-                            final Runnable Update = () -> {
-                                if (currentPage1 == bannerDetails.size()) {
-                                    currentPage1 = 0;
-                                }
-                                binding.pager.setCurrentItem(currentPage1++, true);
-                            };
-                            Timer swipeTimer = new Timer();
-                            swipeTimer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    handler.post(Update);
-                                }
-                            }, 0,4000);
-
-
-
-                            if (bannerDetails != null && bannerDetails.size() > 0) {
-                                for (int i = 0; i < bannerDetails.size(); i++) {
-                                    //Log.d(TAG, "SIZE" + bannerDetails.size());
-
-                                    //get values
-                                    bannerListAdapter = new BannerListAdapter(getActivity(), bannerDetails);
-
-                                    linearLayoutManager1 = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
-                                    binding.articlesBanners.setLayoutManager(linearLayoutManager1);
-
-
-                                    binding.articlesBanners.setAdapter(bannerListAdapter);
-                                    bannerListAdapter.notifyDataSetChanged();
-
-                                    binding.mSwipeRefreshLayout.setRefreshing(false);
-
-                                    Log.d("IMAGEURL",""+bannerDetails.get(i).getImage_url());
-
-                                    //viewFlipper(Integer.parseInt(bannerDetails.get(i).getImage_url()));
-
-                                  String []im=new String[]{bannerDetails.get(i).getImage_url()};
-
-                                    for(String url: im){
-                                        ImageView image = new ImageView(getActivity());
-
-
-                                        ImageLoader.getInstance ( )
-                                                .displayImage (url, image, options);
-
-
-                                        binding.viewfliper.addView(image);
-                                    }
-
-                                    binding.viewfliper.setAutoStart(true);
-                                    binding.viewfliper.setFlipInterval(3000);
-                                    binding.viewfliper.startFlipping();
-                                    binding.viewfliper.setInAnimation(getActivity(),android.R.anim.slide_in_left);
-                                    binding.viewfliper.setOutAnimation(getActivity(),android.R.anim.slide_out_right);
-
-
-
-
-                                }
+                    if (banners.isStatus()){
+                        if (bannerDetailsList != null&&bannerDetailsList.size()>0  ) {
+                            for (int i = 0; i <bannerDetailsList.size(); i++) {
+                                Log.d(TAG, "" + bannerDetailsList.size());
 
 
                             }
+                            setupBannerSlider(bannerDetailsList);
+                            //get values
+
                         }
-
-
+                    } else {
+                        Toast.makeText(getActivity(), ""+ banners.getMessage(), Toast.LENGTH_SHORT).show();
                     }
+
+
+
                 }
-                // Stopping Shimmer Effect's animation after data is loaded to ListView
-                binding.shimmerViewContainer.stopShimmer();
-                binding.shimmerViewContainer.setVisibility(View.GONE);
-
-                binding.articlesBanners.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        int lastItem = linearLayoutManager1.findLastCompletelyVisibleItemPosition();
-                        if(lastItem == linearLayoutManager1.getItemCount()-1){
-                            mHandler.removeCallbacks(SCROLLING_RUNNABLE);
-                            Handler postHandler = new Handler();
-                            postHandler.postDelayed(() -> {
-                                binding.articlesBanners.setAdapter(null);
-                                binding.articlesBanners.setAdapter(bannerListAdapter);
-                                mHandler.postDelayed(SCROLLING_RUNNABLE, 1000);
-                            }, 1000);
-                        }
-                    }
-                });
-                mHandler.postDelayed(SCROLLING_RUNNABLE, 1000);
             }
 
             @Override
@@ -502,6 +422,91 @@ public class HomeFragment1 extends Fragment {
         });
 
 
+
+
+    }
+
+
+
+
+    private void setupBannerSlider(final List<Banners.BannerDetails> bannerImages) {
+
+
+        // Initialize new LinkedHashMap<ImageName, ImagePath>
+        //final LinkedHashMap<String, String> slider_covers = new LinkedHashMap<>();
+
+        HashMap<String,String> slider_covers = new HashMap<String, String>();
+        //Log.e(TAG,"BANNERSIZE"+bannerImages.size());
+
+
+
+        for (int i=0;  i< bannerImages.size();  i++) {
+            // Get bannerDetails at given Position from bannerImages List
+            Banners.BannerDetails bannerData = bannerImages.get(i);
+
+            // Put Image's Name and URL to the HashMap slider_covers
+            slider_covers.put
+                    (
+
+                            bannerData.getId(), bannerData.getImage_url()
+                    );
+
+
+
+
+
+        }
+
+        //Log.d(TAG,"BANNER1"+slider_covers.size());
+
+
+
+        for(String name : slider_covers.keySet()) {
+            // Initialize DefaultSliderView
+            final DefaultSliderView defaultSliderView = new DefaultSliderView(getContext());
+
+
+
+
+            // Set Attributes(Name, Image, Type etc) to DefaultSliderView
+            defaultSliderView
+                    .description(name)
+                    .empty(R.drawable.image_not_available)
+                    .error(R.drawable.image_not_available)
+                    .image(slider_covers.get(name))
+                    .setScaleType(BaseSliderView.ScaleType.Fit);
+
+
+
+
+            // Add DefaultSliderView to the SliderLayout
+            sliderLayout.addSlider(defaultSliderView);
+
+
+        }
+
+        // Set PresetTransformer type of the SliderLayout
+        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Accordion);
+
+
+        // Check if the size of Images in the Slider is less than 2
+        if (slider_covers.size() < 2) {
+            // Disable PagerTransformer
+            sliderLayout.setPagerTransformer(false, new BaseTransformer() {
+                @Override
+                protected void onTransform(View view, float v) {
+                }
+            });
+
+            // Hide Slider PagerIndicator
+            sliderLayout.setIndicatorVisibility(PagerIndicator.IndicatorVisibility.Invisible);
+
+        } else {
+            // Set custom PagerIndicator to the SliderLayout
+            sliderLayout.setCustomIndicator(pagerIndicator);
+            // Make PagerIndicator Visible
+            sliderLayout.setIndicatorVisibility(PagerIndicator.IndicatorVisibility.Visible);
+        }
 
 
 
@@ -526,6 +531,7 @@ public class HomeFragment1 extends Fragment {
         jsonObject.addProperty("language_id", "2");
         jsonObject.addProperty("crop_id", "");
         jsonObject.addProperty("page", currentPage);
+        String article_tag = "";
         jsonObject.addProperty("search_value", article_tag);
         jsonObject.addProperty("search_byDate", "");
         jsonObject.addProperty("user_id", user_id);
@@ -680,13 +686,13 @@ public class HomeFragment1 extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        binding.shimmerViewContainer.startShimmer();
+        shimmer.startShimmer();
     }
 
     @Override
     public void onPause() {
-        binding.shimmerViewContainer.stopShimmer();
         super.onPause();
+        shimmer.stopShimmer();
     }
 
 

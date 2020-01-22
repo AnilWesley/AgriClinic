@@ -55,7 +55,7 @@ import com.novaagritech.agriclinic.fragments.AboutFragment;
 import com.novaagritech.agriclinic.fragments.EventsFragment;
 import com.novaagritech.agriclinic.fragments.HelpCropFragment;
 import com.novaagritech.agriclinic.fragments.HelpFragment;
-import com.novaagritech.agriclinic.fragments.HomeFragment1;
+import com.novaagritech.agriclinic.fragments.HomeFragment_test1;
 import com.novaagritech.agriclinic.fragments.NewsFragment;
 import com.novaagritech.agriclinic.fragments.SchemesFragment;
 import com.novaagritech.agriclinic.fragments.SearchMArticlesFragment;
@@ -80,8 +80,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     boolean doubleBackToExitPressedOnce = false;
 
-    final Fragment homeFragment1 = new HomeFragment1();
-    //final Fragment homeFragment1 = new HomeFragment_test();
+    //final Fragment homeFragment1 = new HomeFragment();
+    final Fragment homeFragment1 = new HomeFragment_test1();
     final Fragment newsFragment = new NewsFragment();
     final Fragment schemesFragment = new SchemesFragment();
     final Fragment eventsFragment = new EventsFragment();
@@ -871,7 +871,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 // again" prompts). Therefore, a user interface affordance is typically implemented
                 // when permissions are denied. Otherwise, your app could appear unresponsive to
                 // touches or interactions which have required permissions.
-                showSnackbar(R.string.permission_denied_explanation, R.string.settings,
+                showSnackbar(R.string.permission_denied_explanation,
+                        R.string.settings,
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {

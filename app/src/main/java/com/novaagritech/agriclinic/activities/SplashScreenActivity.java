@@ -24,6 +24,7 @@ import com.novaagritech.agriclinic.R;
 import com.novaagritech.agriclinic.constants.ConstantValues;
 import com.novaagritech.agriclinic.constants.MyAppPrefsManager;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,12 +60,6 @@ public class SplashScreenActivity extends AppCompatActivity {
                 LaunchApp();
             }
         }, 3000);
-
-
-
-
-
-
 
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(task -> {

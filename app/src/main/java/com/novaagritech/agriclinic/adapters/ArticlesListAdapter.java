@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -316,7 +317,7 @@ public class ArticlesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                     .addOnCompleteListener ((Activity) context, (OnCompleteListener<ShortDynamicLink>) task -> {
                                         if (task.isSuccessful ( )) {
                                             // Short link created
-                                            Uri shortLink = task.getResult ( ).getShortLink ( );
+                                            Uri shortLink = Objects.requireNonNull(task.getResult()).getShortLink ( );
                                             Uri flowchartLink = task.getResult ( ).getPreviewLink ( );
                                             Log.e ( "main ", "substring1 " + shortLink );
                                             Log.e ( "main ", "substring1 " + flowchartLink );
@@ -325,6 +326,7 @@ public class ArticlesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                             Intent intent = new Intent ( );
                                             intent.setAction ( Intent.ACTION_SEND );
 
+                                            assert shortLink != null;
                                             intent.putExtra ( Intent.EXTRA_TEXT, shortLink.toString ( ) );
                                             intent.putExtra("title","articles");
                                             intent.setType ( "text/plain" );

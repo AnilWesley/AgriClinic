@@ -143,6 +143,44 @@ public class Info implements Serializable {
     private String crop_name;
 
 
+
+    @SerializedName("user_type")
+    @Expose
+    private String user_type;
+
+    @SerializedName("role_user_id")
+    @Expose
+    private String role_user_id;
+
+    @SerializedName("language_type")
+    @Expose
+    private String language_type;
+
+
+    public String getUser_type() {
+        return user_type;
+    }
+
+    public void setUser_type(String user_type) {
+        this.user_type = user_type;
+    }
+
+    public String getRole_user_id() {
+        return role_user_id;
+    }
+
+    public void setRole_user_id(String role_user_id) {
+        this.role_user_id = role_user_id;
+    }
+
+    public String getLanguage_type() {
+        return language_type;
+    }
+
+    public void setLanguage_type(String language_type) {
+        this.language_type = language_type;
+    }
+
     public String getCrop_name() {
         return crop_name;
     }

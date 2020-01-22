@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-
-    xmlns:tools="http://schemas.android.com/tools">
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/mSwipeRefreshLayout">
@@ -71,66 +70,42 @@
             android:background="@color/quantum_grey"/>-->
 
 
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_margin="5dp"
-            android:layout_height="match_parent">
-            <com.novaagritech.agriclinic.utilities.PagerContainer
-                android:id="@+id/pager_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/pager"
-                android:layout_width="match_parent"
-                android:layout_height="180dp" />
-            </com.novaagritech.agriclinic.utilities.PagerContainer>
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_margin="5dp">
 
+            <com.daimajia.slider.library.SliderLayout
+                android:id="@+id/banner_slider1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
-            <me.relex.circleindicator.CircleIndicator
-                android:id="@+id/indicator"
-                app:ci_drawable="@drawable/circle"
-                android:layout_alignParentBottom="true"
+            <com.daimajia.slider.library.Indicators.PagerIndicator
+                android:id="@+id/banner_slider_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:selected_color="@color/colorPrimary"
+                app:unselected_color="@color/windowBackground"
                 android:layout_centerHorizontal="true"
-                android:gravity="bottom"
-                android:layout_width="match_parent"
-                android:layout_height="32dp" />
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="4dp"
+                style="@style/AndroidImageSlider_Indicator" />
+
         </RelativeLayout>
 
 
 
-        <ViewFlipper
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_margin="5dp"
-            android:visibility="gone"
-            android:id="@+id/viewfliper"/>
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:visibility="gone"
-            android:layout_margin="5dp"
-            android:background="@color/quantum_grey"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/articlesBanners"
-            android:layout_width="match_parent"
-            android:layout_margin="5dp"
-            android:visibility="gone"
-            android:padding="3dp"
-            app:reverseLayout="true"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
-
-
-
-
-        <View
+            android:id="@+id/view1"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_margin="5dp"
-            android:padding="3dp"
-            android:visibility="visible"
+            android:visibility="gone"
             android:background="@color/quantum_grey400"/>
 
 
@@ -157,5 +132,4 @@
 
 </androidx.core.widget.NestedScrollView>
 </RelativeLayout>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-</layout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -155,7 +155,13 @@ public class SingleEventActivity extends AppCompatActivity {
                                 binding.textStartTime.setText("Start Date : "+ infoList.get(0).getStart_date());
                                 binding.textEndTime.setText("End Date : "+ infoList.get(0).getEnd_date());
 
-                                binding.textDesc.loadDataWithBaseURL(null, infoList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
+                                //Font must be placed in assets/fonts folder
+                                String text = "<html><style type='text/css'>@font-face { font-family: Mandali-Regular; src: url('fonts/Mandali-Regular.ttf'); } body p {font-family: Mandali-Regular;}</style>"
+                                        + "<body >" + "<p align=\"justify\" style=\"font-size: 24px; font-family: Mandali-Regular;\">" + infoList.get(0).getDescription() + "</p> "+ "</body></html>";
+
+                                binding.textDesc.loadDataWithBaseURL("file:///android_asset/",text,"text/html","utf-8",null);
+
+                                //binding.textDesc.loadDataWithBaseURL(null, infoList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
                                 ImageLoader.getInstance()
                                         .displayImage(infoList.get(0).getImage(), binding.textImage, options,new SimpleImageLoadingListener(){

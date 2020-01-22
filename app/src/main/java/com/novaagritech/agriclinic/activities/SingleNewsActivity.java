@@ -145,7 +145,7 @@ public class SingleNewsActivity extends AppCompatActivity {
 
 
                                 binding.textDate.setText("Published on : " + ConstantValues.getFormattedDate(MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, infoList.get(0).getCreated_on()));
-                                binding.textTitle.setText(infoList.get(0).getTitle());
+                                binding.textTitle1.setText(infoList.get(0).getTitle());
 
                               /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
@@ -156,7 +156,13 @@ public class SingleNewsActivity extends AppCompatActivity {
 
                                 }*/
 
-                                binding.textDesc.loadDataWithBaseURL(null, infoList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
+                                //Font must be placed in assets/fonts folder
+                                String text = "<html><style type='text/css'>@font-face { font-family: Mandali-Regular; src: url('fonts/Mandali-Regular.ttf'); } body p {font-family: Mandali-Regular;}</style>"
+                                        + "<body >" + "<p align=\"justify\" style=\"font-size: 24px; font-family: Mandali-Regular;\">" + infoList.get(0).getDescription() + "</p> "+ "</body></html>";
+
+                                binding.textDesc.loadDataWithBaseURL("file:///android_asset/",text,"text/html","utf-8",null);
+
+                               // binding.textDesc.loadDataWithBaseURL(null, infoList.get(0).getDescription(), "text/html; charset=utf-8", "UTF-8",null);
 
                                 ImageLoader.getInstance()
                                         .displayImage(infoList.get(0).getImage(), binding.textImage, options,new SimpleImageLoadingListener(){

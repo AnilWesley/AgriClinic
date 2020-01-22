@@ -1,9 +1,11 @@
 package com.novaagritech.agriclinic.adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,11 @@ import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.google.gson.JsonObject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -36,6 +43,7 @@ import com.novaagritech.agriclinic.utilities.Urls;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -293,23 +301,56 @@ public class ArticleListAdapterPagination extends RecyclerView.Adapter<RecyclerV
 
                     // Check if the User is Authenticated
                     if (ConstantValues.IS_USER_LOGGED_IN) {
-
-                        //ConstantValues.shareDeepLink1(context, String.format(context.getResources().getString(R.string.access_farmrise_articles), articleModal.getTitle()));
-
                         try {
-                            String shareMessage;
-                            shareMessage = context.getResources ( ).getString ( R.string.access_farmrise_articles1 ) + "\n" + articleModal.getTitle ( );
-                            Intent shareIntent = new Intent ( Intent.ACTION_SEND );
-                            shareIntent.setType ( "text/plain" );
 
-                            shareIntent.putExtra ( Intent.EXTRA_TEXT, shareMessage );
-                            context.startActivity ( Intent.createChooser ( shareIntent, "choose one" ) );
+
+                            // shorten the link
+                            Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance ( ).createDynamicLink ( )
+                                    .setLink ( Uri.parse ( "https://agriclinic.org/viewcontent.php?id=" + articleModal.getId ( )+ "articles" ) )// manually
+                                    .setDomainUriPrefix ( "https://agcl.in/a")
+                                    .setAndroidParameters ( new DynamicLink.AndroidParameters.Builder ( )
+                                            .build ( ) )
+                                    .setSocialMetaTagParameters ( new DynamicLink.SocialMetaTagParameters.Builder ( )
+                                            .setTitle ( articleModal.getTitle ( ) )
+                                            .setDescription ( context.getResources ( ).getString ( R.string.access_farmrise_articles1 ) )
+                                            .build ( ) )
+                                    .buildShortDynamicLink ( ShortDynamicLink.Suffix.SHORT )
+                                    .addOnCompleteListener ((Activity) context, (OnCompleteListener<ShortDynamicLink>) task -> {
+                                        if (task.isSuccessful ( )) {
+                                            // Short link created
+                                            Uri shortLink = Objects.requireNonNull(task.getResult()).getShortLink ( );
+                                            Uri flowchartLink = task.getResult ( ).getPreviewLink ( );
+                                            Log.e ( "main ", "substring1 " + shortLink );
+                                            Log.e ( "main ", "substring1 " + flowchartLink );
+
+
+                                            Intent intent = new Intent ( );
+                                            intent.setAction ( Intent.ACTION_SEND );
+
+                                            assert shortLink != null;
+                                            intent.putExtra ( Intent.EXTRA_TEXT, shortLink.toString ( ) );
+                                            intent.putExtra("title","articles");
+                                            intent.setType ( "text/plain" );
+                                            context.startActivity ( intent );
+
+
+                                        } else {
+                                            // Error
+                                            // ...
+                                            Log.e ( "main", " error " + task.getException ( ) );
+
+                                        }
+                                    } );
+
+                            Log.e ( "main ", "short link " + shortLinkTask );
+
                         } catch (Exception e) {
                             e.printStackTrace ( );
 
                         }
 
                     }
+
                 }
             } );
             ((MyViewHolder) holder).articleCommentCount.setOnClickListener ( new View.OnClickListener ( ) {

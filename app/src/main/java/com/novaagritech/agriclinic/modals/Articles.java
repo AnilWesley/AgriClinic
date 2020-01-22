@@ -22,6 +22,9 @@ public class Articles implements Serializable {
     @Expose
     private List<Banners.BannerDetails> blist = new ArrayList<Banners.BannerDetails>();
 
+
+
+
     @SerializedName("message")
     @Expose
     private String message;

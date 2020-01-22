@@ -196,9 +196,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     String channelId = "channel_id";
                     NotificationChannel channel = new NotificationChannel(channelId, json.getString("message"), NotificationManager.IMPORTANCE_DEFAULT);
                     channel.setDescription(json.getString("message"));
+                    assert notificationManager != null;
                     notificationManager.createNotificationChannel(channel);
                     notificationbuilder.setChannelId(channelId);
                 }
+                assert notificationManager != null;
                 notificationManager.notify(0, notificationbuilder.build());
 
             }
@@ -251,9 +253,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     String channelId = "channel_id";
                     NotificationChannel channel = new NotificationChannel(channelId, json.getString("message"), NotificationManager.IMPORTANCE_DEFAULT);
                     channel.setDescription(json.getString("message"));
+                    assert notificationManager != null;
                     notificationManager.createNotificationChannel(channel);
                     notificationbuilder.setChannelId(channelId);
                 }
+                assert notificationManager != null;
                 notificationManager.notify(0, notificationbuilder.build());
 
             }
@@ -307,9 +311,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     String channelId = "channel_id";
                     NotificationChannel channel = new NotificationChannel(channelId, json.getString("message"), NotificationManager.IMPORTANCE_DEFAULT);
                     channel.setDescription(json.getString("message"));
+                    assert notificationManager != null;
                     notificationManager.createNotificationChannel(channel);
                     notificationbuilder.setChannelId(channelId);
                 }
+                assert notificationManager != null;
                 notificationManager.notify(0, notificationbuilder.build());
 
             }
@@ -363,9 +369,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     String channelId = "channel_id";
                     NotificationChannel channel = new NotificationChannel(channelId, json.getString("message"), NotificationManager.IMPORTANCE_DEFAULT);
                     channel.setDescription(json.getString("message"));
+                    assert notificationManager != null;
                     notificationManager.createNotificationChannel(channel);
                     notificationbuilder.setChannelId(channelId);
                 }
+                assert notificationManager != null;
                 notificationManager.notify(0, notificationbuilder.build());
 
             }

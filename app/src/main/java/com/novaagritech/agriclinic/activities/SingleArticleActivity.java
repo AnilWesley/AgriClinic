@@ -221,7 +221,14 @@ public class SingleArticleActivity extends AppCompatActivity {
                                 binding.textDate.setText ( "Published on : " + ConstantValues.getFormattedDate ( MyAppPrefsManager.DD_MMM_YYYY_DATE_FORMAT, articlesDetails.get ( 0 ).getCreated_on ( ) ) );
 
 
-                                binding.textDesc.loadDataWithBaseURL ( null, articlesDetails.get ( 0 ).getDescription ( ) + articlesDetails.get ( 0 ).getDescription2 ( ) + articlesDetails.get ( 0 ).getDescription3 ( ), "text/html; charset=utf-8", "UTF-8", null );
+                                //Font must be placed in assets/fonts folder
+                                String text = "<html><style type='text/css'>@font-face { font-family: Mandali-Regular; src: url('fonts/Mandali-Regular.ttf'); } body p {font-family: Mandali-Regular;}</style>"
+                                        + "<body >" + "<p align=\"justify\" style=\"font-size: 24px; font-family: Mandali-Regular;\">" + articlesDetails.get ( 0 ).getDescription ( ) + articlesDetails.get ( 0 ).getDescription2 ( ) + articlesDetails.get ( 0 ).getDescription3 ( ) + "</p> "+ "</body></html>";
+
+                                binding.textDesc.loadDataWithBaseURL("file:///android_asset/",text,"text/html","utf-8",null);
+
+
+                                //binding.textDesc.loadDataWithBaseURL ( null, articlesDetails.get ( 0 ).getDescription ( ) + articlesDetails.get ( 0 ).getDescription2 ( ) + articlesDetails.get ( 0 ).getDescription3 ( ), "text/html; charset=utf-8", "UTF-8", null );
 
                                 ImageLoader.getInstance ( )
                                         .displayImage ( Urls.IMAGE_URL + articlesDetails.get ( 0 ).getImage_path ( ), binding.textImage, options, new SimpleImageLoadingListener ( ) {
