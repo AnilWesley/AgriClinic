@@ -70,7 +70,7 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
     ProgressDialog pDialog;
     String otp;
 
-    
+    boolean doublePressedBackToExit=false;
    
     String number;
     String otp_Num;
@@ -195,6 +195,11 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
                 }
             }
         });
+
+        binding.resendotp.setOnClickListener(v ->
+                send_otp()
+
+        );
 
         mResultReceiver = new AddressResultReceiver(new Handler());
 
@@ -543,7 +548,7 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
         pDialog.show();
 
         number = binding.editTextNumber.getText().toString().trim();
-
+        name = binding.editTextName.getText().toString().trim();
 
         // prepare call in Retrofit 2.0
         JsonObject jsonObject = new JsonObject();
@@ -598,6 +603,8 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
     public void veriyOtp(View view) {
          otp_Num = binding.editTextOTP.getText().toString().trim();
          password = binding.editTextPasswrd.getText().toString().trim();
+         number = binding.editTextNumber.getText().toString().trim();
+         name = binding.editTextName.getText().toString().trim();
         if (TextUtils.isEmpty(otp_Num)) {
             Toast.makeText(this, "Enter OTP", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(password)) {
@@ -761,6 +768,31 @@ public class RegistrationActivity extends AppCompatActivity implements OtpReceiv
                 binding.editTextNumber.setText(credential.getId());
             }
         }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (doublePressedBackToExit) {
+            super.onBackPressed();
+        }
+        else {
+            this.doublePressedBackToExit = true;
+            Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
+
+            // Delay of 2 seconds
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    // Set doublePressedBackToExit false after 2 seconds
+                    doublePressedBackToExit = false;
+                }
+            }, 2000);
+        }
+
+        // Check if doubleBackToExitPressed is true
 
     }
 }

@@ -1,41 +1,43 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/mSwipeRefreshLayout">
-    <androidx.core.widget.NestedScrollView
-        android:layout_margin="5dp"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="vertical">
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmer_view_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            app:shimmer_duration="1500"
             android:layout_marginTop="40dp"
+            android:orientation="vertical"
             android:visibility="visible"
-            android:orientation="vertical">
+            app:shimmer_duration="1500">
 
             <!-- Adding 7 rows of placeholders -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <include layout="@layout/data_placeholder_layout1" />
+
                 <include layout="@layout/data_placeholder_layout1" />
+
                 <include layout="@layout/data_placeholder_layout1" />
+
                 <include layout="@layout/data_placeholder_layout1" />
+
                 <include layout="@layout/data_placeholder_layout1" />
+
                 <include layout="@layout/data_placeholder_layout1" />
+
                 <include layout="@layout/data_placeholder_layout1" />
+
                 <include layout="@layout/data_placeholder_layout1" />
 
 
@@ -44,42 +46,52 @@
         </com.facebook.shimmer.ShimmerFrameLayout>
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="match_parent"
-            android:textSize="15sp"
-            android:text="@string/schemes"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:drawablePadding="5dp"
-            android:layout_margin="5dp"
-            android:textColor="@color/colorPrimary"
-            android:layout_height="wrap_content"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/quantum_grey"
-            android:layout_margin="5dp"/>
-        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:nestedScrollingEnabled="false"
-            android:id="@+id/articlesSchemes"/>
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/emptyView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="top|center"
-                android:text="@string/no_records"
-                android:visibility="gone" />
+                android:layout_margin="5dp"
+                android:drawablePadding="5dp"
+                android:gravity="center"
+                android:text="@string/schemes"
+                android:textColor="@color/colorPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="5dp"
+                android:background="@color/quantum_grey" />
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/mSwipeRefreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/articlesSchemes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
         </LinearLayout>
 
+
+        <TextView
+            android:id="@+id/emptyView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="@string/no_records"
+            android:visibility="gone" />
+
     </RelativeLayout>
-    </androidx.core.widget.NestedScrollView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 </layout>
