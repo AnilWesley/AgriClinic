@@ -59,7 +59,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 // Pre-Marshmallow
                 LaunchApp();
             }
-        }, 3000);
+        }, 2500);
 
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(task -> {
@@ -240,7 +240,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                     intent.setData(uri);
                     startActivityForResult(intent, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
                     finish();
-                }, 3000);
+                }, 2500);
             }
 
         }

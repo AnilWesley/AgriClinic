@@ -58,7 +58,7 @@ public class SplashScreenActivity1 extends AppCompatActivity {
                 // Pre-Marshmallow
                 LaunchApp();
             }
-        }, 3000);
+        }, 2500);
 
 
 
@@ -225,7 +225,7 @@ public class SplashScreenActivity1 extends AppCompatActivity {
                     intent.setData(uri);
                     startActivityForResult(intent, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
                     finish();
-                }, 3000);
+                }, 2500);
             }
 
         }
